@@ -29,6 +29,7 @@ import com.teamll.expectlauncher.helper.SimpleItemTouchHelperCallback;
 import com.teamll.expectlauncher.others.AppModel;
 import com.teamll.expectlauncher.others.AppsLoader;
 import com.teamll.expectlauncher.others.CustomItemDecoration;
+import com.teamll.expectlauncher.ultilities.Tool;
 
 import java.util.ArrayList;
 
@@ -39,6 +40,17 @@ public class AppDrawerFragment extends Fragment implements AppListAdapterForRecy
     RecyclerView appRecyclerView;
     ItemTouchHelper mItemTouchHelper;
 
+    float statusBarHeight  = 0;
+    float navigationHeight = 0;
+    float oneDp = 0;
+
+    private void setScreenProperties(){
+
+        oneDp = Tool.getOneDps(getActivity());
+        statusBarHeight = Tool.getStatusHeight(getResources());
+        navigationHeight = Tool.getNavigationHeight(getActivity());
+
+    }
 
     @Nullable
     @Override
@@ -47,13 +59,14 @@ public class AppDrawerFragment extends Fragment implements AppListAdapterForRecy
         rootView = inflater.inflate(R.layout.app_list_fragment,container,false);
         appRecyclerView = rootView.findViewById(R.id.appListRecyclerView);
         //  setEmptyText("No Applications");
-
+        setScreenProperties();
         setAdapterForRecyclerView();
         setLayoutManager();
         setDraggable();
 
         return rootView;
     }
+
 
     private void setAdapterForRecyclerView() {
         mAdapter = new AppListAdapterForRecyclerView(activity,null,this);
@@ -63,20 +76,23 @@ public class AppDrawerFragment extends Fragment implements AppListAdapterForRecy
 
     private void setLayoutManager() {
         DisplayMetrics displayMetrics = activity.getResources().getDisplayMetrics();
+        float padding = activity.getResources().getDimension(R.dimen.padding);
+        padding = (statusBarHeight>padding) ? statusBarHeight: padding;
+        padding = (navigationHeight>padding)? navigationHeight : padding;
         float screenWidth = displayMetrics.widthPixels;
         float screenHeight = displayMetrics.heightPixels;
-
+       // appRecyclerView.setPadding((int)padding,(int)padding,(int)padding,(int)padding);
         Resources resources = getResources();
         float appWidth = resources.getDimension(R.dimen.app_width);
         float appHeight = resources.getDimension(R.dimen.app_height);
 
-        float minWidthZone = appWidth*1.2f;
-        float minHeightZone = appHeight*1.1f;
+        float minWidthZone = appWidth*1.4f;
+        float minHeightZone = appHeight*1.35f;
 
         int numberColumn = (int) (screenWidth/minWidthZone);
         int numberRow = (int) (screenHeight/minHeightZone);
-        float widthMargin = (screenWidth - numberColumn*appWidth)/(numberColumn*2);
-        float heightMargin = (screenHeight - numberRow*appHeight)/(numberRow*2);
+        float horizontalMargin = (screenWidth - numberColumn*appWidth)/(numberColumn+1);
+        float verticalMargin = (screenHeight - numberRow*appHeight)/(numberRow+1);
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(activity,numberColumn,GridLayoutManager.VERTICAL,false);
         appRecyclerView.setLayoutManager(gridLayoutManager);
@@ -84,7 +100,7 @@ public class AppDrawerFragment extends Fragment implements AppListAdapterForRecy
        // SnapHelper snapHelper = new LinearSnapHelper();
        // snapHelper.attachToRecyclerView(appRecyclerView);
 
-        CustomItemDecoration itemDecoration = new CustomItemDecoration((int) widthMargin,(int)widthMargin);
+        CustomItemDecoration itemDecoration = new CustomItemDecoration(screenWidth, screenHeight,numberColumn,numberRow,(int) (verticalMargin*0.9f),(int)(horizontalMargin*0.9f));
         appRecyclerView.addItemDecoration(itemDecoration);
     }
 
@@ -99,13 +115,6 @@ public class AppDrawerFragment extends Fragment implements AppListAdapterForRecy
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
         mItemTouchHelper.startDrag(viewHolder);
-    }
-
-    public static int calculateNoOfColumns(Context context, float appWidth) {
-        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
-       // float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        int noOfColumns = (int) (displayMetrics.widthPixels / appWidth);
-        return noOfColumns;
     }
 
     @NonNull

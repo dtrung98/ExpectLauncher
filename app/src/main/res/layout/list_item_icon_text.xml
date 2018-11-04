@@ -13,21 +13,26 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/app_width"
+    android:layout_height="@dimen/app_height"
+    >
+<LinearLayout
     android:orientation="vertical"
     android:layout_width="@dimen/app_width"
     android:layout_height="@dimen/app_height"
+
+    android:layout_gravity="center"
   >
     <ImageView
         android:id="@+id/icon"
-        android:layout_width="@dimen/app_width"
-        android:layout_height="@dimen/app_width"
+        android:layout_width="62dp"
+        android:layout_height="62dp"
 
         android:layout_gravity="center_horizontal"/>
     <TextView android:id="@+id/text"
-        android:layout_gravity="center_horizontal"
         android:layout_width="50dp"
+        android:layout_gravity="center_horizontal"
         android:maxLines="1"
         android:layout_height="20dp"
         android:ellipsize="end"
@@ -39,3 +44,4 @@
         android:shadowRadius="1"
         />
 </LinearLayout>
+</FrameLayout>
