@@ -1,12 +1,17 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeScreen">
-    <fragment
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:name="ch.arnab.simplelauncher.AppsGridFragment"
-            android:id="@+id/apps_grid" />
-
-</RelativeLayout>
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <com.teamll.expectlauncher.views.SeeThroughTranslucentTextView
+        android:id="@+id/app_drawer"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="App Drawer"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:background="#80ffffff"/>
+</android.support.constraint.ConstraintLayout>

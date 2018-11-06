@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 
-public class AppListAdapterForRecyclerView extends RecyclerView.Adapter<AppListAdapterForRecyclerView.ViewHolder> implements ItemTouchHelperAdapter {
+public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.ViewHolder> implements ItemTouchHelperAdapter {
     private Context mContext;
     private List<AppModel> mData = new ArrayList<>();
     private final OnStartDragListener mDragStartListener;
@@ -32,9 +32,10 @@ public class AppListAdapterForRecyclerView extends RecyclerView.Adapter<AppListA
     private ItemClickListener mClickListener;
 
 
-    public AppListAdapterForRecyclerView(Context context, List<AppModel> data, OnStartDragListener dragStartListener) {
+    public AppListAdapter(Context context, List<AppModel> data, OnStartDragListener dragStartListener) {
         mContext = context;
         mDragStartListener = dragStartListener;
+
         if(data!=null)
         this.mData = data;
     }

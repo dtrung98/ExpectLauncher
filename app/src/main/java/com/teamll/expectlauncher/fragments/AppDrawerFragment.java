@@ -2,7 +2,6 @@ package com.teamll.expectlauncher.fragments;
 
 import android.app.Activity;
 import android.app.ActivityOptions;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -12,10 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.LinearSnapHelper;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SnapHelper;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -23,7 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.teamll.expectlauncher.R;
-import com.teamll.expectlauncher.adapters.AppListAdapterForRecyclerView;
+import com.teamll.expectlauncher.adapters.AppListAdapter;
 import com.teamll.expectlauncher.helper.OnStartDragListener;
 import com.teamll.expectlauncher.helper.SimpleItemTouchHelperCallback;
 import com.teamll.expectlauncher.others.AppModel;
@@ -33,11 +29,11 @@ import com.teamll.expectlauncher.ultilities.Tool;
 
 import java.util.ArrayList;
 
-public class AppDrawerFragment extends Fragment implements AppListAdapterForRecyclerView.ItemClickListener, LoaderManager.LoaderCallbacks<ArrayList<AppModel>>, OnStartDragListener {
+public class AppDrawerFragment extends Fragment implements AppListAdapter.ItemClickListener, LoaderManager.LoaderCallbacks<ArrayList<AppModel>>, OnStartDragListener {
     View rootView;
     Activity activity;
-    AppListAdapterForRecyclerView mAdapter;
-    RecyclerView appRecyclerView;
+    AppListAdapter mAdapter;
+    RecyclerView recyclerView;
     ItemTouchHelper mItemTouchHelper;
 
     float statusBarHeight  = 0;
@@ -56,8 +52,8 @@ public class AppDrawerFragment extends Fragment implements AppListAdapterForRecy
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         activity = getActivity();
-        rootView = inflater.inflate(R.layout.app_list_fragment,container,false);
-        appRecyclerView = rootView.findViewById(R.id.appListRecyclerView);
+        rootView = inflater.inflate(R.layout.app_drawer_fragment,container,false);
+        recyclerView = rootView.findViewById(R.id.appListRecyclerView);
         //  setEmptyText("No Applications");
         setScreenProperties();
         setAdapterForRecyclerView();
@@ -69,8 +65,8 @@ public class AppDrawerFragment extends Fragment implements AppListAdapterForRecy
 
 
     private void setAdapterForRecyclerView() {
-        mAdapter = new AppListAdapterForRecyclerView(activity,null,this);
-        appRecyclerView.setAdapter(mAdapter);
+        mAdapter = new AppListAdapter(activity,null,this);
+        recyclerView.setAdapter(mAdapter);
         mAdapter.setClickListener(this);
     }
 
@@ -81,7 +77,7 @@ public class AppDrawerFragment extends Fragment implements AppListAdapterForRecy
         padding = (navigationHeight>padding)? navigationHeight : padding;
         float screenWidth = displayMetrics.widthPixels;
         float screenHeight = displayMetrics.heightPixels;
-       // appRecyclerView.setPadding((int)padding,(int)padding,(int)padding,(int)padding);
+       // recyclerView.setPadding((int)padding,(int)padding,(int)padding,(int)padding);
         Resources resources = getResources();
         float appWidth = resources.getDimension(R.dimen.app_width);
         float appHeight = resources.getDimension(R.dimen.app_height);
@@ -95,13 +91,13 @@ public class AppDrawerFragment extends Fragment implements AppListAdapterForRecy
         float verticalMargin = (screenHeight - numberRow*appHeight)/(numberRow+1);
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(activity,numberColumn,GridLayoutManager.VERTICAL,false);
-        appRecyclerView.setLayoutManager(gridLayoutManager);
+        recyclerView.setLayoutManager(gridLayoutManager);
 
        // SnapHelper snapHelper = new LinearSnapHelper();
-       // snapHelper.attachToRecyclerView(appRecyclerView);
+       // snapHelper.attachToRecyclerView(recyclerView);
 
         CustomItemDecoration itemDecoration = new CustomItemDecoration(screenWidth, screenHeight,numberColumn,numberRow,(int) (verticalMargin*0.9f),(int)(horizontalMargin*0.9f));
-        appRecyclerView.addItemDecoration(itemDecoration);
+        recyclerView.addItemDecoration(itemDecoration);
     }
 
     private void setDraggable() {
@@ -109,7 +105,7 @@ public class AppDrawerFragment extends Fragment implements AppListAdapterForRecy
         getLoaderManager().initLoader(0, null, this);
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
-        mItemTouchHelper.attachToRecyclerView(appRecyclerView);
+        mItemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
     @Override
