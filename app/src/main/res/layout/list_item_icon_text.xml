@@ -26,8 +26,8 @@
   >
     <ImageView
         android:id="@+id/icon"
-        android:layout_width="62dp"
-        android:layout_height="62dp"
+        android:layout_width="@dimen/default_icon_width"
+        android:layout_height="@dimen/default_icon_height"
 
         android:layout_gravity="center_horizontal"/>
     <TextView android:id="@+id/text"

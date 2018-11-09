@@ -3,4 +3,8 @@
     <dimen name="app_width">62dp</dimen>
     <dimen name="app_height">82dp</dimen>
     <dimen name="padding">20dp</dimen>
+    <dimen name="default_icon_width">62dp</dimen>
+    <dimen name="default_icon_height">62dp</dimen>
+    <dimen name="popup_menu_width">40dp</dimen>
+    <dimen name="popup_menu_height">40dp</dimen>
 </resources>

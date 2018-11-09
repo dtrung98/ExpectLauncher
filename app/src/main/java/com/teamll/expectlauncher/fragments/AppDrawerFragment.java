@@ -12,11 +12,16 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.PopupMenu;
 
 import com.teamll.expectlauncher.R;
 import com.teamll.expectlauncher.adapters.AppListAdapter;
@@ -33,8 +38,9 @@ public class AppDrawerFragment extends Fragment implements AppListAdapter.ItemCl
     View rootView;
     Activity activity;
     AppListAdapter mAdapter;
-    RecyclerView recyclerView;
+    public RecyclerView recyclerView;
     ItemTouchHelper mItemTouchHelper;
+    ImageButton popupMenu;
 
     float statusBarHeight  = 0;
     float navigationHeight = 0;
@@ -54,6 +60,7 @@ public class AppDrawerFragment extends Fragment implements AppListAdapter.ItemCl
         activity = getActivity();
         rootView = inflater.inflate(R.layout.app_drawer_fragment,container,false);
         recyclerView = rootView.findViewById(R.id.appListRecyclerView);
+        //popupMenu = rootView.findViewById(R.id.popupMenu);
         //  setEmptyText("No Applications");
         setScreenProperties();
         setAdapterForRecyclerView();

@@ -5,7 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.MainActivity"
-    android:background="@android:color/transparent">
+    android:background="@android:color/transparent"
+    android:fitsSystemWindows="true">
+
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
@@ -17,5 +19,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/container"
+        android:layout_marginTop="50dp"
         />
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbarResizeIcon"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/colorPrimaryDark"
+        android:layout_marginTop="20dp">
+
+    </android.support.v7.widget.Toolbar>
 </FrameLayout>
