@@ -3,4 +3,7 @@
     <dimen name="app_width">62dp</dimen>
     <dimen name="app_height">82dp</dimen>
     <dimen name="padding">20dp</dimen>
+    <dimen name="dock_height">85dp</dimen>
+    <dimen name="dock_margin">10dp</dimen>
+    <dimen name="recyclerview_margin">10dp</dimen>
 </resources>

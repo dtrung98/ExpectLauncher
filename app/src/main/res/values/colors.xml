@@ -3,4 +3,41 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+    <color name= "SurfaceColor">#FFCC00</color>
+    <color name="BackwardColorHeavy">#B0000000</color>
+    <color name="BackwardColor">#A0000000</color>
+    <color name = "Gray">#22000000</color>
+    <color name="NearlyWhite">#44ffffff</color>
+    <color name="FlatRed">#FF3B30</color>
+    <color name="FlatGreen">#4CD964</color>
+    <color name="FlatOrange">#FF9500</color>
+    <color name="FlatYellow">#FFCC00</color>
+    <color name="FlatTealBlue">#5AC8FA</color>
+    <color name="FlatPurple">#5856D6</color>
+    <color name="FlatPink">#FF2D55</color>
+    <color name="FlatBlue">#007AFF</color>
+
+    <color name="HeavyOrange">#AF8700</color>
+    <color name="HeavyRed">#770000</color>
+    <color name="HeavyTealBlue">#0058AA</color>
+    <color name="HeavyYellow">#802D00</color>
+    <color name="HeavyGreen">#005800</color>
+    <color name="HeavyBlue">#00218B</color>
+    <color name="HeavyPurple">#162EA6</color>
+    <color name="HeavyPink">#B60024</color>
+
+    <item name="yellow" type="color">#F7B500</item>
+    <item name="yellow_dark" type="color">#AC7E00</item>
+    <item name="FlatWhite" type="color">#F5F5F5</item>
+    <item name="SplashBackground" type ="color">#fff0f0f0</item>
+    <integer-array name="androidcolors">
+        <item>@color/yellow</item>
+        <item>@color/yellow_dark</item>
+    </integer-array>
+    <color name="selection_border">#ffffff</color>
+    <color name="playback_indicator">#ffff66</color>
+    <color name="grid_line">#6D6D6D</color>
+    <color name="timecode">#000000</color>
+    <color name="timecode_shadow">#aa000000</color>
+    <color name="md_bottom_sheet_text_color">@android:color/black</color>
 </resources>

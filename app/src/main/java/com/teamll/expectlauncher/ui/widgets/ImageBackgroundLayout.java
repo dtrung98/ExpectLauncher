@@ -1,4 +1,4 @@
-package com.teamll.expectlauncher.views;
+package com.teamll.expectlauncher.ui.widgets;
 
 import android.content.Context;
 import android.graphics.Bitmap;

@@ -1,4 +1,4 @@
-package com.teamll.expectlauncher.ultilities;
+package com.teamll.expectlauncher.utils;
 
 import android.app.Activity;
 import android.content.Context;
@@ -24,7 +24,6 @@ import android.renderscript.RenderScript;
 import android.renderscript.ScriptIntrinsicBlur;
 import android.view.View;
 import android.widget.ImageView;
-import android.support.v8.renderscript.*;
 
 /**
  * Created by trung on 7/11/2017.

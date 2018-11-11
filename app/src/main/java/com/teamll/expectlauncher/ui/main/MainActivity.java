@@ -1,9 +1,8 @@
-package com.teamll.expectlauncher.activities;
+package com.teamll.expectlauncher.ui.main;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.WindowManager;
@@ -11,12 +10,12 @@ import android.view.accessibility.AccessibilityEvent;
 import android.widget.ImageView;
 
 import com.teamll.expectlauncher.R;
-import com.teamll.expectlauncher.fragments.AppDrawerFragment;
-import com.teamll.expectlauncher.fragments.MainScreenFragment;
-import com.teamll.expectlauncher.ultilities.Tool;
+import com.teamll.expectlauncher.ui.main.appdrawer.AppDrawerFragment;
+import com.teamll.expectlauncher.ui.main.mainscreen.MainScreenFragment;
+import com.teamll.expectlauncher.utils.Tool;
 
 
-public class MainActivity extends AppCompatActivity implements Tool.WallpaperChangedNotifier {
+public class MainActivity extends AppLoaderActivity implements Tool.WallpaperChangedNotifier {
     @Override
     protected void onResume() {
        super.onResume();
@@ -43,11 +42,10 @@ public class MainActivity extends AppCompatActivity implements Tool.WallpaperCha
 
         imageView = findViewById(R.id.imageView);
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container, new MainScreenFragment())
-                    .commitNow();
+            initScreen();
             getWindow().getDecorView()
                     .sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
+
         }
     }
 
@@ -55,15 +53,9 @@ public class MainActivity extends AppCompatActivity implements Tool.WallpaperCha
     public void onWallpaperChanged(Bitmap original, Bitmap blur) {
         imageView.setImageBitmap(original);
     }
-    private int mode = 0;
     @Override
     public void onBackPressed() {
-        if(mode !=0) {
-        getSupportFragmentManager().beginTransaction()
-            .replace(R.id.container, new MainScreenFragment())
-            .commitNow();
-         mode=1;
-}
+
     }
     @Override
     protected void onNewIntent(Intent intent) {
@@ -73,12 +65,29 @@ public class MainActivity extends AppCompatActivity implements Tool.WallpaperCha
            onBackPressed();
         }
     }
+    private LayoutSwitcher switcher;
+    private MainScreenFragment mainScreenFragment;
+    private AppDrawerFragment appDrawerFragment;
 
-    public void openAppDrawer() {
+    public void initScreen() {
+        mainScreenFragment = new MainScreenFragment();
+        appDrawerFragment = new AppDrawerFragment();
+
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, new AppDrawerFragment())
+                .add(R.id.container,mainScreenFragment )
                 .commitNow();
-        mode = 1;
+
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.container, appDrawerFragment)
+                .commitNow();
+     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(switcher==null)
+            switcher = new LayoutSwitcher(this,mainScreenFragment,appDrawerFragment);
+
     }
 
     @Override

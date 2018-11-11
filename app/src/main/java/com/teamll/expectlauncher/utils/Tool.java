@@ -1,10 +1,11 @@
-package com.teamll.expectlauncher.ultilities;
+package com.teamll.expectlauncher.utils;
 
 import android.app.Activity;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -137,8 +138,6 @@ public class Tool {
         }
     }
 
-
-
     private static int GlobalColor = 0xffff4081;
     private static int SurfaceColor =0xff00dbde;
     public static void setSurfaceColor(int surfaceColor) {
@@ -149,6 +148,7 @@ public class Tool {
      *  A color get in 7 basic color, nearly the global color
      * @return a color which nearly the global color
      */
+    public static boolean WHITE_TEXT_THEME = true;
     public static int getSurfaceColor() {
         return SurfaceColor;
     }
@@ -307,9 +307,11 @@ public class Tool {
     public static int[] getScreenSize(Context context)
     {
         if(!HAD_GOT_SCREEN_SIZE) {
+            Point p = new Point();
             Display d = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay(); // this will get the view of screen
-            int width = d.getWidth();
-            int height = d.getHeight();
+            d.getRealSize(p);
+            int width = p.x;
+            int height = p.y;
             screenSize = new int[] {width,height};
             screenSizeInDp = new float[] {(width+0.0f)/getOneDps(context),(height+0.0f)/getOneDps(context)};
             HAD_GOT_SCREEN_SIZE = true;

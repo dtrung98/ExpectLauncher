@@ -1,11 +1,9 @@
-package com.teamll.expectlauncher.others;
+package com.teamll.expectlauncher.model;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-
-import com.teamll.expectlauncher.others.AppsLoader;
 
 /**
  * Helper class to look for interesting changes to the installed apps

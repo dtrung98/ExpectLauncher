@@ -1,8 +1,6 @@
-package com.teamll.expectlauncher.adapters;
+package com.teamll.expectlauncher.ui.main.appdrawer;
 
-import android.annotation.TargetApi;
-import android.content.Context;
-import android.os.Build;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,57 +11,47 @@ import android.widget.TextView;
 
 
 import com.teamll.expectlauncher.R;
-import com.teamll.expectlauncher.others.AppModel;
-import com.teamll.expectlauncher.helper.ItemTouchHelperAdapter;
-import com.teamll.expectlauncher.helper.ItemTouchHelperViewHolder;
-import com.teamll.expectlauncher.helper.OnStartDragListener;
+import com.teamll.expectlauncher.model.App;
+import com.teamll.expectlauncher.model.AppDetail;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.ItemTouchHelperAdapter;
+import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.ItemTouchHelperViewHolder;
+import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.OnStartDragListener;
+import com.teamll.expectlauncher.utils.Tool;
 
-public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.ViewHolder> implements ItemTouchHelperAdapter {
-    private Context mContext;
-    private List<AppModel> mData = new ArrayList<>();
+public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.ViewHolder> implements ItemTouchHelperAdapter {
+    private ArrayList<AppDetail> mData = new ArrayList<>();
     private final OnStartDragListener mDragStartListener;
 
     private ItemClickListener mClickListener;
 
 
-    public AppListAdapter(Context context, List<AppModel> data, OnStartDragListener dragStartListener) {
-        mContext = context;
+    AppDrawerAdapter(OnStartDragListener dragStartListener) {
         mDragStartListener = dragStartListener;
-
-        if(data!=null)
-        this.mData = data;
     }
-    public void setData(ArrayList<AppModel> data) {
+    public void setData(List<App> data) {
         mData.clear();
-        if (data != null) {
-            addAll(data);
-            notifyDataSetChanged();
+        if (data!=null) {
+            mData.addAll(data);
         }
+        notifyDataSetChanged();
     }
-
-
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public void addAll(Collection<? extends AppModel> items) {
-        //If the platform supports it, use addAll, otherwise add in loop
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-           mData.addAll(items);
-        }else{
-            for(AppModel item: items){
-               mData.addAll(items);
-            }
+    public void addData(List<App> data) {
+        if(data!=null) {
+            int posBefore = mData.size();
+            mData.addAll(data);
+            notifyItemRangeInserted(posBefore,data.size());
         }
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view =LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_icon_text, parent, false);
+        View view =LayoutInflater.from(parent.getContext()).inflate(R.layout.item_app_drawer, parent, false);
         return new ViewHolder(view);
     }
 
@@ -110,9 +98,11 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.ViewHold
                 mClickListener.onItemClick(view,mData.get(pos));
             }
         }
-        void bind(AppModel appModel) {
-            text.setText(appModel.getLabel());
-            icon.setImageDrawable(appModel.getIcon());
+        void bind(AppDetail appDetail) {
+            text.setText(appDetail.getLabel());
+            if(Tool.WHITE_TEXT_THEME) text.setTextColor(Color.WHITE);
+            else text.setTextColor(0xFF444444);
+            icon.setImageDrawable(appDetail.getIcon());
             /*
             icon.setOnTouchListener(new View.OnTouchListener() {
                 @Override
@@ -138,11 +128,11 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.ViewHold
         }
     }
 
-    public void setClickListener(ItemClickListener itemClickListener) {
+    void setClickListener(ItemClickListener itemClickListener) {
         this.mClickListener = itemClickListener;
     }
 
     public interface ItemClickListener {
-        void onItemClick(View view, AppModel appModel);
+        void onItemClick(View view, AppDetail appDetail);
     }
 }

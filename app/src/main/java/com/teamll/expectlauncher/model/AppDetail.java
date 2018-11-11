@@ -1,4 +1,4 @@
-package com.teamll.expectlauncher.others;
+package com.teamll.expectlauncher.model;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -9,7 +9,7 @@ import java.io.File;
 /**
  * @credit http://developer.android.com/reference/android/content/AsyncTaskLoader.html
  */
-public class AppModel {
+public abstract class AppDetail {
 
     private final Context mContext;
     private final ApplicationInfo mInfo;
@@ -20,7 +20,7 @@ public class AppModel {
     private boolean mMounted;
     private final File mApkFile;
 
-    public AppModel(Context context, ApplicationInfo info) {
+    public AppDetail(Context context, ApplicationInfo info) {
         mContext = context;
         mInfo = info;
 

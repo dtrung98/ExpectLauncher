@@ -1,15 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.teamll.expectlauncher.ui.widgets.EventWatchableFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.teamll.expectlauncher.fragments.AppDrawerFragment">
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/appListRecyclerView"
+    tools:context="com.teamll.expectlauncher.ui.main.appdrawer.AppDrawerFragment">
+    <com.teamll.expectlauncher.ui.widgets.DarkenRoundedBackgroundFrameLayout
+        android:id="@+id/parentOfRecycleView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-       />
-</android.support.constraint.ConstraintLayout>
+        android:background="@android:color/transparent"
+        android:layout_margin="@dimen/recyclerview_margin">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="ifContentScrolls"
+            android:scrollbars="vertical"
+            android:fadeScrollbars="true"
+           />
+    </com.teamll.expectlauncher.ui.widgets.DarkenRoundedBackgroundFrameLayout>
+</com.teamll.expectlauncher.ui.widgets.EventWatchableFrameLayout>

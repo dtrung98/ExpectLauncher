@@ -1,4 +1,4 @@
-package com.teamll.expectlauncher.others;
+package com.teamll.expectlauncher.model;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -14,8 +14,8 @@ import java.util.List;
 /**
  * @credit http://developer.android.com/reference/android/content/AsyncTaskLoader.html
  */
-public class AppsLoader extends AsyncTaskLoader<ArrayList<AppModel>> {
-    ArrayList<AppModel> mInstalledApps;
+public class AppsLoader extends AsyncTaskLoader<ArrayList<App>> {
+    ArrayList<App> mInstalledApps;
 
     final PackageManager mPm;
     PackageIntentReceiver mPackageObserver;
@@ -27,7 +27,7 @@ public class AppsLoader extends AsyncTaskLoader<ArrayList<AppModel>> {
     }
 
     @Override
-    public ArrayList<AppModel> loadInBackground() {
+    public ArrayList<App> loadInBackground() {
         // retrieve the list of installed applications
         List<ApplicationInfo> apps = mPm.getInstalledApplications(0);
 
@@ -38,13 +38,13 @@ public class AppsLoader extends AsyncTaskLoader<ArrayList<AppModel>> {
         final Context context = getContext();
 
         // create corresponding apps and load their labels
-        ArrayList<AppModel> items = new ArrayList<AppModel>(apps.size());
+        ArrayList<App> items = new ArrayList<App>(apps.size());
         for (int i = 0; i < apps.size(); i++) {
             String pkg = apps.get(i).packageName;
 
             // only apps which are launchable
             if (context.getPackageManager().getLaunchIntentForPackage(pkg) != null) {
-                AppModel app = new AppModel(context, apps.get(i));
+                App app = new App(context, apps.get(i));
                 app.loadLabel(context);
                 items.add(app);
             }
@@ -57,7 +57,7 @@ public class AppsLoader extends AsyncTaskLoader<ArrayList<AppModel>> {
     }
 
     @Override
-    public void deliverResult(ArrayList<AppModel> apps) {
+    public void deliverResult(ArrayList<App> apps) {
         if (isReset()) {
             // An async query came in while the loader is stopped.  We
             // don't need the result.
@@ -66,7 +66,7 @@ public class AppsLoader extends AsyncTaskLoader<ArrayList<AppModel>> {
             }
         }
 
-        ArrayList<AppModel> oldApps = apps;
+        ArrayList<App> oldApps = apps;
         mInstalledApps = apps;
 
         if (isStarted()) {
@@ -110,7 +110,7 @@ public class AppsLoader extends AsyncTaskLoader<ArrayList<AppModel>> {
     }
 
     @Override
-    public void onCanceled(ArrayList<AppModel> apps) {
+    public void onCanceled(ArrayList<App> apps) {
         super.onCanceled(apps);
 
         // At this point we can release the resources associated with 'apps'
@@ -143,7 +143,7 @@ public class AppsLoader extends AsyncTaskLoader<ArrayList<AppModel>> {
      *
      * @param apps
      */
-    protected void onReleaseResources(ArrayList<AppModel> apps) {
+    protected void onReleaseResources(ArrayList<App> apps) {
         // do nothing
     }
 
@@ -151,10 +151,10 @@ public class AppsLoader extends AsyncTaskLoader<ArrayList<AppModel>> {
     /**
      * Perform alphabetical comparison of application entry objects.
      */
-    public static final Comparator<AppModel> ALPHA_COMPARATOR = new Comparator<AppModel>() {
+    public static final Comparator<App> ALPHA_COMPARATOR = new Comparator<App>() {
         private final Collator sCollator = Collator.getInstance();
         @Override
-        public int compare(AppModel object1, AppModel object2) {
+        public int compare(App object1, App object2) {
             return sCollator.compare(object1.getLabel(), object2.getLabel());
         }
     };

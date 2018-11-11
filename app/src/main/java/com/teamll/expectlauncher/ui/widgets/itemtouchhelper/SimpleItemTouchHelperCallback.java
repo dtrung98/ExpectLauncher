@@ -1,4 +1,4 @@
-package com.teamll.expectlauncher.helper;
+package com.teamll.expectlauncher.ui.widgets.itemtouchhelper;
 
 /*
  * Copyright (C) 2015 Paul Burke

@@ -1,0 +1,25 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <com.teamll.expectlauncher.ui.widgets.DarkenRoundedBackgroundFrameLayout
+        android:id="@+id/dock"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dock_height"
+        android:layout_margin="@dimen/dock_margin"
+        android:background="@android:color/transparent"
+        >
+
+
+    </com.teamll.expectlauncher.ui.widgets.DarkenRoundedBackgroundFrameLayout>
+    <ImageView
+        android:id="@+id/toggleButton"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:src="@drawable/up"
+        android:scaleType="centerInside"
+        android:padding="15dp"
+        android:layout_gravity="center_horizontal"
+        android:alpha="0.7"/>
+</FrameLayout>
