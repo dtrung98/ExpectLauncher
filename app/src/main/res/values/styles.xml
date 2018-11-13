@@ -14,4 +14,14 @@
         <item name="android:navigationBarColor" tools:targetApi="lollipop">#00ffffff</item>
         <item name="android:colorPrimaryDark" tools:targetApi="lollipop">#00ffffff</item>
     </style>
+    <style name="BottomSheet" parent="@style/Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/rounded_bottom_sheet_drawable</item>
+    </style>
+
+    <style name="BaseBottomSheetDialog" parent="@style/Theme.Design.Light.BottomSheetDialog">
+
+        <item name="bottomSheetStyle">@style/BottomSheet</item>
+    </style>
+
+    <style name="BottomSheetDialogTheme" parent="BaseBottomSheetDialog" />
 </resources>
