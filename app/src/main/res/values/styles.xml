@@ -19,8 +19,10 @@
     </style>
 
     <style name="BaseBottomSheetDialog" parent="@style/Theme.Design.Light.BottomSheetDialog">
-
+        <!--item name="android:windowIsFloating">false</item-->
         <item name="bottomSheetStyle">@style/BottomSheet</item>
+        <item name="android:backgroundDimEnabled">true</item>
+
     </style>
 
     <style name="BottomSheetDialogTheme" parent="BaseBottomSheetDialog" />

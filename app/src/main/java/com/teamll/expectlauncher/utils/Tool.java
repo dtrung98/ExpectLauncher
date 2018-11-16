@@ -5,7 +5,11 @@ import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Point;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -20,6 +24,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.teamll.expectlauncher.model.Rectangle;
+
 import java.io.File;
 import java.util.ArrayList;
 
@@ -31,6 +37,7 @@ public class Tool {
     public static void Init(Context context) {
         if(tool==null) tool = new Tool();
         tool.context = context;
+        Tool.getScreenSize(context);
         tool.resumeWallpaperTracking();
     }
     public static Tool getInstance() {
@@ -53,13 +60,42 @@ public class Tool {
     {
         final WallpaperManager wallpaperManager = WallpaperManager.getInstance(context);
         final Drawable wallpaperDrawable = wallpaperManager.getDrawable();
+
         Bitmap bmp = ((BitmapDrawable)wallpaperDrawable).getBitmap();
         if(bmp.getWidth()>0) return bmp.copy(bmp.getConfig(),true);
         return Bitmap.createBitmap(150,150, Bitmap.Config.ARGB_8888);
     }
 
     private Bitmap blurWallBitmap() {
-        return BitmapEditor.getBlurredWithGoodPerformance(context,originalWallPaper,1,12,1.4f);
+        return BitmapEditor.getBlurredWithGoodPerformance(context,originalWallPaper,1,12,1.6f);
+    }
+    private Bitmap getCropCenterScreenBitmap(Bitmap source_bitmap) {
+        Rectangle rect_parent_in_bitmap = new Rectangle();
+        float parentWidth = screenSize[0];
+        float parentHeight = screenSize[1];
+        float ratio_parent =  parentWidth/(parentHeight +0.0f);
+        float ratio_source = source_bitmap.getWidth()/(source_bitmap.getHeight() +0.0f);
+
+        if(ratio_parent> ratio_source) {
+            // crop height of source
+            rect_parent_in_bitmap.Width = source_bitmap.getWidth();
+            rect_parent_in_bitmap.Height = (int) (rect_parent_in_bitmap.Width*parentHeight/parentWidth);
+
+            rect_parent_in_bitmap.Left = 0;
+            rect_parent_in_bitmap.Top = source_bitmap.getHeight()/2 - rect_parent_in_bitmap.Height/2;
+        } else {
+            // crop width of source
+            // mean that
+            rect_parent_in_bitmap.Height = source_bitmap.getHeight();
+            rect_parent_in_bitmap.Width = (int) (rect_parent_in_bitmap.Height*parentWidth/parentHeight);
+
+            rect_parent_in_bitmap.Top = 0;
+            rect_parent_in_bitmap.Left = source_bitmap.getWidth()/2 - rect_parent_in_bitmap.Width/2;
+        }
+        Bitmap ret = Bitmap.createBitmap((int)parentWidth, (int) parentHeight,Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(ret);
+        canvas.drawBitmap(source_bitmap,rect_parent_in_bitmap.getRectGraphic(),new Rect(0,0,screenSize[0],screenSize[1]),null);
+        return ret;
     }
     private boolean status = false;
     public void stopWallpaperTracking() {
@@ -68,7 +104,13 @@ public class Tool {
             mHandler.removeCallbacks(mHandlerTask);
         }
     }
+    boolean first_run = true;
+    public void startWallpaperTracking() {
+        first_run = false;
+        resumeWallpaperTracking();
+    }
     public void resumeWallpaperTracking() {
+        if(first_run) return;
         if(!status) {
             status = true;
             mHandlerTask.run();
@@ -124,15 +166,15 @@ public class Tool {
 
             // nếu ảnh gốc chưa được load lần đầu
             if(origin ==null) {
-                tool.originalWallPaper = tool.getActiveWallPaper();
-                tool.blurWallPaper = tool.blurWallBitmap();
+                tool.originalWallPaper = tool.getCropCenterScreenBitmap(tool.getActiveWallPaper());
+                tool.blurWallPaper = tool.getCropCenterScreenBitmap(tool.blurWallBitmap());
                 return true;
             }
             // ngược lại ta so sánh ảnh mới và ảnh gốc
-            Bitmap newOrigin = tool.getActiveWallPaper();
+            Bitmap newOrigin = tool.getCropCenterScreenBitmap(tool.getActiveWallPaper());
             if(!origin.sameAs(newOrigin)) {
                 tool.originalWallPaper = newOrigin;
-                tool.blurWallPaper = tool.blurWallBitmap();
+                tool.blurWallPaper = tool.getCropCenterScreenBitmap(tool.blurWallBitmap());
                 return true;
             } else return false;
         }

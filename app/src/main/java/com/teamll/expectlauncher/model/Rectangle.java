@@ -1,5 +1,8 @@
 package com.teamll.expectlauncher.model;
 
+import android.graphics.Rect;
+import android.graphics.RectF;
+
 public class Rectangle {
     public int Left;
     public int Top;
@@ -63,5 +66,17 @@ public class Rectangle {
     public void setPosition(int left, int top) {
         Left = left;
         Top = top;
+    }
+    public static RectF getRectGraphicF(Rectangle rect) {
+        return new RectF(rect.Left,rect.Top,rect.Left+rect.Width,rect.Top+rect.Height);
+    }
+    public static Rect getRectGraphic(Rectangle rect) {
+        return new Rect(rect.Left,rect.Top,rect.Left+rect.Width,rect.Top+rect.Height);
+    }
+    public RectF getRectGraphicF() {
+        return new RectF(Left,Top,Left+Width,Top+Height);
+    }
+    public Rect getRectGraphic() {
+        return new Rect(Left,Top,Left+Width,Top + Height);
     }
 }

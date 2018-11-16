@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.teamll.expectlauncher.R;
 import com.teamll.expectlauncher.model.Rectangle;
 import com.teamll.expectlauncher.ui.main.appdrawer.AppDrawerFragment;
+import com.teamll.expectlauncher.ui.main.bottomsheet.RoundedBottomSheetDialogFragment;
 import com.teamll.expectlauncher.ui.main.mainscreen.MainScreenFragment;
 import com.teamll.expectlauncher.ui.widgets.SwipeDetectorGestureListener;
 import com.teamll.expectlauncher.utils.Animation;
@@ -77,6 +78,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
                             motionUp();
                             return true;
                         }
+
                         return true;
                 }
                 return true;
@@ -102,15 +104,16 @@ public class LayoutSwitcher implements View.OnTouchListener {
        if(v.getId() ==recyclerView.getId()) {
           return onTouchRecyclerView(v,event);
        } else if(v.getId() == container.getId()) {
+           if(event.getAction()==MotionEvent.ACTION_UP) mainScreen.onUp();
          return _onTouch(v,event);
        }
        return false;
     }
-    private enum MODE {
+    public enum MODE {
         IN_MAIN_SCREEN,
         IN_APP_DRAWER
     }
-    private MODE mode = MODE.IN_APP_DRAWER;
+    private MODE mode = MODE.IN_MAIN_SCREEN;
 
     void controlPos(int id,int pos) {
         Log.d(TAG, "controlPos");
@@ -123,16 +126,16 @@ public class LayoutSwitcher implements View.OnTouchListener {
             appDrawerParams.topMargin = rect.Height + pos  ;
             int tgPos = appDrawerParams.topMargin- toggleParams.height + recyclerMarginTop;
             toggleParams.topMargin = (tgPos> toggleOriginalY) ? toggleOriginalY : tgPos;
-
         }
         appDrawerRootView.requestLayout();
+        appDrawer.recyclerParent.invalidate();
         toggle.requestLayout();
         if(appDrawerParams.topMargin<=0) mode =MODE.IN_APP_DRAWER;
         else if(appDrawerParams.topMargin>=appDrawerParams.height) mode = MODE.IN_MAIN_SCREEN;
         runControlEffect();
 
     }
-
+    private float max_value = 0.65f;
     private boolean inEffectMode = false;
     private void runControlEffect() {
         Log.d(TAG, "runControlEffect: mode ="+ mode);
@@ -146,7 +149,14 @@ public class LayoutSwitcher implements View.OnTouchListener {
                public void onAnimationUpdate(ValueAnimator animation) {
                   float value = (float) animation.getAnimatedValue();
                    appDrawer.recyclerParent.setRoundNumber(0.5f + value*(1.75f-0.5f),true);
-                   appDrawer.recyclerParent.setAlphaBackground(value);
+
+                   float alpha_blur = value/max_value;
+                   if(alpha_blur>1) alpha_blur = 1;
+                   appDrawer.recyclerParent.setAlphaBlurPaint(alpha_blur,false);
+                   appDrawer.recyclerParent.setAlphaBackground(value*max_value);
+                   mainScreen.widgetContainer.setAlpha(value);
+
+                   toggle.setAlpha(value);
                    if(value>=0.5f) {
                        Tool.WHITE_TEXT_THEME = false;
                        appDrawer.mAdapter.notifyDataSetChanged();
@@ -163,7 +173,13 @@ public class LayoutSwitcher implements View.OnTouchListener {
                public void onAnimationUpdate(ValueAnimator animation) {
                    float value = (float) animation.getAnimatedValue();
                    appDrawer.recyclerParent.setRoundNumber(0.5f + value*(1.75f-0.5f),true);
-                   appDrawer.recyclerParent.setAlphaBackground(value);
+
+                   float alpha_blur = value/max_value;
+                   if(alpha_blur>1) alpha_blur = 1;
+                   appDrawer.recyclerParent.setAlphaBlurPaint(alpha_blur,false);
+                   appDrawer.recyclerParent.setAlphaBackground(max_value*value);
+                   mainScreen.widgetContainer.setAlpha(value);
+                   toggle.setAlpha(value);
                    if(value<=0.5f) {
                        Tool.WHITE_TEXT_THEME = true;
                        appDrawer.mAdapter.notifyDataSetChanged();
@@ -172,6 +188,11 @@ public class LayoutSwitcher implements View.OnTouchListener {
            });
            va.start();
        }
+    }
+    public void onBackPressed() {
+        if(mode==MODE.IN_APP_DRAWER) {
+            motionDown();
+        }
     }
 
     private float yWhenOnTop = -1;
@@ -201,11 +222,12 @@ public class LayoutSwitcher implements View.OnTouchListener {
         public boolean onUp(MotionEvent e) {
 
             Log.d(TAG, "onUp");
-           if(id==R.id.container) {
+           if(id==R.id.container&&mode==MODE.IN_MAIN_SCREEN) {
+
                if (onMoveUp() && appDrawerParams.topMargin <= 1 / 2.0f * rect.Height)
                    motionUp();
                else motionDown();
-           } else {
+           } else if(id ==R.id.recyclerview&&mode==MODE.IN_APP_DRAWER){
                Log.d(TAG, " onMoveDown =  "+onMoveDown());
                if((onMoveDown())&&appDrawerParams.topMargin>=1/4.0f*rect.Height) {
                    Log.d(TAG, "onUp: recycler should move down");
@@ -256,6 +278,19 @@ public class LayoutSwitcher implements View.OnTouchListener {
                return true;
            }
 
+        }
+
+        @Override
+        public void onLongPress(MotionEvent e) {
+          // mainScreen.selectWidget();
+
+           RoundedBottomSheetDialogFragment fragment =  RoundedBottomSheetDialogFragment.newInstance(mode);
+           if(mode ==MODE.IN_MAIN_SCREEN)
+           fragment.setListener(mainScreen);
+           else
+               fragment.setListener(appDrawer);
+           fragment.show(appDrawer.getActivity().getSupportFragmentManager(),
+                    "song_popup_menu");
         }
 
         @Override

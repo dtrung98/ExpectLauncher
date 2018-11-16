@@ -101,7 +101,7 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
         void bind(AppDetail appDetail) {
             text.setText(appDetail.getLabel());
             if(Tool.WHITE_TEXT_THEME) text.setTextColor(Color.WHITE);
-            else text.setTextColor(0xFF444444);
+            else text.setTextColor(0xFF333333);
             icon.setImageDrawable(appDetail.getIcon());
             /*
             icon.setOnTouchListener(new View.OnTouchListener() {

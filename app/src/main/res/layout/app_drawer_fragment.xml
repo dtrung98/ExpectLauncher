@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.teamll.expectlauncher.ui.main.appdrawer.AppDrawerFragment">
-    <com.teamll.expectlauncher.ui.widgets.DarkenRoundedBackgroundFrameLayout
+    <com.teamll.expectlauncher.ui.widgets.MotionRoundedBitmapFrameLayout
         android:id="@+id/parentOfRecycleView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -19,5 +19,5 @@
             android:scrollbars="vertical"
             android:fadeScrollbars="true"
            />
-    </com.teamll.expectlauncher.ui.widgets.DarkenRoundedBackgroundFrameLayout>
+    </com.teamll.expectlauncher.ui.widgets.MotionRoundedBitmapFrameLayout>
 </com.teamll.expectlauncher.ui.widgets.EventWatchableFrameLayout>

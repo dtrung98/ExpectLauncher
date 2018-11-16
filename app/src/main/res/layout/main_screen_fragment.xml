@@ -3,16 +3,55 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <com.teamll.expectlauncher.ui.widgets.DarkenRoundedBackgroundFrameLayout
+    <ScrollView
+    android:id="@+id/scrollview"
+    android:layout_width="match_parent"
+    android:layout_height="370dp">
+    <LinearLayout
+        android:id="@+id/widget_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"/>
+    </ScrollView>
+    <com.teamll.expectlauncher.ui.widgets.MotionRoundedBitmapFrameLayout
         android:id="@+id/dock"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dock_height"
         android:layout_margin="@dimen/dock_margin"
-        android:background="@android:color/transparent"
-        >
 
-
-    </com.teamll.expectlauncher.ui.widgets.DarkenRoundedBackgroundFrameLayout>
+        android:background="@android:color/transparent">
+        <LinearLayout
+            android:id="@+id/appDockLinear"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="4">
+            <ImageView
+                android:id="@+id/dockApp1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:padding="15dp"/>
+            <ImageView
+                android:id="@+id/dockApp2"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:padding="15dp"/>
+            <ImageView
+                android:id="@+id/dockApp3"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:padding="15dp"/>
+            <ImageView
+                android:id="@+id/dockApp4"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:padding="15dp"/>
+        </LinearLayout>
+    </com.teamll.expectlauncher.ui.widgets.MotionRoundedBitmapFrameLayout>
     <ImageView
         android:id="@+id/toggleButton"
         android:layout_width="match_parent"
@@ -21,5 +60,7 @@
         android:scaleType="centerInside"
         android:padding="15dp"
         android:layout_gravity="center_horizontal"
-        android:alpha="0.7"/>
+        android:alpha="0.7"
+
+        />
 </FrameLayout>

@@ -29,8 +29,10 @@ import com.teamll.expectlauncher.model.App;
 import com.teamll.expectlauncher.model.Rectangle;
 import com.teamll.expectlauncher.ui.main.AppLoaderActivity;
 import com.teamll.expectlauncher.ui.main.LayoutSwitcher;
+import com.teamll.expectlauncher.ui.main.bottomsheet.RoundedBottomSheetDialogFragment;
 import com.teamll.expectlauncher.ui.widgets.DarkenRoundedBackgroundFrameLayout;
 import com.teamll.expectlauncher.ui.widgets.EventWatchableFrameLayout;
+import com.teamll.expectlauncher.ui.widgets.MotionRoundedBitmapFrameLayout;
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.OnStartDragListener;
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.SimpleItemTouchHelperCallback;
 import com.teamll.expectlauncher.model.AppDetail;
@@ -40,7 +42,7 @@ import com.teamll.expectlauncher.utils.Tool;
 
 import java.util.ArrayList;
 
-public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.ItemClickListener, OnStartDragListener, AppLoaderActivity.AppDetailReceiver, LayoutSwitcher.EventSender {
+public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.ItemClickListener, OnStartDragListener, AppLoaderActivity.AppDetailReceiver, LayoutSwitcher.EventSender, RoundedBottomSheetDialogFragment.BottomSheetListener {
     private static final String TAG="AppDrawerFragment";
 
     /**
@@ -60,7 +62,7 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
     public AppDrawerAdapter mAdapter;
 
     RecyclerView recyclerView;
-    public DarkenRoundedBackgroundFrameLayout recyclerParent;
+    public MotionRoundedBitmapFrameLayout recyclerParent;
     /*
     ViewGroup chứa fragment hiện tại
      */
@@ -118,6 +120,7 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
         recyclerParent.requestLayout();
         recyclerParent.setBackGroundColor(0xFFEEEEEE);
         recyclerParent.setRoundNumber(1.75f,true);
+        Tool.getInstance().AddWallpaperChangedNotifier((Tool.WallpaperChangedNotifier) recyclerParent);
 
         recyclerView = recyclerParent.findViewById(R.id.recyclerview);
 
@@ -202,16 +205,7 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
     }
 
     void openApp(View v, AppDetail appDetail) {
-        if (appDetail != null) {
-            Intent intent =activity.getPackageManager().getLaunchIntentForPackage(appDetail.getApplicationPackageName());
-            if (intent != null) {
-                int left = 0, top = 0;
-                int width = v.getMeasuredWidth(), height = v.getMeasuredHeight();
-                ActivityOptions options = ActivityOptions.makeScaleUpAnimation(v,left,top,width,height);
-                activity.startActivity(intent, options.toBundle());
-                // getActivity().overridePendingTransition(R.anim.zoom_in,R.anim.zoom_out);
-            }
-        }
+        ((AppLoaderActivity)getActivity()).openApp(v,appDetail);
     }
 
 
@@ -234,5 +228,10 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
     @Override
     public View getEventSenderView() {
         return recyclerView;
+    }
+
+    @Override
+    public boolean onClickButtonInsideBottomSheet(int id) {
+        return false;
     }
 }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="BaseBottomSheetDialog" parent="@style/Theme.Design.Light.BottomSheetDialog">
+        <!--item name="android:windowIsFloating">false</item-->
+        <item name="android:navigationBarColor">@android:color/black</item>
+        <item name="bottomSheetStyle">@style/BottomSheet</item>
+    </style>
+</resources>

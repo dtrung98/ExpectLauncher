@@ -1,9 +1,15 @@
 package com.teamll.expectlauncher.ui.main;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
@@ -16,6 +22,9 @@ import com.teamll.expectlauncher.utils.Tool;
 
 
 public class MainActivity extends AppLoaderActivity implements Tool.WallpaperChangedNotifier {
+    private static final String TAG="MainActivity";
+
+    private static final int MY_PERMISSIONS_READ_STORAGE = 1;
     @Override
     protected void onResume() {
        super.onResume();
@@ -32,21 +41,25 @@ public class MainActivity extends AppLoaderActivity implements Tool.WallpaperCha
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+       setContentView(R.layout.main_activity);
         Tool.Init(this);
         Tool tool = Tool.getInstance();
         tool.AddWallpaperChangedNotifier(this);
-        setContentView(R.layout.main_activity);
+
         // FullScreen
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
         imageView = findViewById(R.id.imageView);
-        if (savedInstanceState == null) {
-            initScreen();
-            getWindow().getDecorView()
-                    .sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
 
-        }
+        initScreen();
+
+        if(savedInstanceState!=null)
+        getWindow().getDecorView()
+                .sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
+
+        GetPermission();
+
     }
 
     @Override
@@ -55,7 +68,7 @@ public class MainActivity extends AppLoaderActivity implements Tool.WallpaperCha
     }
     @Override
     public void onBackPressed() {
-
+        if(switcher!=null) switcher.onBackPressed();
     }
     @Override
     protected void onNewIntent(Intent intent) {
@@ -118,5 +131,54 @@ public class MainActivity extends AppLoaderActivity implements Tool.WallpaperCha
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         return (event.getKeyCode() == KeyEvent.KEYCODE_HOME) || super.dispatchKeyEvent(event);
+    }
+
+    private void GetPermission() {
+        // Here, thisActivity is the current activity
+        if (Build.VERSION.SDK_INT >= 27&&ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE
+                }, MY_PERMISSIONS_READ_STORAGE);
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+            } else {
+
+                // No explanation needed, we can request the permission.
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{
+                                android.Manifest.permission.READ_EXTERNAL_STORAGE
+                        },
+                        MY_PERMISSIONS_READ_STORAGE);
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        } else doStuff();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResult) {
+        //   Log.d("Permission Order","Reply Permission'");
+        switch (requestCode) {
+            case MY_PERMISSIONS_READ_STORAGE: {
+                if (grantResult.length > 0 && grantResult[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                        // Granted
+                        doStuff();
+                    } else finish();
+                }
+            }
+            return;
+        }
+    }
+    private void doStuff() {
+        Log.d(TAG, "doStuff: ");
+        Tool.getInstance().startWallpaperTracking();
     }
 }

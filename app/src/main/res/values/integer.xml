@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="APPWIDGET_HOST_ID" >1201</integer>
+    <integer name="REQUEST_CREATE_APPWIDGET">1202</integer>
+    <integer name="REQUEST_PICK_APPWIDGET">1203</integer>
+</resources>

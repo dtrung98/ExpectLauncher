@@ -1,0 +1,97 @@
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginBottom="@dimen/dp_8"
+    android:layout_marginTop="@dimen/dp_8">
+    <ImageView
+        android:id="@+id/toggleButton"
+        android:layout_width="35dp"
+        android:layout_height="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/slide_up_down_icon_drawable"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/add_widget"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_marginTop="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:scaleType="center"
+        android:src="@drawable/plus"
+        app:backgroundTint="#FBFFBD"
+        app:fabCustomSize="75dp"
+        app:layout_constraintEnd_toStartOf="@+id/choose_wallpaper"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toggleButton" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/choose_wallpaper"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_marginTop="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:scaleType="center"
+        android:src="@drawable/picture"
+        app:backgroundTint="#FBFFBD"
+        app:fabCustomSize="75dp"
+        app:layout_constraintEnd_toStartOf="@id/wallpaper_editor"
+        app:layout_constraintStart_toEndOf="@id/add_widget"
+        app:layout_constraintTop_toBottomOf="@id/toggleButton" />
+    <android.support.design.widget.FloatingActionButton
+        android:layout_marginTop="16dp"
+        android:id="@+id/wallpaper_editor"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/choose_wallpaper"
+        app:layout_constraintTop_toBottomOf="@id/toggleButton"
+        android:src="@drawable/editor"
+        app:fabCustomSize="75dp"
+        android:scaleType="center"
+        app:backgroundTint="#FBFFBD"
+        android:clickable="true"
+        android:focusable="true"
+        />
+
+    <TextView
+        android:id="@+id/add_widget_text"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:text="App Size"
+        android:textColor="#444"
+        app:layout_constraintEnd_toStartOf="@id/choose_wallpaper"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/add_widget" />
+
+    <TextView
+        android:id="@+id/wallpaper_text"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:text="Position"
+        android:textColor="#444"
+        app:layout_constraintEnd_toStartOf="@+id/wallpaper_editor"
+        app:layout_constraintStart_toEndOf="@id/add_widget"
+        app:layout_constraintTop_toBottomOf="@id/choose_wallpaper" />
+
+    <TextView
+        android:id="@+id/editor"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:text="App Icon Editor"
+        android:textColor="#444"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/choose_wallpaper"
+        app:layout_constraintTop_toBottomOf="@id/wallpaper_editor" />
+
+</android.support.constraint.ConstraintLayout>
