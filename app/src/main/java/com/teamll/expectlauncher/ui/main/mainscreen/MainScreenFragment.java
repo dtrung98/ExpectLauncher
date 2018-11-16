@@ -2,6 +2,7 @@ package com.teamll.expectlauncher.ui.main.mainscreen;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -11,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,12 +24,13 @@ import com.teamll.expectlauncher.model.Rectangle;
 import com.teamll.expectlauncher.ui.main.AppLoaderActivity;
 import com.teamll.expectlauncher.ui.main.LayoutSwitcher;
 import com.teamll.expectlauncher.ui.main.MainActivity;
+import com.teamll.expectlauncher.ui.main.bottomsheet.RoundedBottomSheetDialogFragment;
 import com.teamll.expectlauncher.ui.widgets.MotionRoundedBitmapFrameLayout;
 import com.teamll.expectlauncher.utils.Tool;
 
 import java.util.ArrayList;
 
-public class MainScreenFragment extends AppWidgetHostFragment implements View.OnTouchListener, View.OnClickListener, LayoutSwitcher.EventSender,AppLoaderActivity.AppDetailReceiver {
+public class MainScreenFragment extends AppWidgetHostFragment implements View.OnTouchListener, View.OnClickListener, LayoutSwitcher.EventSender,AppLoaderActivity.AppDetailReceiver, RoundedBottomSheetDialogFragment.BottomSheetListener {
     private static final String TAG="MainScreenFragment";
 
     private long savedTime;
@@ -71,13 +75,43 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.main_screen_fragment,container,false);
     }
+    ScrollView scrollView;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view,savedInstanceState);
         mRootView = view;
     dock = view.findViewById(R.id.dock);
+    scrollView = view.findViewById(R.id.scrollview);
+    scrollView.setOnTouchListener(new View.OnTouchListener() {
+        long saved;
+        float savedPosX;
+        float savedPosY;
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    saved = System.currentTimeMillis();
+                    savedPosY = event.getRawY();
+                    savedPosX = event.getRawX();
 
+                    break;
+                case MotionEvent.ACTION_UP :
+                    if(System.currentTimeMillis() - saved>=300&&
+                            Math.sqrt(
+                                    (savedPosX-event.getRawX())*(savedPosX - event.getRawX())+
+                                    (savedPosY-event.getRawY())*(savedPosY-event.getRawY()))<=100)
+                    {
+                        RoundedBottomSheetDialogFragment fragment =  RoundedBottomSheetDialogFragment.newInstance(LayoutSwitcher.MODE.IN_MAIN_SCREEN);
+                         fragment.setListener(MainScreenFragment.this);
+                        fragment.show(getActivity().getSupportFragmentManager(),
+                                "song_popup_menu");
+                    }
+                    break;
+            }
+            return v.onTouchEvent(event);
+        }
+    });
     dockApp[0] =dock.findViewById(R.id.dockApp1);
     dockApp[1] =dock.findViewById(R.id.dockApp2);
     dockApp[2] =dock.findViewById(R.id.dockApp3);
@@ -99,6 +133,12 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
     toggleParams = (FrameLayout.LayoutParams) toggle.getLayoutParams();
     toggleParams.topMargin = dockParams.topMargin - toggleParams.height;
     toggle.requestLayout();
+
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) scrollView.getLayoutParams();
+        params.topMargin = (int) (statusBarHeight + params.topMargin);
+        params.height =  toggleParams.topMargin - params.topMargin - params.bottomMargin;
+        params.bottomMargin = 0;
+        scrollView.requestLayout();
     Tool.getInstance().AddWallpaperChangedNotifier(dock);
         AppLoaderActivity ac = (AppLoaderActivity)getActivity();
         if(ac!=null)
@@ -176,5 +216,18 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
 
     @Override
     public void onLoadReset() {
+    }
+
+    @Override
+    public boolean onClickButtonInsideBottomSheet(int id) {
+        switch (id) {
+            case R.id.add_widget:selectWidget(); break;
+            case R.id.choose_wallpaper:
+                //TODO: call replace wallpaper function;
+                break;
+            case R.id.wallpaper_editor:
+                break;
+        }
+        return true;
     }
 }
