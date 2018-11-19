@@ -21,7 +21,7 @@
     public void onLoadReset() {
     }
 ```
-### Bước 3 :gọi hàm đăng ký lắng nghe vào cuối phương thức onViewCreated() 
+### Bước 3 : Gọi hàm đăng ký lắng nghe vào cuối phương thức onViewCreated() 
 ```
  @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
