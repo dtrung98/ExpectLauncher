@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -12,10 +13,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.teamll.expectlauncher.R;
 import com.teamll.expectlauncher.model.Rectangle;
+import com.teamll.expectlauncher.ui.main.appdrawer.AppDrawerAdapter;
 import com.teamll.expectlauncher.ui.main.appdrawer.AppDrawerFragment;
 import com.teamll.expectlauncher.ui.main.bottomsheet.RoundedBottomSheetDialogFragment;
 import com.teamll.expectlauncher.ui.main.mainscreen.MainScreenFragment;
@@ -52,7 +53,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
         rect = new Rectangle();
         rect.setSize(Tool.getScreenSize(activity));
 
-        recyclerMarginTop = (int) (activity.getResources().getDimension(R.dimen.recyclerview_margin) + Tool.getStatusHeight(activity.getResources()));
+        recyclerMarginTop = (int) (activity.getResources().getDimension(R.dimen.app_drawer_margin) + Tool.getStatusHeight(activity.getResources()));
 
         toggle = mainScreen.toggle;
         toggleParams = mainScreen.toggleParams;
@@ -101,7 +102,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
     @Override
     public boolean onTouch(View v, MotionEvent event) {
       //  Log.d(TAG, "onTouch: topMargin = "+appDrawerParams.topMargin);
-       if(v.getId() ==recyclerView.getId()) {
+       if(v.getId() ==recyclerView.getId()&&appDrawer.mAdapter.mConfigMode==AppDrawerAdapter.APP_DRAWER_CONFIG_MODE.NORMAL) {
           return onTouchRecyclerView(v,event);
        } else if(v.getId() == container.getId()) {
            if(event.getAction()==MotionEvent.ACTION_UP) mainScreen.onUp();
@@ -127,6 +128,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
             int tgPos = appDrawerParams.topMargin- toggleParams.height + recyclerMarginTop;
             toggleParams.topMargin = (tgPos> toggleOriginalY) ? toggleOriginalY : tgPos;
         }
+        appDrawer.search_bar.requestLayout();
         appDrawerRootView.requestLayout();
         appDrawer.recyclerParent.invalidate();
         toggle.requestLayout();
@@ -155,10 +157,12 @@ public class LayoutSwitcher implements View.OnTouchListener {
                    appDrawer.recyclerParent.setAlphaBlurPaint(alpha_blur,false);
                    appDrawer.recyclerParent.setAlphaBackground(value*max_value);
                    mainScreen.widgetContainer.setAlpha(value);
-
+                   mainScreen.dock.setAlpha(value);
                    toggle.setAlpha(value);
                    if(value>=0.5f) {
                        Tool.WHITE_TEXT_THEME = false;
+                       appDrawer.search_text_view.setTextColor(Color.BLACK);
+                       appDrawer.search_image_view.setImageBitmap(appDrawer.black_search_icon);
                        appDrawer.mAdapter.notifyDataSetChanged();
                    }
                }
@@ -179,9 +183,12 @@ public class LayoutSwitcher implements View.OnTouchListener {
                    appDrawer.recyclerParent.setAlphaBlurPaint(alpha_blur,false);
                    appDrawer.recyclerParent.setAlphaBackground(max_value*value);
                    mainScreen.widgetContainer.setAlpha(value);
+                   mainScreen.dock.setAlpha(value);
                    toggle.setAlpha(value);
                    if(value<=0.5f) {
                        Tool.WHITE_TEXT_THEME = true;
+                       appDrawer.search_text_view.setTextColor(0xFFEEEEEE);
+                       appDrawer.search_image_view.setImageBitmap(appDrawer.white_search_icon);
                        appDrawer.mAdapter.notifyDataSetChanged();
                    }
                }
@@ -191,6 +198,9 @@ public class LayoutSwitcher implements View.OnTouchListener {
     }
     public void onBackPressed() {
         if(mode==MODE.IN_APP_DRAWER) {
+            if(appDrawer.mAdapter.mConfigMode!=AppDrawerAdapter.APP_DRAWER_CONFIG_MODE.NORMAL)
+                appDrawer.mAdapter.switchMode(AppDrawerAdapter.APP_DRAWER_CONFIG_MODE.NORMAL);
+            else
             motionDown();
         }
     }
@@ -288,7 +298,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
            if(mode ==MODE.IN_MAIN_SCREEN)
            fragment.setListener(mainScreen);
            else
-               fragment.setListener(appDrawer);
+               fragment.setAppDrawer(appDrawer);
            fragment.show(appDrawer.getActivity().getSupportFragmentManager(),
                     "song_popup_menu");
         }
