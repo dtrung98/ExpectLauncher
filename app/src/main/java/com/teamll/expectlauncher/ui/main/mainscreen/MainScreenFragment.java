@@ -1,5 +1,6 @@
 package com.teamll.expectlauncher.ui.main.mainscreen;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -223,7 +224,8 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
         switch (id) {
             case R.id.add_widget:selectWidget(); break;
             case R.id.choose_wallpaper:
-                //TODO: call replace wallpaper function;
+                Intent wallpagerIntent = new Intent(Intent.ACTION_SET_WALLPAPER);
+                startActivity(Intent.createChooser(wallpagerIntent, "Select Wallpager"));
                 break;
             case R.id.wallpaper_editor:
                 break;

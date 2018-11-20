@@ -283,7 +283,6 @@ public class LayoutSwitcher implements View.OnTouchListener {
         @Override
         public void onLongPress(MotionEvent e) {
           // mainScreen.selectWidget();
-            Log.e("long press: ", "yes");
            RoundedBottomSheetDialogFragment fragment =  RoundedBottomSheetDialogFragment.newInstance(mode);
            if(mode ==MODE.IN_MAIN_SCREEN)
            fragment.setListener(mainScreen);

@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.BottomSheetDialogFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -83,6 +84,7 @@ public class RoundedBottomSheetDialogFragment extends BottomSheetDialogFragment 
             return;
         }
         if(listener!=null) {
+
             view.postDelayed(new Runnable() {
                 @Override
                 public void run() {
