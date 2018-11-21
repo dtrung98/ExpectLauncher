@@ -1,6 +1,7 @@
 package com.teamll.expectlauncher.ui.widgets;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -10,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
+import com.teamll.expectlauncher.R;
 import com.teamll.expectlauncher.utils.BitmapEditor;
 import com.teamll.expectlauncher.utils.Tool;
 
@@ -21,27 +23,29 @@ public class DarkenRoundedBackgroundFrameLayout extends FrameLayout {
 
     public DarkenRoundedBackgroundFrameLayout(@NonNull Context context) {
         super(context);
-        init();
+        init(null);
     }
 
     public DarkenRoundedBackgroundFrameLayout(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(attrs);
     }
-    private int backColor1=Color.WHITE,backColor2 =Color.WHITE;
-    public void setBackColor1(int color)
-    {
-        backColor1 = color;
-        invalidate();
+
+    public DarkenRoundedBackgroundFrameLayout(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init(attrs);
     }
-    public void setBackColor2(int color)
-    {
-        backColor2 = color;
-        invalidate();
-    }
+
     protected Paint mSolidPaint;
-    private void init()
+    private void init( AttributeSet attrs)
     {
+        TypedArray t = getContext().obtainStyledAttributes(attrs, R.styleable.DarkenRoundedBackgroundFrameLayout);
+
+        color_background = t.getColor(R.styleable.DarkenRoundedBackgroundFrameLayout_round_back_color,Color.WHITE);
+        round_type = (t.getInt(R.styleable.DarkenRoundedBackgroundFrameLayout_round_type,1)==1) ? ROUND_TYPE.ROUND_ALL : ROUND_TYPE.ROUND_TOP;
+        number = t.getFloat(R.styleable.DarkenRoundedBackgroundFrameLayout_round_number,0);
+        alpha = t.getFloat(R.styleable.DarkenRoundedBackgroundFrameLayout_background_alpha,1);
+
         drawDarkenPaint = new Paint();
         drawDarkenPaint.setStyle(Paint.Style.FILL);
 
@@ -50,6 +54,7 @@ public class DarkenRoundedBackgroundFrameLayout extends FrameLayout {
 
         mSolidPaint.setStyle(Paint.Style.FILL);
         mSolidPaint.setAntiAlias(true);
+        t.recycle();
     }
     private float darken=0f;
     public void setDarken(float darken, boolean shouldDraw)
@@ -73,12 +78,12 @@ public class DarkenRoundedBackgroundFrameLayout extends FrameLayout {
         ROUND_ALL,
         ROUND_TOP
     }
-    protected ROUND_TYPE round_type = ROUND_TYPE.ROUND_TOP;
+    protected ROUND_TYPE round_type = ROUND_TYPE.ROUND_ALL;
     public void setRoundType(ROUND_TYPE type, boolean shouldInvalidate) {
         round_type = type;
         if(shouldInvalidate) invalidate();
     }
-    private int color_background = Color.WHITE;
+    private int color_background;
     public void setBackGroundColor(int color) {
         color_background = color;
     }
@@ -120,7 +125,7 @@ public class DarkenRoundedBackgroundFrameLayout extends FrameLayout {
         else
         {
 
-        canvas.drawPath(BitmapEditor.RoundedRect(0,0,canvas.getWidth(),canvas.getHeight(),maxRx*eachDP*number,maxRy*eachDP*number,round_type==ROUND_TYPE.ROUND_ALL),paint);
+        canvas.drawPath(BitmapEditor.RoundedRect(0,0,getWidth(),getHeight(),maxRx*eachDP*number,maxRy*eachDP*number,round_type==ROUND_TYPE.ROUND_TOP),paint);
         }
     }
 

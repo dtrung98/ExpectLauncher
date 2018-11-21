@@ -1,5 +1,6 @@
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -15,44 +16,90 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/add_widget"
-        android:layout_width="75dp"
-        android:layout_height="75dp"
-        android:layout_marginTop="16dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:scaleType="center"
-        android:src="@drawable/plus"
-        app:backgroundTint="#FBFFBD"
-        app:fabCustomSize="75dp"
-        app:layout_constraintEnd_toStartOf="@+id/choose_wallpaper"
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="10dp"
+        app:layout_constraintTop_toTopOf="@id/size_label"
+        app:layout_constraintBottom_toBottomOf="@id/seek_bar"
+        app:layout_constraintStart_toStartOf="@id/size_label"
+        app:layout_constraintEnd_toEndOf="@id/size_label"
+        android:background="@drawable/count_round"/>
+    <TextView
+        android:layout_marginTop="0dp"
+        android:id="@+id/size_label"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        app:layout_constraintTop_toBottomOf="@id/toggleButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toggleButton" />
+        android:gravity="center_vertical"
+        android:paddingTop="10dp"
+        android:paddingStart="30dp"
+        android:paddingEnd="30dp"
+        android:text="@string/icon_size"
+        android:textColor="#FF444444"
+        android:textSize="16sp"
+        android:textStyle="bold"
+      />
+    <com.teamll.expectlauncher.ui.widgets.rangeseekbar.RangeSeekBar
+        android:id="@+id/seek_bar"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        app:rsb_mode="single"
 
+        app:rsb_tick_mark_mode="number"
+        app:rsb_indicator_text_size="14sp"
+        app:rsb_tick_mark_text_array="@array/markArray"
+        app:rsb_progress_color="@color/FlatGreen"
+        app:rsb_progress_default_color="@color/rsbColorSeekBarDefault"
+        app:rsb_tick_mark_text_color="#FF555555"
+        app:rsb_thumb_drawable="@drawable/seekbar_thumb"
+        app:rsb_indicator_height="25dp"
+        app:rsb_min="25"
+        app:rsb_max="200"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        app:rsb_tick_mark_text_margin="20dp"
+        app:rsb_indicator_show_mode="alwaysHide"
+        app:rsb_indicator_radius="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/size_label"
+        />
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/choose_wallpaper"
+        android:id="@+id/show_title"
         android:layout_width="75dp"
         android:layout_height="75dp"
-        android:layout_marginTop="16dp"
         android:clickable="true"
         android:focusable="true"
         android:scaleType="center"
-        android:src="@drawable/picture"
+        app:backgroundTint="@color/FloatingButtonColor"
+        app:fabCustomSize="75dp"
+        android:src="@drawable/text_a"
+        app:layout_constraintEnd_toStartOf="@id/position"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/position" />
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/position"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:scaleType="center"
+        android:src="@drawable/move_dark_pink"
         app:backgroundTint="#FBFFBD"
         app:fabCustomSize="75dp"
-        app:layout_constraintEnd_toStartOf="@id/wallpaper_editor"
-        app:layout_constraintStart_toEndOf="@id/add_widget"
-        app:layout_constraintTop_toBottomOf="@id/toggleButton" />
+        android:layout_marginTop="12dp"
+        app:layout_constraintEnd_toStartOf="@id/app_icon_editor"
+        app:layout_constraintStart_toEndOf="@id/show_title"
+        app:layout_constraintTop_toBottomOf="@id/seek_bar" />
     <android.support.design.widget.FloatingActionButton
-        android:layout_marginTop="16dp"
-        android:id="@+id/wallpaper_editor"
+        android:id="@+id/app_icon_editor"
         android:layout_width="75dp"
         android:layout_height="75dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/choose_wallpaper"
-        app:layout_constraintTop_toBottomOf="@id/toggleButton"
+        app:layout_constraintStart_toEndOf="@id/position"
+        app:layout_constraintTop_toTopOf="@id/position"
         android:src="@drawable/editor"
         app:fabCustomSize="75dp"
         android:scaleType="center"
@@ -62,36 +109,35 @@
         />
 
     <TextView
-        android:id="@+id/add_widget_text"
+        android:id="@+id/show_title_text"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:gravity="center"
-        android:text="App Size"
+        android:text="@string/visible_app_title"
         android:textColor="#444"
-        app:layout_constraintEnd_toStartOf="@id/choose_wallpaper"
+        app:layout_constraintEnd_toStartOf="@id/position"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/add_widget" />
-
+        app:layout_constraintTop_toBottomOf="@id/position" />
     <TextView
-        android:id="@+id/wallpaper_text"
+        android:id="@+id/position_text"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:gravity="center"
-        android:text="Position"
+        android:text="@string/change_position"
         android:textColor="#444"
-        app:layout_constraintEnd_toStartOf="@+id/wallpaper_editor"
-        app:layout_constraintStart_toEndOf="@id/add_widget"
-        app:layout_constraintTop_toBottomOf="@id/choose_wallpaper" />
+        app:layout_constraintEnd_toStartOf="@+id/app_icon_editor"
+        app:layout_constraintStart_toEndOf="@id/show_title"
+        app:layout_constraintTop_toBottomOf="@id/position" />
 
     <TextView
-        android:id="@+id/editor"
+        android:id="@+id/editor_text"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:gravity="center"
-        android:text="App Icon Editor"
+        android:text="@string/app_icon_editor"
         android:textColor="#444"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/choose_wallpaper"
-        app:layout_constraintTop_toBottomOf="@id/wallpaper_editor" />
+        app:layout_constraintStart_toEndOf="@id/position"
+        app:layout_constraintTop_toBottomOf="@id/app_icon_editor" />
 
 </android.support.constraint.ConstraintLayout>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorPrimary">@color/FlatGreen</color>
+    <color name="colorPrimaryDark">@color/FlatGreen</color>
     <color name="colorAccent">#D81B60</color>
     <color name= "SurfaceColor">#FFCC00</color>
     <color name="BackwardColorHeavy">#B0000000</color>
@@ -40,4 +40,11 @@
     <color name="timecode">#000000</color>
     <color name="timecode_shadow">#aa000000</color>
     <color name="md_bottom_sheet_text_color">@android:color/black</color>
+
+    <color name="rsbColorSeekBarDefault">#c3c3c3</color>
+    <color name="rsbColorThumbPressed">#FFE7E7E7</color>
+    <color name="rsbColorThumbDefault">#FFFFFF</color>
+    <color name="rsbColorThumbBorder">#FFD7D7D7</color>
+    <color name="colorProgress">#ffffbb33</color>
+    <color name="FloatingButtonColor">#FBFFBD</color>
 </resources>

@@ -18,16 +18,18 @@ import android.widget.ImageView;
 import com.teamll.expectlauncher.R;
 import com.teamll.expectlauncher.ui.main.appdrawer.AppDrawerFragment;
 import com.teamll.expectlauncher.ui.main.mainscreen.MainScreenFragment;
+import com.teamll.expectlauncher.utils.HomeWatcher;
 import com.teamll.expectlauncher.utils.Tool;
 
 
-public class MainActivity extends AppLoaderActivity implements Tool.WallpaperChangedNotifier {
+public class MainActivity extends AppLoaderActivity implements Tool.WallpaperChangedNotifier,HomeWatcher.OnHomePressedListener {
     private static final String TAG="MainActivity";
 
     private static final int MY_PERMISSIONS_READ_STORAGE = 1;
     @Override
     protected void onResume() {
        super.onResume();
+       inResuming = true;
        Tool.getInstance().resumeWallpaperTracking();
     }
 
@@ -35,6 +37,7 @@ public class MainActivity extends AppLoaderActivity implements Tool.WallpaperCha
     protected void onPause() {
       //  InstallShortcutReceiver.enableInstallQueue(InstallShortcutReceiver.FLAG_ACTIVITY_PAUSED);
         super.onPause();
+        inResuming = false;
         Tool.getInstance().stopWallpaperTracking();
     }
     ImageView imageView;
@@ -57,7 +60,7 @@ public class MainActivity extends AppLoaderActivity implements Tool.WallpaperCha
         if(savedInstanceState!=null)
         getWindow().getDecorView()
                 .sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
-
+        initHomeWatcher();
         GetPermission();
 
     }
@@ -159,7 +162,7 @@ public class MainActivity extends AppLoaderActivity implements Tool.WallpaperCha
                 // app-defined int constant. The callback method gets the
                 // result of the request.
             }
-        } else doStuff();
+        } else doWorkAfterPermissionGranted();
     }
 
     @Override
@@ -170,15 +173,33 @@ public class MainActivity extends AppLoaderActivity implements Tool.WallpaperCha
                 if (grantResult.length > 0 && grantResult[0] == PackageManager.PERMISSION_GRANTED) {
                     if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                         // Granted
-                        doStuff();
+                        doWorkAfterPermissionGranted();
                     } else finish();
                 }
             }
             return;
         }
     }
-    private void doStuff() {
-        Log.d(TAG, "doStuff: ");
+    HomeWatcher mHomeWatcher;
+    private void initHomeWatcher() {
+        if(mHomeWatcher!=null) return;
+        mHomeWatcher = new HomeWatcher(this);
+        mHomeWatcher.setOnHomePressedListener(this);
+        mHomeWatcher.startWatch();
+    }
+    private void doWorkAfterPermissionGranted() {
+        Log.d(TAG, "doWorkAfterPermissionGranted: ");
         Tool.getInstance().startWallpaperTracking();
+    }
+    private boolean inResuming = false;
+
+    @Override
+    public void onHomePressed() {
+        if(inResuming&&switcher!=null) switcher.onBackPressed();
+    }
+
+    @Override
+    public void onHomeLongPressed() {
+
     }
 }

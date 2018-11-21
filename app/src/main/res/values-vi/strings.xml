@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Expect Launcher</string>
+    <string name="app_size">Đổi kích cỡ app</string>
+    <string name="change_position">Đổi vị trí</string>
+    <string name="app_icon_editor">Sửa biểu tượng</string>
+    <string name="icon_size">Kích thước biểu tượng</string>
+    <string name="search_string">Tìm kiếm ứng dụng</string>
+    <string name="hidden_app_title">Tiêu đề đang ẩn</string>
+    <string name="visible_app_title">Tiêu đề đang hiện</string>
+</resources>

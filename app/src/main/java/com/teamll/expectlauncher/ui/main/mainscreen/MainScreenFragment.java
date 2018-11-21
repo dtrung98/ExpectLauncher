@@ -1,8 +1,8 @@
 package com.teamll.expectlauncher.ui.main.mainscreen;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,7 +49,7 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
 
     private View mRootView;
     private TextView appDrawerButton;
-    private MotionRoundedBitmapFrameLayout dock;
+    public MotionRoundedBitmapFrameLayout dock;
     private MainActivity activity;
     float statusBarHeight  = 0;
     float navigationHeight = 0;
@@ -77,6 +76,7 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
     }
     ScrollView scrollView;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view,savedInstanceState);
@@ -219,15 +219,14 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
     }
 
     @Override
-    public boolean onClickButtonInsideBottomSheet(int id) {
-        switch (id) {
-            case R.id.add_widget:selectWidget(); break;
-            case R.id.choose_wallpaper:
+    public void onClickButtonInsideBottomSheet(View view) {
+        switch (view.getId()) {
+            case R.id.app_size:selectWidget(); break;
+            case R.id.position:
                 //TODO: call replace wallpaper function;
                 break;
-            case R.id.wallpaper_editor:
+            case R.id.app_icon_editor:
                 break;
         }
-        return true;
     }
 }

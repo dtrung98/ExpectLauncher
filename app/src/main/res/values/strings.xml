@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Expect Launcher</string>
+    <string name="app_size">App Size</string>
+    <string name="change_position">Change Position</string>
+    <string name="app_icon_editor">Icon Editor</string>
+    <string name="icon_size">Icon Size</string>
+
+    <string name="path_search" translatable="false">
+       M141,17 A9,9 0 1,1 142,16 L149,23
+    </string>
+    <string name="search_string">Search</string>
+    <string name="hidden_app_title">Show app title</string>
+    <string name="visible_app_title">Visible app title</string>
 </resources>

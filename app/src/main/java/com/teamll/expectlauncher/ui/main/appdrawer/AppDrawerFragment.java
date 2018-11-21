@@ -1,28 +1,27 @@
 package com.teamll.expectlauncher.ui.main.appdrawer;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ActivityOptions;
-import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.teamll.expectlauncher.R;
 import com.teamll.expectlauncher.model.App;
@@ -30,38 +29,33 @@ import com.teamll.expectlauncher.model.Rectangle;
 import com.teamll.expectlauncher.ui.main.AppLoaderActivity;
 import com.teamll.expectlauncher.ui.main.LayoutSwitcher;
 import com.teamll.expectlauncher.ui.main.bottomsheet.RoundedBottomSheetDialogFragment;
-import com.teamll.expectlauncher.ui.widgets.DarkenRoundedBackgroundFrameLayout;
-import com.teamll.expectlauncher.ui.widgets.EventWatchableFrameLayout;
 import com.teamll.expectlauncher.ui.widgets.MotionRoundedBitmapFrameLayout;
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.OnStartDragListener;
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.SimpleItemTouchHelperCallback;
 import com.teamll.expectlauncher.model.AppDetail;
 import com.teamll.expectlauncher.ui.widgets.BoundItemDecoration;
-import com.teamll.expectlauncher.utils.Animation;
+import com.teamll.expectlauncher.ui.widgets.rangeseekbar.OnRangeChangedListener;
+import com.teamll.expectlauncher.ui.widgets.rangeseekbar.RangeSeekBar;
+import com.teamll.expectlauncher.utils.PreferencesUtility;
 import com.teamll.expectlauncher.utils.Tool;
 
 import java.util.ArrayList;
 
-public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.ItemClickListener, OnStartDragListener, AppLoaderActivity.AppDetailReceiver, LayoutSwitcher.EventSender, RoundedBottomSheetDialogFragment.BottomSheetListener {
+public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.ItemClickListener, OnStartDragListener, AppLoaderActivity.AppDetailReceiver, LayoutSwitcher.EventSender, RoundedBottomSheetDialogFragment.BottomSheetListener, OnRangeChangedListener {
     private static final String TAG="AppDrawerFragment";
 
-    /**
-     * FrameLayout cho phép nó phát sinh sự kiện chạm trước tòan bộ view con của nó.
-     * Khác với sự kiện chạm bình thường - phát sinh khi KHÔNG CÓ view con nào xử lý.
-     *
-     **/
-    EventWatchableFrameLayout rootView;
+    FrameLayout rootView;
 
     /**
     Activity sở hữu fragment
      */
     Activity activity;
     /**
-    Adapter của recyclerView
+    Adapter của mRecyclerView
      */
     public AppDrawerAdapter mAdapter;
 
-    RecyclerView recyclerView;
+    RecyclerView mRecyclerView;
     public MotionRoundedBitmapFrameLayout recyclerParent;
     /*
     ViewGroup chứa fragment hiện tại
@@ -77,7 +71,12 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
     float dockMargin;
     Rectangle rect;
 
+    public MotionRoundedBitmapFrameLayout search_bar;
     FrameLayout.LayoutParams params;
+
+    public ImageView search_image_view;
+    public Bitmap black_search_icon, white_search_icon;
+    public TextView search_text_view;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -102,7 +101,7 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        rootView = (EventWatchableFrameLayout) view;
+        rootView = (FrameLayout) view;
 
         /**
          * Vị trí mặc định của AppDrawer
@@ -112,24 +111,31 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
         rect.Left = 0;
         rect.Top = rect.Height;
         updateLayout();
+        search_bar = rootView.findViewById(R.id.search_bar);
         recyclerParent = rootView.findViewById(R.id.parentOfRecycleView);
-        FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) recyclerParent.getLayoutParams();
-        lp.topMargin += (int) statusBarHeight;
-        lp.height = (int) (rect.Height - lp.bottomMargin - navigationHeight - dockMargin -dockHeight - lp.topMargin);
-        lp.bottomMargin = 0;
+
+        search_image_view = recyclerParent.findViewById(R.id.search_icon);
+        search_text_view = recyclerParent.findViewById(R.id.search_text_view);
+        black_search_icon = BitmapFactory.decodeResource(getResources(),R.drawable.search);
+        white_search_icon = BitmapFactory.decodeResource(getResources(),R.drawable.search_white);
+
+
+        FrameLayout.LayoutParams rPParams = (FrameLayout.LayoutParams) recyclerParent.getLayoutParams();
+        rPParams.topMargin += (int) statusBarHeight;
+        rPParams.height = (int) (rect.Height - rPParams.bottomMargin - navigationHeight /*-dockHeight  - dockMargin */ - rPParams.topMargin);
+        rPParams.bottomMargin = 0;
         recyclerParent.requestLayout();
         recyclerParent.setBackGroundColor(0xFFEEEEEE);
         recyclerParent.setRoundNumber(1.75f,true);
-        Tool.getInstance().AddWallpaperChangedNotifier((Tool.WallpaperChangedNotifier) recyclerParent);
+        Tool.getInstance().AddWallpaperChangedNotifier( recyclerParent);
+        Tool.getInstance().AddWallpaperChangedNotifier(search_bar);
+        mRecyclerView = recyclerParent.findViewById(R.id.recyclerview);
 
-        recyclerView = recyclerParent.findViewById(R.id.recyclerview);
-
-        mAdapter = new AppDrawerAdapter(this);
-        recyclerView.setAdapter(mAdapter);
+        mAdapter = new AppDrawerAdapter(getActivity(),this);
+        mRecyclerView.setAdapter(mAdapter);
         mAdapter.setClickListener(this);
         setLayoutManager();
-     //   setDraggable();
-
+        setDraggable();
 
         /**
          * Đăng ký bộ lắng nghe việc load app cho đối tượng này.
@@ -138,40 +144,48 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
         if(ac!=null)
         ac.addAppDetailReceiver(this);
          else throw new NullPointerException("Fragment was created from an activity class that doesn't inherit from AppLoaderActivity class");
+
     }
 
-    private void setLayoutManager() {
-        DisplayMetrics displayMetrics = activity.getResources().getDisplayMetrics();
-        float padding = activity.getResources().getDimension(R.dimen.padding);
-        padding = (statusBarHeight>padding) ? statusBarHeight: padding;
-        padding = (navigationHeight>padding)? navigationHeight : padding;
-        float screenWidth = displayMetrics.widthPixels;
-        float screenHeight = displayMetrics.heightPixels;
-       // recyclerView.setPadding((int)padding,(int)padding,(int)padding,(int)padding);
+    public void setLayoutManager() {
         Resources resources = getResources();
-        float appWidth = resources.getDimension(R.dimen.app_width);
-        float appHeight = resources.getDimension(R.dimen.app_height);
-
+        float margin = resources.getDimension(R.dimen.app_drawer_margin);
+        float padding = resources.getDimension(R.dimen.recycler_view_padding);
+        int[] ss = Tool.getScreenSize(getActivity());
+        float mRVContentWidth = ss[0] - margin - padding;
+        float mRVContentHeight = recyclerParent.getLayoutParams().height
+                - resources.getDimension(R.dimen.search_bar_height)
+                - 2*resources.getDimension(R.dimen.search_bar_margin)
+                - padding;
+         float scale = PreferencesUtility.getInstance(getActivity().getApplicationContext()).getAppIconSize();
+        float appWidth = resources.getDimension(R.dimen.app_width)*scale;
+        float appHeight = resources.getDimension(R.dimen.app_height)*scale;
+        if(!PreferencesUtility.getInstance(getActivity().getApplicationContext()).isShowAppTitle())
+            appHeight = appWidth;
         float minWidthZone = appWidth*1.4f;
         float minHeightZone = appHeight*1.35f;
 
-        int numberColumn = (int) (screenWidth/minWidthZone);
-        int numberRow = (int) (screenHeight/minHeightZone);
-        float horizontalMargin = (screenWidth - numberColumn*appWidth)/(numberColumn+1);
-        float verticalMargin = (screenHeight - numberRow*appHeight)/(numberRow+1);
-
+        int numberColumn = (int) (mRVContentWidth/minWidthZone);
+        int numberRow = (int) (mRVContentHeight/minHeightZone);
+        float horizontalMargin = (mRVContentWidth - numberColumn*appWidth)/(numberColumn+1);
+        float verticalMargin = (mRVContentHeight - numberRow*appHeight)/(numberRow+1);
+        if(numberColumn<1) numberColumn = 1;
+        if(numberRow<1) numberRow = 1;
         GridLayoutManager gridLayoutManager = new GridLayoutManager(activity,numberColumn,GridLayoutManager.VERTICAL,false);
-        recyclerView.setLayoutManager(gridLayoutManager);
-
-        BoundItemDecoration itemDecoration = new BoundItemDecoration(screenWidth, screenHeight,numberColumn,numberRow,(int) (verticalMargin*0.9f),(int)(horizontalMargin*0.9f));
-        recyclerView.addItemDecoration(itemDecoration);
+        mRecyclerView.setLayoutManager(gridLayoutManager);
+        BoundItemDecoration itemDecoration = new BoundItemDecoration(mRVContentWidth, mRVContentHeight,numberColumn,numberRow,(int) (verticalMargin*0.9f),(int)(horizontalMargin*0.9f));
+        mRecyclerView.addItemDecoration(itemDecoration);
     }
-
+    public void setAppIconSize(float scale) {
+        PreferencesUtility.getInstance(getActivity().getApplicationContext()).setAppIconSize(scale);
+        mAdapter.notifyDataSetChanged();
+        setLayoutManager();
+    }
 
     private void setDraggable() {
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
-        mItemTouchHelper.attachToRecyclerView(recyclerView);
+        mItemTouchHelper.attachToRecyclerView(mRecyclerView);
     }
 
     @Override
@@ -182,6 +196,15 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
     @Override
     public void onItemClick(View view, AppDetail app) {
         openApp(view,app);
+    }
+
+    @Override
+    public void onItemLongPressed(View view, AppDetail appDetail) {
+        RoundedBottomSheetDialogFragment fragment =  RoundedBottomSheetDialogFragment.newInstance(LayoutSwitcher.MODE.IN_APP_DRAWER);
+
+        fragment.setAppDrawer(this);
+        fragment.show(getActivity().getSupportFragmentManager(),
+                "song_popup_menu");
     }
 
     public void updateLayout() {
@@ -207,8 +230,28 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
     void openApp(View v, AppDetail appDetail) {
         ((AppLoaderActivity)getActivity()).openApp(v,appDetail);
     }
-
-
+    void showHideAppTitle(View v) {
+       PreferencesUtility pu =  PreferencesUtility.getInstance(getActivity().getApplicationContext());
+       boolean isShow = !pu.isShowAppTitle();
+       pu.setShowAppTitle(
+               isShow
+        );
+       mAdapter.notifyDataSetChanged();
+      updateShowHideTitleButton(v,isShow);
+    }
+    private void updateShowHideTitleButton(View v,boolean isShow) {
+        FloatingActionButton fab = (FloatingActionButton) v;
+        TextView tv = ((ViewGroup)v.getParent()).findViewById(R.id.show_title_text);
+        if(null==tv) return;
+        if(isShow) {
+            fab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.FloatingButtonColor)));
+            tv.setText(R.string.visible_app_title);
+        } else {
+            fab.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
+            tv.setText(R.string.hidden_app_title);
+        }
+        setLayoutManager();
+    }
 
     @Override
     public void onLoadComplete(ArrayList<App> data) {
@@ -227,11 +270,35 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
 
     @Override
     public View getEventSenderView() {
-        return recyclerView;
+        return mRecyclerView;
     }
 
     @Override
-    public boolean onClickButtonInsideBottomSheet(int id) {
-        return false;
+    public void onClickButtonInsideBottomSheet(View v) {
+        switch (v.getId()) {
+            case R.id.show_title:
+                showHideAppTitle(v);
+                return;
+            case R.id.position:
+                mAdapter.switchMode(AppDrawerAdapter.APP_DRAWER_CONFIG_MODE.MOVABLE_APP_ICON);
+                return;
+            case R.id.app_icon_editor:
+                mAdapter.switchMode(AppDrawerAdapter.APP_DRAWER_CONFIG_MODE.APP_ICON_EDITOR);
+        }
+    }
+
+    @Override
+    public void onRangeChanged(RangeSeekBar view, float leftValue, float rightValue, boolean isFromUser) {
+        setAppIconSize(leftValue/100);
+    }
+
+    @Override
+    public void onStartTrackingTouch(RangeSeekBar view, boolean isLeft) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(RangeSeekBar view, boolean isLeft) {
+
     }
 }

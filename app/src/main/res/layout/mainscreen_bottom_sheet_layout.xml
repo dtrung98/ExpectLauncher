@@ -16,7 +16,7 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/add_widget"
+        android:id="@+id/app_size"
         android:layout_width="@dimen/size_floating_button"
         android:layout_height="@dimen/size_floating_button"
         android:layout_marginTop="16dp"
@@ -26,12 +26,12 @@
         android:src="@drawable/plus_black"
         app:backgroundTint="#FBFFBD"
         app:fabCustomSize="@dimen/size_floating_button"
-        app:layout_constraintEnd_toStartOf="@+id/choose_wallpaper"
+        app:layout_constraintEnd_toStartOf="@+id/position"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toggleButton" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/choose_wallpaper"
+        android:id="@+id/position"
         android:layout_width="@dimen/size_floating_button"
         android:layout_height="@dimen/size_floating_button"
         android:layout_marginTop="16dp"
@@ -41,16 +41,16 @@
         android:src="@drawable/picture"
         app:backgroundTint="#FBFFBD"
         app:fabCustomSize="@dimen/size_floating_button"
-        app:layout_constraintEnd_toStartOf="@id/wallpaper_editor"
-        app:layout_constraintStart_toEndOf="@id/add_widget"
+        app:layout_constraintEnd_toStartOf="@id/app_icon_editor"
+        app:layout_constraintStart_toEndOf="@id/app_size"
         app:layout_constraintTop_toBottomOf="@id/toggleButton" />
     <android.support.design.widget.FloatingActionButton
         android:layout_marginTop="16dp"
-        android:id="@+id/wallpaper_editor"
+        android:id="@+id/app_icon_editor"
         android:layout_width="@dimen/size_floating_button"
         android:layout_height="@dimen/size_floating_button"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/choose_wallpaper"
+        app:layout_constraintStart_toEndOf="@id/position"
         app:layout_constraintTop_toBottomOf="@id/toggleButton"
         android:src="@drawable/editor"
         app:fabCustomSize="@dimen/size_floating_button"
@@ -61,36 +61,36 @@
         />
 
     <TextView
-        android:id="@+id/add_widget_text"
+        android:id="@+id/app_size_text"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:gravity="center"
         android:text="Add Widget"
         android:textColor="#444"
-        app:layout_constraintEnd_toStartOf="@id/choose_wallpaper"
+        app:layout_constraintEnd_toStartOf="@id/position"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/add_widget" />
+        app:layout_constraintTop_toBottomOf="@id/app_size" />
 
     <TextView
-        android:id="@+id/wallpaper_text"
+        android:id="@+id/position_text"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:gravity="center"
         android:text="Wallpaper"
         android:textColor="#444"
-        app:layout_constraintEnd_toStartOf="@+id/wallpaper_editor"
-        app:layout_constraintStart_toEndOf="@id/add_widget"
-        app:layout_constraintTop_toBottomOf="@id/choose_wallpaper" />
+        app:layout_constraintEnd_toStartOf="@+id/app_icon_editor"
+        app:layout_constraintStart_toEndOf="@id/app_size"
+        app:layout_constraintTop_toBottomOf="@id/position" />
 
     <TextView
-        android:id="@+id/editor"
+        android:id="@+id/editor_text"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:gravity="center"
         android:text="Wallpaper Editor"
         android:textColor="#444"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/choose_wallpaper"
-        app:layout_constraintTop_toBottomOf="@id/wallpaper_editor" />
+        app:layout_constraintStart_toEndOf="@id/position"
+        app:layout_constraintTop_toBottomOf="@id/app_icon_editor" />
 
 </android.support.constraint.ConstraintLayout>

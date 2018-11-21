@@ -5,7 +5,7 @@
     <dimen name="padding">20dp</dimen>
     <dimen name="dock_height">85dp</dimen>
     <dimen name="dock_margin">10dp</dimen>
-    <dimen name="recyclerview_margin">10dp</dimen>
+    <dimen name="app_drawer_margin">10dp</dimen>
 
     <!-- Bottom Sheet Fragment -->
     <dimen name="dp_8">8dp</dimen>
@@ -22,4 +22,12 @@
 
     <dimen name="md_bottom_sheet_separator_top_margin">7dp</dimen>
     <dimen name="size_floating_button">85dp</dimen>
+    <dimen name="text_app_width">60dp</dimen>
+    <dimen name="text_app_margin">2dp</dimen>
+    <dimen name="recycler_view_padding">5dp</dimen>
+    <dimen name="search_bar_height">40dp</dimen>
+    <dimen name="search_bar_margin">15dp</dimen>
+
+    <integer name="duration_bar">800</integer>
+    <integer name="duration_search">800</integer>
 </resources>

@@ -135,7 +135,7 @@ public class Tool {
         Tool tool;
         @Override
         protected void onPostExecute(Boolean result) {
-            Log.d(TAG,"compare result : "+result);
+          //  Log.d(TAG,"compare result : "+result);
             if(tool.status) {
                 if (result) {
                     // nếu có thay đổi

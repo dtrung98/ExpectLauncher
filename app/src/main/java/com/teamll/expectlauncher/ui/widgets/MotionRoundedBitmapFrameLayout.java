@@ -138,7 +138,7 @@ public class MotionRoundedBitmapFrameLayout extends DarkenRoundedBackgroundFrame
             canvas.save();
           //  canvas.scale(1,1);
             canvas.translate(-rect_view_in_parent.Left,-rect_view_in_parent.Top);
-            Path path = BitmapEditor.RoundedRect(rect_view_in_parent.Left,rect_view_in_parent.Top,rect_view_in_parent.Width + rect_view_in_parent.Left,rect_view_in_parent.Height+rect_view_in_parent.Top,maxRx*eachDP*number,maxRy*eachDP*number,round_type==ROUND_TYPE.ROUND_ALL);
+            Path path = BitmapEditor.RoundedRect(rect_view_in_parent.Left,rect_view_in_parent.Top,rect_view_in_parent.Width + rect_view_in_parent.Left,rect_view_in_parent.Height+rect_view_in_parent.Top,maxRx*eachDP*number,maxRy*eachDP*number,round_type==ROUND_TYPE.ROUND_TOP);
          //  canvas.drawRect(getRectGraphic(drawRect), mSolidPaint);
            canvas.drawPath(path, mShaderPaint);
            canvas.restore();
