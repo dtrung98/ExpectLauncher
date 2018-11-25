@@ -1,6 +1,7 @@
 package com.teamll.expectlauncher.ui.main.mainscreen;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -29,7 +30,7 @@ import com.teamll.expectlauncher.utils.Tool;
 
 import java.util.ArrayList;
 
-public class MainScreenFragment extends AppWidgetHostFragment implements View.OnTouchListener, View.OnClickListener, LayoutSwitcher.EventSender,AppLoaderActivity.AppDetailReceiver, RoundedBottomSheetDialogFragment.BottomSheetListener {
+public class MainScreenFragment extends AppWidgetHostFragment implements View.OnTouchListener, LayoutSwitcher.EventSender,AppLoaderActivity.AppDetailReceiver, RoundedBottomSheetDialogFragment.BottomSheetListener {
     private static final String TAG="MainScreenFragment";
 
     private long savedTime;
@@ -46,6 +47,11 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
 
         return false;
     }
+    public static MainScreenFragment newInstance() {
+
+        MainScreenFragment fragment = new MainScreenFragment();
+        return fragment;
+    }
 
     private View mRootView;
     private TextView appDrawerButton;
@@ -60,7 +66,7 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        Log.d(TAG, "onCreate");
         activity = (MainActivity) getActivity();
         statusBarHeight= Tool.getStatusHeight(activity.getResources());
         navigationHeight = Tool.getNavigationHeight(activity);
@@ -119,7 +125,6 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
         for (View v :
                 dockApp) {
             v.setOnTouchListener(this);
-
         }
     dock.setBackGroundColor(Color.WHITE);
     dock.setAlphaBackground(0.35f);
@@ -155,11 +160,6 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
     }
    public FrameLayout.LayoutParams toggleParams ;
     public ImageView toggle;
-
-    @Override
-    public void onClick(View v) {
-        activity.initScreen();
-    }
     public void onUp() {
         if(System.currentTimeMillis() - savedTime <=300) {
            if(adaptiveDock!=null) {
@@ -174,13 +174,6 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
         return null;
     }
 
-    @Override
-    public View getEventSenderView() {
-        return null;
-    }
-    public void onLongPress() {
-        Toast.makeText(getContext(),"On Long Press",Toast.LENGTH_SHORT).show();
-    }
     private ArrayList<App> appInDock = new ArrayList<>();
     private String[] packageDock = {
             "com.android.dialer" ,
@@ -224,9 +217,17 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
             case R.id.app_size:selectWidget(); break;
             case R.id.position:
                 //TODO: call replace wallpaper function;
+                Intent wallpagerIntent = new Intent(Intent.ACTION_SET_WALLPAPER);
+                startActivity(Intent.createChooser(wallpagerIntent, "Select Wallpaper"));
                 break;
             case R.id.app_icon_editor:
                 break;
         }
+    }
+
+    public void setAlpha(float value) {
+        Log.d(TAG, "setAlpha: "+value);
+        widgetContainer.setAlpha(value);
+        dock.setAlpha(value);
     }
 }

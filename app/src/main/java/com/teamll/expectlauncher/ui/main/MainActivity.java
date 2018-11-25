@@ -4,10 +4,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Build;
+import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -28,26 +30,32 @@ public class MainActivity extends AppLoaderActivity implements Tool.WallpaperCha
     private static final int MY_PERMISSIONS_READ_STORAGE = 1;
     @Override
     protected void onResume() {
+        Log.d(TAG, "onResume");
        super.onResume();
        inResuming = true;
        Tool.getInstance().resumeWallpaperTracking();
+        mHomeWatcher.startWatch();
     }
 
     @Override
     protected void onPause() {
-      //  InstallShortcutReceiver.enableInstallQueue(InstallShortcutReceiver.FLAG_ACTIVITY_PAUSED);
+        Log.d(TAG, "onPause");
         super.onPause();
         inResuming = false;
+        mHomeWatcher.stopWatch();
         Tool.getInstance().stopWallpaperTracking();
     }
     ImageView imageView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
        setContentView(R.layout.main_activity);
-        Tool.Init(this);
+        Tool.Init(getApplicationContext());
         Tool tool = Tool.getInstance();
         tool.AddWallpaperChangedNotifier(this);
+        //Layout Switcher
+        switcher = new LayoutSwitcher();
 
         // FullScreen
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
@@ -73,67 +81,52 @@ public class MainActivity extends AppLoaderActivity implements Tool.WallpaperCha
     public void onBackPressed() {
         if(switcher!=null) switcher.onBackPressed();
     }
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        if ((intent.getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) !=
-                Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) {
-           onBackPressed();
-        }
-    }
     private LayoutSwitcher switcher;
     private MainScreenFragment mainScreenFragment;
     private AppDrawerFragment appDrawerFragment;
-
     public void initScreen() {
+
+
         mainScreenFragment = new MainScreenFragment();
         appDrawerFragment = new AppDrawerFragment();
 
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.container,mainScreenFragment )
-                .commitNow();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
-        getSupportFragmentManager().beginTransaction()
+        ft.add(R.id.container, mainScreenFragment)
                 .add(R.id.container, appDrawerFragment)
-                .commitNow();
-     }
+                .commit();
+
+
+    }
 
     @Override
     protected void onStart() {
+        Log.d(TAG, "onStart");
         super.onStart();
-        if(switcher==null)
-            switcher = new LayoutSwitcher(this,mainScreenFragment,appDrawerFragment);
+        if(null!=switcher)
+            switcher.bind(this,mainScreenFragment,appDrawerFragment);
 
     }
 
+
+
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    protected void onStop() {
+        Log.d(TAG, "onStop");
+        if(null!=switcher&&switcher.isViewAttached()) {
+            Log.d(TAG, "switcher : ");
+            switcher.detachView();
+            switcher = null;
+        }
+       // Tool.getInstance().clear();
+        super.onStop();
     }
 
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        return super.onKeyDown(keyCode, event);
-    }
+    protected void onDestroy() {
+        Log.d(TAG, "onDestroy");
 
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-    }
-
-    @Override
-    public void onAttachedToWindow() {
-        super.onAttachedToWindow();
-    }
-
-    @Override
-    public void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-    }
-
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        return (event.getKeyCode() == KeyEvent.KEYCODE_HOME) || super.dispatchKeyEvent(event);
+        super.onDestroy();
     }
 
     private void GetPermission() {
@@ -185,7 +178,7 @@ public class MainActivity extends AppLoaderActivity implements Tool.WallpaperCha
         if(mHomeWatcher!=null) return;
         mHomeWatcher = new HomeWatcher(this);
         mHomeWatcher.setOnHomePressedListener(this);
-        mHomeWatcher.startWatch();
+
     }
     private void doWorkAfterPermissionGranted() {
         Log.d(TAG, "doWorkAfterPermissionGranted: ");

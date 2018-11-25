@@ -16,6 +16,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,7 +56,7 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
      */
     public AppDrawerAdapter mAdapter;
 
-    RecyclerView mRecyclerView;
+    public RecyclerView mRecyclerView;
     public MotionRoundedBitmapFrameLayout recyclerParent;
     /*
     ViewGroup chứa fragment hiện tại
@@ -80,6 +81,7 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate");
         activity = getActivity();
         statusBarHeight= Tool.getStatusHeight(activity.getResources());
         navigationHeight = Tool.getNavigationHeight(activity);
@@ -94,6 +96,7 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView");
         return inflater.inflate(R.layout.app_drawer_fragment,container,false);
 
     }
@@ -268,10 +271,6 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
         return rootView;
     }
 
-    @Override
-    public View getEventSenderView() {
-        return mRecyclerView;
-    }
 
     @Override
     public void onClickButtonInsideBottomSheet(View v) {

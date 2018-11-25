@@ -28,7 +28,15 @@ public class LayoutSwitcher implements View.OnTouchListener {
     private static final String TAG="LayoutSwitcher";
     public interface EventSender {
         View getRoot();
-        View getEventSenderView();
+    }
+    enum MOVE_DIRECTION {
+        NONE,
+        MOVE_UP,
+        MOVE_DOWN
+    }
+    public enum MODE {
+        IN_MAIN_SCREEN,
+        IN_APP_DRAWER
     }
 
     private MainScreenFragment mainScreen;
@@ -37,15 +45,47 @@ public class LayoutSwitcher implements View.OnTouchListener {
     private Rectangle rect;
     private FrameLayout.LayoutParams appDrawerParams;
     private View appDrawerRootView;
-    private RecyclerView recyclerView;
+    public RecyclerView recyclerView;
 
     private ImageView toggle;
     private int toggleOriginalY;
     private FrameLayout.LayoutParams toggleParams;
     private int recyclerMarginTop;
 
+
+    private MODE mode = MODE.IN_MAIN_SCREEN;
+    private float max_value = 0.65f;
+    private boolean mainScreenIsHidden = false;
+    private GestureDetector mGestureDetector ;
+    ValueAnimator va;
+    boolean isRunning = false;
+    public void detachView() {
+        mainScreen = null;
+        appDrawer = null;
+        container = null;
+        rect = null;
+        appDrawerParams = null;
+        appDrawerRootView = null;
+        recyclerView = null;
+
+        toggle = null;
+        toggleParams = null;
+
+        mGestureDetector = null ;
+        if(null!=va&&va.isRunning()) va.cancel();
+        if(null!=va) va = null;
+        isBind = false;
+
+    }
+    public boolean isViewAttached() {
+        return isBind;
+    }
+    private boolean isBind = false;
+
     @SuppressLint("ClickableViewAccessibility")
-    LayoutSwitcher(Activity activity, MainScreenFragment mainScreen, AppDrawerFragment appDrawer) {
+    public void bind(Activity activity, MainScreenFragment mainScreen, AppDrawerFragment appDrawer) {
+        if(isBind) return;
+        isBind = true;
         this.mainScreen = mainScreen;
         this.appDrawer = appDrawer;
         container = activity.findViewById(R.id.container);
@@ -90,14 +130,13 @@ public class LayoutSwitcher implements View.OnTouchListener {
         appDrawerRootView = appDrawer.getRoot();
         appDrawerParams = (FrameLayout.LayoutParams) appDrawerRootView.getLayoutParams();
 
-        recyclerView = (RecyclerView)appDrawer.getEventSenderView();
+        recyclerView = (RecyclerView)appDrawer.mRecyclerView;
 
         container.setOnTouchListener(this);
         recyclerView.setOnTouchListener(this);
         mGestureDetector = new GestureDetector(activity, gestureListener);
     }
 
-    private float yWhenTouchDown;
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -110,11 +149,6 @@ public class LayoutSwitcher implements View.OnTouchListener {
        }
        return false;
     }
-    public enum MODE {
-        IN_MAIN_SCREEN,
-        IN_APP_DRAWER
-    }
-    private MODE mode = MODE.IN_MAIN_SCREEN;
 
     void controlPos(int id,int pos) {
         Log.d(TAG, "controlPos");
@@ -122,6 +156,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
             appDrawerParams.topMargin = pos;
             int tgPos = pos- toggleParams.height + recyclerMarginTop;
             toggleParams.topMargin = (tgPos> toggleOriginalY) ? toggleOriginalY : tgPos;
+          // if(appDrawerParams.topMargin<toggleParams.topMargin + toggleParams.height-recyclerMarginTop) motion(toggleParams.topMargin + toggleParams.height-recyclerMarginTop);
         }
         else {
             appDrawerParams.topMargin = rect.Height + pos  ;
@@ -134,63 +169,55 @@ public class LayoutSwitcher implements View.OnTouchListener {
         toggle.requestLayout();
         if(appDrawerParams.topMargin<=0) mode =MODE.IN_APP_DRAWER;
         else if(appDrawerParams.topMargin>=appDrawerParams.height) mode = MODE.IN_MAIN_SCREEN;
-        runControlEffect();
+        showHideMainScreenWhenModeChanged();
 
     }
-    private float max_value = 0.65f;
-    private boolean inEffectMode = false;
-    private void runControlEffect() {
-        Log.d(TAG, "runControlEffect: mode ="+ mode);
-       if(appDrawerParams.topMargin>0&&!inEffectMode) {
+    private void updateShowHideMainScreen(boolean zero2One, float value) {
+        appDrawer.recyclerParent.setRoundNumber(0.5f + value*(1.75f-0.5f),true);
+
+        float alpha_blur = value/max_value;
+        if(alpha_blur>1) alpha_blur = 1;
+        appDrawer.recyclerParent.setAlphaBlurPaint(alpha_blur,false);
+        appDrawer.recyclerParent.setAlphaBackground(value*max_value);
+
+        mainScreen.setAlpha(value);
+        toggle.setAlpha(value);
+        if(value>=0.5f&&zero2One) {
+            Tool.WHITE_TEXT_THEME = false;
+            appDrawer.search_text_view.setTextColor(Color.BLACK);
+            appDrawer.search_image_view.setImageBitmap(appDrawer.black_search_icon);
+            appDrawer.mAdapter.notifyDataSetChanged();
+        } else if(value<=0.5f&&!zero2One) {
+            Tool.WHITE_TEXT_THEME = true;
+            appDrawer.search_text_view.setTextColor(0xFFEEEEEE);
+            appDrawer.search_image_view.setImageBitmap(appDrawer.white_search_icon);
+            appDrawer.mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private void showHideMainScreenWhenModeChanged() {
+        Log.d(TAG, "showHideMainScreenWhenModeChanged: mode ="+ mode+", topMargin = "+ appDrawerParams.topMargin+", mainScreenIsHidden = "+ mainScreenIsHidden);
+       if(appDrawerParams.topMargin>0&&!mainScreenIsHidden) {
            // run into effect
-           inEffectMode = true;
-           ValueAnimator va = ValueAnimator.ofFloat(0,1);
+           mainScreenIsHidden = true;
+           final ValueAnimator va = ValueAnimator.ofFloat(0,1);
            va.setDuration(350);
            va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                @Override
                public void onAnimationUpdate(ValueAnimator animation) {
-                  float value = (float) animation.getAnimatedValue();
-                   appDrawer.recyclerParent.setRoundNumber(0.5f + value*(1.75f-0.5f),true);
-
-                   float alpha_blur = value/max_value;
-                   if(alpha_blur>1) alpha_blur = 1;
-                   appDrawer.recyclerParent.setAlphaBlurPaint(alpha_blur,false);
-                   appDrawer.recyclerParent.setAlphaBackground(value*max_value);
-                   mainScreen.widgetContainer.setAlpha(value);
-                   mainScreen.dock.setAlpha(value);
-                   toggle.setAlpha(value);
-                   if(value>=0.5f) {
-                       Tool.WHITE_TEXT_THEME = false;
-                       appDrawer.search_text_view.setTextColor(Color.BLACK);
-                       appDrawer.search_image_view.setImageBitmap(appDrawer.black_search_icon);
-                       appDrawer.mAdapter.notifyDataSetChanged();
-                   }
+                 updateShowHideMainScreen(true, (Float) animation.getAnimatedValue());
                }
            });
            va.start();
-       } else if(appDrawerParams.topMargin<=0&&inEffectMode) {
-           inEffectMode = false;
+
+       } else if(appDrawerParams.topMargin<=0&& mainScreenIsHidden) {
+           mainScreenIsHidden = false;
            final ValueAnimator va = ValueAnimator.ofFloat(1,0);
            va.setDuration(350);
            va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                @Override
                public void onAnimationUpdate(ValueAnimator animation) {
-                   float value = (float) animation.getAnimatedValue();
-                   appDrawer.recyclerParent.setRoundNumber(0.5f + value*(1.75f-0.5f),true);
-
-                   float alpha_blur = value/max_value;
-                   if(alpha_blur>1) alpha_blur = 1;
-                   appDrawer.recyclerParent.setAlphaBlurPaint(alpha_blur,false);
-                   appDrawer.recyclerParent.setAlphaBackground(max_value*value);
-                   mainScreen.widgetContainer.setAlpha(value);
-                   mainScreen.dock.setAlpha(value);
-                   toggle.setAlpha(value);
-                   if(value<=0.5f) {
-                       Tool.WHITE_TEXT_THEME = true;
-                       appDrawer.search_text_view.setTextColor(0xFFEEEEEE);
-                       appDrawer.search_image_view.setImageBitmap(appDrawer.white_search_icon);
-                       appDrawer.mAdapter.notifyDataSetChanged();
-                   }
+                  updateShowHideMainScreen(false, (Float) animation.getAnimatedValue());
                }
            });
            va.start();
@@ -205,14 +232,6 @@ public class LayoutSwitcher implements View.OnTouchListener {
         }
     }
 
-    private float yWhenOnTop = -1;
-    int[] xy = new int[2];
-    enum MOVE_DIRECTION {
-        NONE,
-        MOVE_UP,
-        MOVE_DOWN
-    }
-    private GestureDetector mGestureDetector ;
     public SwipeGestureListener gestureListener = new SwipeGestureListener();
     class SwipeGestureListener extends SwipeDetectorGestureListener {
         public boolean down = false;
@@ -343,7 +362,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
         return !recyclerView.canScrollVertically(-1);
     }
 
-    private boolean inDownRecycler = false;
+
     private boolean _onTouch(View v, MotionEvent event) {
         v.performClick();
         gestureListener.setAdaptiveView(v);
@@ -359,8 +378,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
     private boolean onTouchRecyclerView(View v, MotionEvent event) {
         return (checkOnTop()) &&_onTouch(v,event);
     }
-    ValueAnimator va;
-    boolean isRunning = false;
+
     private void motion(int to){
         motion(appDrawerParams.topMargin,to);
     }
@@ -397,5 +415,6 @@ public class LayoutSwitcher implements View.OnTouchListener {
 
         va.start();
     }
+
 
 }

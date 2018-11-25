@@ -40,6 +40,7 @@ public class Tool {
         Tool.getScreenSize(context);
         tool.resumeWallpaperTracking();
     }
+
     public static Tool getInstance() {
         return tool;
     }
@@ -48,6 +49,12 @@ public class Tool {
     public void AddWallpaperChangedNotifier(WallpaperChangedNotifier notifier) {
         notifiers.add(notifier);
         CallFirstTime.add(false);
+    }
+    public void clear() {
+        notifiers.clear();
+    }
+    public void remove(WallpaperChangedNotifier notifier) {
+        notifiers.remove(notifier);
     }
 
     public interface WallpaperChangedNotifier {
@@ -335,7 +342,7 @@ public class Tool {
     {
         if(oneDPs !=-1) return oneDPs;
         //      oneDPs = context.getResources().getDimensionPixelOffset(R.dimen.oneDP);
-        oneDPs = getPixelsFromDPs((Activity)context,1);
+        oneDPs = getPixelsFromDPs(context,1);
         return oneDPs;
     }
     public static float oneDPs =-1;
