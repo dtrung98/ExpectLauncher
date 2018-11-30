@@ -29,6 +29,7 @@ import com.teamll.expectlauncher.model.Rectangle;
 import com.teamll.expectlauncher.ui.main.AppLoaderActivity;
 import com.teamll.expectlauncher.ui.main.LayoutSwitcher;
 import com.teamll.expectlauncher.ui.main.bottomsheet.RoundedBottomSheetDialogFragment;
+import com.teamll.expectlauncher.ui.main.search.SearchAppFragment;
 import com.teamll.expectlauncher.ui.widgets.MotionRoundedBitmapFrameLayout;
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.OnStartDragListener;
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.SimpleItemTouchHelperCallback;
@@ -40,8 +41,9 @@ import com.teamll.expectlauncher.utils.PreferencesUtility;
 import com.teamll.expectlauncher.utils.Tool;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
-public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.ItemClickListener, OnStartDragListener, AppLoaderActivity.AppDetailReceiver, LayoutSwitcher.EventSender, RoundedBottomSheetDialogFragment.BottomSheetListener, OnRangeChangedListener {
+public class AppDrawerFragment extends Fragment implements View.OnClickListener, AppDrawerAdapter.ItemClickListener, OnStartDragListener, AppLoaderActivity.AppDetailReceiver, LayoutSwitcher.EventSender, RoundedBottomSheetDialogFragment.BottomSheetListener, OnRangeChangedListener {
     private static final String TAG="AppDrawerFragment";
 
     FrameLayout rootView;
@@ -78,6 +80,7 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
     public Bitmap black_search_icon, white_search_icon;
     public TextView search_text_view;
 
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         activity = getActivity();
@@ -112,6 +115,7 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
         rect.Top = rect.Height;
         updateLayout();
         search_bar = rootView.findViewById(R.id.search_bar);
+        search_bar.setOnClickListener(this);
         recyclerParent = rootView.findViewById(R.id.parentOfRecycleView);
 
         search_image_view = recyclerParent.findViewById(R.id.search_icon);
@@ -300,5 +304,16 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
     @Override
     public void onStopTrackingTouch(RangeSeekBar view, boolean isLeft) {
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.search_bar:
+                getActivity().getSupportFragmentManager().beginTransaction()
+                    .add(R.id.container, new SearchAppFragment())
+                    .commitNow();
+                break;
+        }
     }
 }

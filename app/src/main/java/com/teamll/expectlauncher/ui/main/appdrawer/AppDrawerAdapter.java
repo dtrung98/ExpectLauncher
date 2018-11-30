@@ -27,6 +27,7 @@ import com.teamll.expectlauncher.model.AppDetail;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.ItemTouchHelperAdapter;
@@ -59,10 +60,13 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
         notifyDataSetChanged();
     }
 
-    AppDrawerAdapter(Context mContext, OnStartDragListener dragStartListener) {
+
+
+    public AppDrawerAdapter(Context mContext, OnStartDragListener dragStartListener) {
         this.mContext = mContext;
         mDragStartListener = dragStartListener;
     }
+
     public void setData(List<App> data) {
         mData.clear();
         if (data!=null) {
@@ -77,6 +81,28 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
             notifyItemRangeInserted(posBefore,data.size());
         }
     }
+    /**phhViet - filter này dùng trong searchView - khi text trong searchView thay đổi thì hiện
+    app tương ứng*/
+    public void Filter(String name,List<App>data) {
+        ArrayList<AppDetail> tmp = new ArrayList<>();
+        name = name.toLowerCase(Locale.getDefault());
+        tmp.clear();
+        if (name.length() == 0) {
+            tmp.addAll(data);
+
+        }
+        else {
+            for(AppDetail i: data){
+                if(i.getLabel().toLowerCase(Locale.getDefault()).contains(name)){
+                    tmp.add(i);
+                }
+            }
+
+        }
+        mData.addAll(tmp);
+        notifyDataSetChanged();
+    }
+
 
     @NonNull
     @Override
