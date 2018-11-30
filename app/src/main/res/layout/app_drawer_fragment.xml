@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.teamll.expectlauncher.ui.main.appdrawer.AppDrawerFragment">
     <com.teamll.expectlauncher.ui.widgets.MotionRoundedBitmapFrameLayout
-        android:id="@+id/parentOfRecycleView"
+        android:id="@+id/recycler_view_parent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/transparent"
@@ -34,10 +34,10 @@
                         android:layout_gravity="center"
                         android:alpha="0.8">
                     <ImageView
-                        android:id="@+id/search_icon"
+                        android:id="@+id/search_image_view"
                         android:layout_width="@dimen/search_bar_height"
                         android:layout_height="@dimen/search_bar_height"
-                        android:src="@drawable/search"
+                        android:src="@drawable/black_search"
                         android:padding="8dp"/>
                         <TextView
                               android:id="@+id/search_text_view"
@@ -48,6 +48,11 @@
                             android:layout_gravity="center_vertical"
                             android:textColor="@android:color/black"/>
                     </LinearLayout>
+                    <android.support.v7.widget.SearchView
+                        android:id="@+id/search_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#AAFFFFFF"/>
                 </com.teamll.expectlauncher.ui.widgets.MotionRoundedBitmapFrameLayout>
             <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerview"

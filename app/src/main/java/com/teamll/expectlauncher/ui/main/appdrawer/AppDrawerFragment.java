@@ -15,8 +15,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +40,9 @@ import com.teamll.expectlauncher.utils.Tool;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.ItemClickListener, OnStartDragListener, AppLoaderActivity.AppDetailReceiver, LayoutSwitcher.EventSender, RoundedBottomSheetDialogFragment.BottomSheetListener, OnRangeChangedListener {
     private static final String TAG="AppDrawerFragment";
 
@@ -56,32 +57,67 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
      */
     public AppDrawerAdapter mAdapter;
 
-    public RecyclerView mRecyclerView;
-    public MotionRoundedBitmapFrameLayout recyclerParent;
-    /*
-    ViewGroup chứa fragment hiện tại
-     */
-    FrameLayout container;
+   @BindView(R.id.recyclerview) public RecyclerView mRecyclerView;
+   @BindView(R.id.recycler_view_parent) public MotionRoundedBitmapFrameLayout mRecyclerViewParent;
 
+   /**
+    ViewGroup gốc mà fragment được thêm vào
+    ContainerView được lấy reference thông qua activity
+     */
+    FrameLayout mContainerView;
+
+    /**
+     * Đối tượng helper xử lý cử chỉ đổi vị trí các ứng dụng
+     */
     ItemTouchHelper mItemTouchHelper;
 
+    /**
+     * Chiều cao của thanh trạng thái
+     */
     float statusBarHeight  = 0;
+
+    /**
+     * Chiều cao của thanh điều hướng ( nếu có)
+     */
     float navigationHeight = 0;
+
+    /**
+     * Một DP bằng mấy PX
+     */
     float oneDp = 0;
+
+    /**
+     * Chiều cao của thanh dock
+     * AppDrawer cần biết giá trị này để tính toán vị trí phù hợp khi hiển thị lên màn hình
+     */
     float dockHeight;
+
+    /**
+     * Viền ngoài của dock
+     */
     float dockMargin;
+
+    /**
+     * Hình chữ nhật bao phủ App Drawer
+     * Left - tương ứng vị trí X của App Drawer
+     * Top - Tương tứng Y của App Drawer trên màn hình
+     * ...
+     */
     Rectangle rect;
 
-    public MotionRoundedBitmapFrameLayout search_bar;
+    @BindView(R.id.search_bar) public MotionRoundedBitmapFrameLayout mSearchBar;
     FrameLayout.LayoutParams params;
 
-    public ImageView search_image_view;
-    public Bitmap black_search_icon, white_search_icon;
-    public TextView search_text_view;
+    @BindView(R.id.search_image_view) public ImageView mSearchImageView;
+
+    public Bitmap mBlackSearchBitmap, mWhiteSearchBitmap;
+
+    @BindView(R.id.search_text_view) public TextView mSearchTextView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate");
+        super.onCreate(savedInstanceState);
+
         activity = getActivity();
         statusBarHeight= Tool.getStatusHeight(activity.getResources());
         navigationHeight = Tool.getNavigationHeight(activity);
@@ -89,14 +125,12 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
         Resources r = getResources();
         dockHeight = r.getDimension(R.dimen.dock_height);
         dockMargin = r.getDimension(R.dimen.dock_margin);
-        container = activity.findViewById(R.id.container);
-        super.onCreate(savedInstanceState);
+        mContainerView = activity.findViewById(R.id.container);
        }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView");
         return inflater.inflate(R.layout.app_drawer_fragment,container,false);
 
     }
@@ -104,7 +138,11 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
+        // Bind View
         rootView = (FrameLayout) view;
+        ButterKnife.bind(this,view);
+
 
         /**
          * Vị trí mặc định của AppDrawer
@@ -113,50 +151,56 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
         rect = new Rectangle(size[0],size[1]);
         rect.Left = 0;
         rect.Top = rect.Height;
-        updateLayout();
-        search_bar = rootView.findViewById(R.id.search_bar);
-        recyclerParent = rootView.findViewById(R.id.parentOfRecycleView);
-
-        search_image_view = recyclerParent.findViewById(R.id.search_icon);
-        search_text_view = recyclerParent.findViewById(R.id.search_text_view);
-        black_search_icon = BitmapFactory.decodeResource(getResources(),R.drawable.search);
-        white_search_icon = BitmapFactory.decodeResource(getResources(),R.drawable.search_white);
+        requestLayout();
 
 
-        FrameLayout.LayoutParams rPParams = (FrameLayout.LayoutParams) recyclerParent.getLayoutParams();
+        mBlackSearchBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.black_search);
+        mWhiteSearchBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.white_search);
+
+
+        FrameLayout.LayoutParams rPParams = (FrameLayout.LayoutParams) mRecyclerViewParent.getLayoutParams();
         rPParams.topMargin += (int) statusBarHeight;
         rPParams.height = (int) (rect.Height - rPParams.bottomMargin - navigationHeight /*-dockHeight  - dockMargin */ - rPParams.topMargin);
         rPParams.bottomMargin = 0;
-        recyclerParent.requestLayout();
-        recyclerParent.setBackGroundColor(0xFFEEEEEE);
-        recyclerParent.setRoundNumber(1.75f,true);
-        Tool.getInstance().AddWallpaperChangedNotifier( recyclerParent);
-        Tool.getInstance().AddWallpaperChangedNotifier(search_bar);
-        mRecyclerView = recyclerParent.findViewById(R.id.recyclerview);
+        mRecyclerViewParent.requestLayout();
+        mRecyclerViewParent.setBackGroundColor(0xFFEEEEEE);
+        mRecyclerViewParent.setRoundNumber(1.75f,true);
+        Tool.getInstance().AddWallpaperChangedNotifier(mRecyclerViewParent);
+        Tool.getInstance().AddWallpaperChangedNotifier(mSearchBar);
+        mRecyclerView = mRecyclerViewParent.findViewById(R.id.recyclerview);
 
         mAdapter = new AppDrawerAdapter(getActivity(),this);
         mRecyclerView.setAdapter(mAdapter);
         mAdapter.setClickListener(this);
         setLayoutManager();
-        setDraggable();
+        initTouchHelper();
 
         /**
          * Đăng ký bộ lắng nghe việc load app cho đối tượng này.
          */
-        AppLoaderActivity ac = (AppLoaderActivity)getActivity();
-        if(ac!=null)
-        ac.addAppDetailReceiver(this);
-         else throw new NullPointerException("Fragment was created from an activity class that doesn't inherit from AppLoaderActivity class");
+        ((AppLoaderActivity)getActivity()).addAppDetailReceiver(this);
 
     }
 
+    private void initTouchHelper() {
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
+        mItemTouchHelper = new ItemTouchHelper(callback);
+        mItemTouchHelper.attachToRecyclerView(mRecyclerView);
+    }
+
+    /**
+     * Hàm này cài đặt GridLayoutManager cho mRecyclerView
+     * Tính toán số lượng cột phù hợp để hiển thị vừa vặn độ rộng màn hình
+     * Nó cũng tính toán margin giữa các biểu tượng sao cho hiển thị trông cách đều nhau
+     * Gọi hàm này mỗi khi kích thước của biểu tượng ứng dụng bị thay đổi
+     */
     public void setLayoutManager() {
         Resources resources = getResources();
         float margin = resources.getDimension(R.dimen.app_drawer_margin);
         float padding = resources.getDimension(R.dimen.recycler_view_padding);
         int[] ss = Tool.getScreenSize(getActivity());
         float mRVContentWidth = ss[0] - margin - padding;
-        float mRVContentHeight = recyclerParent.getLayoutParams().height
+        float mRVContentHeight = mRecyclerViewParent.getLayoutParams().height
                 - resources.getDimension(R.dimen.search_bar_height)
                 - 2*resources.getDimension(R.dimen.search_bar_margin)
                 - padding;
@@ -179,16 +223,16 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
         BoundItemDecoration itemDecoration = new BoundItemDecoration(mRVContentWidth, mRVContentHeight,numberColumn,numberRow,(int) (verticalMargin*0.9f),(int)(horizontalMargin*0.9f));
         mRecyclerView.addItemDecoration(itemDecoration);
     }
+
+    /**
+     * Hàm thay đổi kích thước biểu tượng ứng dụng
+     * Gọi trực tiếp hàm này để thực hiện chức năng phóng to - thu nhỏ biểu tượng ứng dụng
+     * @param scale tỉ lệ zoom từ kích thước mặc định ( scale từ 0.5 -> 3 )
+     */
     public void setAppIconSize(float scale) {
         PreferencesUtility.getInstance(getActivity().getApplicationContext()).setAppIconSize(scale);
         mAdapter.notifyDataSetChanged();
         setLayoutManager();
-    }
-
-    private void setDraggable() {
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
-        mItemTouchHelper = new ItemTouchHelper(callback);
-        mItemTouchHelper.attachToRecyclerView(mRecyclerView);
     }
 
     @Override
@@ -210,7 +254,11 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
                 "song_popup_menu");
     }
 
-    public void updateLayout() {
+    /**
+     * Cập nhật vị trí mới cho App Drawer
+     * Dùng nó để di chuyển App Drawer từ dưới lên
+     */
+    public void requestLayout() {
         if(params==null) {
             params = new FrameLayout.LayoutParams(
             rect.Width,rect.Height);
@@ -224,10 +272,6 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
             params.height = rect.Height;
             rootView.requestLayout();
         }
-    }
-
-    public void setAppData(ArrayList<App> data) {
-        if(mAdapter!=null) mAdapter.setData(data);
     }
 
     void openApp(View v, AppDetail appDetail) {
@@ -258,12 +302,12 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
 
     @Override
     public void onLoadComplete(ArrayList<App> data) {
-        setAppData(data);
+        if(mAdapter!=null) mAdapter.setData(data);
     }
 
     @Override
     public void onLoadReset() {
-      setAppData(null);
+    // do nothing
     }
 
     @Override
