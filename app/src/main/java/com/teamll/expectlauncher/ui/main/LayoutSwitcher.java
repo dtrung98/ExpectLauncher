@@ -60,6 +60,8 @@ public class LayoutSwitcher implements View.OnTouchListener {
     ValueAnimator va;
     boolean isRunning = false;
     public void detachView() {
+    //    if(true) return;
+
         mainScreen = null;
         appDrawer = null;
         container = null;
@@ -141,10 +143,11 @@ public class LayoutSwitcher implements View.OnTouchListener {
     @Override
     public boolean onTouch(View v, MotionEvent event) {
       //  Log.d(TAG, "onTouch: topMargin = "+appDrawerParams.topMargin);
+        if(!isViewAttached()) return false;
        if(v.getId() ==recyclerView.getId()&&appDrawer.mAdapter.mConfigMode==AppDrawerAdapter.APP_DRAWER_CONFIG_MODE.NORMAL) {
           return onTouchRecyclerView(v,event);
        } else if(v.getId() == container.getId()) {
-           if(event.getAction()==MotionEvent.ACTION_UP) mainScreen.onUp();
+           if(event.getAction()==MotionEvent.ACTION_UP) mainScreen.onUp(event);
          return _onTouch(v,event);
        }
        return false;
@@ -388,6 +391,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
     private void motionDown(){
         motion(appDrawerParams.topMargin,appDrawerParams.height);
     }
+
     private void motion(int yFrom, int yTo) {
         if(yTo ==appDrawerParams.topMargin) return;
         if(va!=null&&isRunning) {
@@ -409,10 +413,14 @@ public class LayoutSwitcher implements View.OnTouchListener {
                 isRunning = false;
             }
         });
+        if(yFrom<yTo) {
+            va.setInterpolator(Animation.getInterpolator(4, 1.5f));
+            va.setDuration((long) (300 + 250 * Math.abs((yTo-yFrom+0.0f)/rect.Height)));
+        } else {
 
-        va.setInterpolator(Animation.getInterpolator(4,1.5f));
-        va.setDuration((long) (300 + 350 * Math.abs((yTo-yFrom+0.0f)/rect.Height)));
-
+            va.setInterpolator(Animation.getEasingInterpolator(2));
+            va.setDuration((long) (150 + 150 * Math.abs((yTo - yFrom + 0.0f) / rect.Height)));
+        }
         va.start();
     }
 

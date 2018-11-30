@@ -1,18 +1,15 @@
 package com.teamll.expectlauncher.ui.main;
 
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Build;
-import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.ImageView;
@@ -51,7 +48,7 @@ public class MainActivity extends AppLoaderActivity implements Tool.WallpaperCha
         Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
        setContentView(R.layout.main_activity);
-        Tool.Init(getApplicationContext());
+        Tool.init(this);
         Tool tool = Tool.getInstance();
         tool.AddWallpaperChangedNotifier(this);
         //Layout Switcher
@@ -63,11 +60,16 @@ public class MainActivity extends AppLoaderActivity implements Tool.WallpaperCha
 
         imageView = findViewById(R.id.imageView);
 
-        initScreen();
 
-        if(savedInstanceState!=null)
-        getWindow().getDecorView()
-                .sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
+
+        if(savedInstanceState!=null) {
+            getWindow().getDecorView()
+                    .sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
+            getFragmentReference();
+
+        } else {
+            initScreen();
+        }
         initHomeWatcher();
         GetPermission();
 
@@ -92,11 +94,16 @@ public class MainActivity extends AppLoaderActivity implements Tool.WallpaperCha
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
-        ft.add(R.id.container, mainScreenFragment)
-                .add(R.id.container, appDrawerFragment)
+        ft.add(R.id.container, mainScreenFragment,"MSF")
+                .add(R.id.container, appDrawerFragment,"ADF")
                 .commit();
 
 
+    }
+    public void getFragmentReference() {
+        FragmentManager ft = getSupportFragmentManager();
+        mainScreenFragment = (MainScreenFragment) ft.findFragmentByTag("MSF");
+        appDrawerFragment = (AppDrawerFragment) ft.findFragmentByTag("ADF");
     }
 
     @Override
@@ -113,11 +120,7 @@ public class MainActivity extends AppLoaderActivity implements Tool.WallpaperCha
     @Override
     protected void onStop() {
         Log.d(TAG, "onStop");
-        if(null!=switcher&&switcher.isViewAttached()) {
-            Log.d(TAG, "switcher : ");
-            switcher.detachView();
-            switcher = null;
-        }
+
        // Tool.getInstance().clear();
         super.onStop();
     }
@@ -126,6 +129,13 @@ public class MainActivity extends AppLoaderActivity implements Tool.WallpaperCha
     protected void onDestroy() {
         Log.d(TAG, "onDestroy");
 
+        if(null!=switcher&&switcher.isViewAttached()) {
+            Log.d(TAG, "switcher : ");
+            switcher.detachView();
+            switcher = null;
+        }
+
+        Tool.getInstance().destroy();
         super.onDestroy();
     }
 

@@ -34,13 +34,18 @@ public class Tool {
 
     private static Tool tool;
     private Context context;
-    public static void Init(Context context) {
+    public static void init(Context context) {
         if(tool==null) tool = new Tool();
         tool.context = context;
         Tool.getScreenSize(context);
         tool.resumeWallpaperTracking();
     }
 
+    public void destroy() {
+        stopWallpaperTracking();
+        context = null;
+        tool = null;
+    }
     public static Tool getInstance() {
         return tool;
     }

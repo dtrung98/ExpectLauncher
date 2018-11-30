@@ -34,6 +34,8 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
     private static final String TAG="MainScreenFragment";
 
     private long savedTime;
+    private float xDown;
+    private float yDown;
     private View adaptiveDock;
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -43,6 +45,8 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
                 adaptiveDock = v;
                 Log.d(TAG, "onTouch: action down");
                 savedTime = System.currentTimeMillis();
+                xDown = event.getRawX();
+                yDown = event.getRawY();
         }
 
         return false;
@@ -160,8 +164,10 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
     }
    public FrameLayout.LayoutParams toggleParams ;
     public ImageView toggle;
-    public void onUp() {
-        if(System.currentTimeMillis() - savedTime <=300) {
+    public void onUp(MotionEvent event) {
+        if(System.currentTimeMillis() - savedTime <=300&& Math.sqrt(
+                (xDown-event.getRawX())*(xDown - event.getRawX())+
+                        (yDown-event.getRawY())*(yDown-event.getRawY()))<=100) {
            if(adaptiveDock!=null) {
                dockClick(adaptiveDock);
                adaptiveDock = null;

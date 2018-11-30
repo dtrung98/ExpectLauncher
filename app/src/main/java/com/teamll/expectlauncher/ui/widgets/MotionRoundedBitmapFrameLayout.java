@@ -91,13 +91,17 @@ public class MotionRoundedBitmapFrameLayout extends DarkenRoundedBackgroundFrame
         }
         invalidate();
     }
-
+    private boolean drawMask = true;
+    public void setBlurred(boolean b) {
+        drawMask = b;
+        invalidate();
+    }
     @Override
     protected void onDraw(Canvas canvas) {
 
         initBitmap();
 
-        if (source_bitmap != null)
+        if (source_bitmap != null&&drawMask)
             drawMask(canvas);
 
         super.onDraw(canvas);
