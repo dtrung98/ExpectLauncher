@@ -10,11 +10,10 @@ import android.graphics.Shader;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.view.View;
 
 import com.teamll.expectlauncher.model.Rectangle;
-import com.teamll.expectlauncher.utils.BitmapEditor;
-import com.teamll.expectlauncher.utils.Tool;
+import com.teamll.expectlauncher.util.BitmapEditor;
+import com.teamll.expectlauncher.util.Tool;
 
 public class MotionRoundedBitmapFrameLayout extends DarkenRoundedBackgroundFrameLayout implements Tool.WallpaperChangedNotifier {
    private static final String TAG="MotionRound";

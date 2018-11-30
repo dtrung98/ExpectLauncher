@@ -1,4 +1,4 @@
-package com.teamll.expectlauncher.utils;
+package com.teamll.expectlauncher.util;
 
 import android.app.Activity;
 import android.content.Context;

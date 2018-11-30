@@ -1,21 +1,10 @@
-package com.teamll.expectlauncher.utils;
+package com.teamll.expectlauncher.util;
 
 import android.animation.TimeInterpolator;
-import android.app.Activity;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Point;
-import android.graphics.Rect;
-import android.graphics.Typeface;
-import android.os.Build;
-import android.os.Bundle;
 import android.support.v4.view.animation.FastOutLinearInInterpolator;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.support.v4.view.animation.LinearOutSlowInInterpolator;
-import android.view.Display;
-import android.view.Gravity;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AnticipateInterpolator;
@@ -25,13 +14,9 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.OvershootInterpolator;
-import android.view.animation.ScaleAnimation;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.daasuu.ei.Ease;
 import com.daasuu.ei.EasingInterpolator;
-import com.teamll.expectlauncher.R;
 
 import java.util.ArrayList;
 import java.util.List;

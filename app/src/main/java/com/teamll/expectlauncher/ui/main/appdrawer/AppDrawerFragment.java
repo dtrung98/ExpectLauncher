@@ -14,10 +14,13 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -35,15 +38,23 @@ import com.teamll.expectlauncher.model.AppDetail;
 import com.teamll.expectlauncher.ui.widgets.BoundItemDecoration;
 import com.teamll.expectlauncher.ui.widgets.rangeseekbar.OnRangeChangedListener;
 import com.teamll.expectlauncher.ui.widgets.rangeseekbar.RangeSeekBar;
-import com.teamll.expectlauncher.utils.PreferencesUtility;
-import com.teamll.expectlauncher.utils.Tool;
+import com.teamll.expectlauncher.util.PreferencesUtility;
+import com.teamll.expectlauncher.util.Tool;
 
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.ItemClickListener, OnStartDragListener, AppLoaderActivity.AppDetailReceiver, LayoutSwitcher.EventSender, RoundedBottomSheetDialogFragment.BottomSheetListener, OnRangeChangedListener {
+public class AppDrawerFragment extends Fragment implements View.OnClickListener,
+                                                            AppDrawerAdapter.ItemClickListener,
+                                                           OnStartDragListener,
+                                                           AppLoaderActivity.AppDetailReceiver,
+                                                           LayoutSwitcher.EventSender,
+                                                           RoundedBottomSheetDialogFragment.BottomSheetListener,
+                                                           OnRangeChangedListener,
+                                                           SearchView.OnQueryTextListener {
+
     private static final String TAG="AppDrawerFragment";
 
     FrameLayout rootView;
@@ -105,7 +116,7 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
      */
     Rectangle rect;
 
-    @BindView(R.id.search_bar) public MotionRoundedBitmapFrameLayout mSearchBar;
+    @BindView(R.id.search_back_ground) public MotionRoundedBitmapFrameLayout mSearchBackGround;
     FrameLayout.LayoutParams params;
 
     @BindView(R.id.search_image_view) public ImageView mSearchImageView;
@@ -113,6 +124,8 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
     public Bitmap mBlackSearchBitmap, mWhiteSearchBitmap;
 
     @BindView(R.id.search_text_view) public TextView mSearchTextView;
+
+    @BindView(R.id.search_view) public SearchView mSearchView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -157,7 +170,6 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
         mBlackSearchBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.black_search);
         mWhiteSearchBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.white_search);
 
-
         FrameLayout.LayoutParams rPParams = (FrameLayout.LayoutParams) mRecyclerViewParent.getLayoutParams();
         rPParams.topMargin += (int) statusBarHeight;
         rPParams.height = (int) (rect.Height - rPParams.bottomMargin - navigationHeight /*-dockHeight  - dockMargin */ - rPParams.topMargin);
@@ -166,8 +178,7 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
         mRecyclerViewParent.setBackGroundColor(0xFFEEEEEE);
         mRecyclerViewParent.setRoundNumber(1.75f,true);
         Tool.getInstance().AddWallpaperChangedNotifier(mRecyclerViewParent);
-        Tool.getInstance().AddWallpaperChangedNotifier(mSearchBar);
-        mRecyclerView = mRecyclerViewParent.findViewById(R.id.recyclerview);
+        Tool.getInstance().AddWallpaperChangedNotifier(mSearchBackGround);
 
         mAdapter = new AppDrawerAdapter(getActivity(),this);
         mRecyclerView.setAdapter(mAdapter);
@@ -179,6 +190,15 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
          * Đăng ký bộ lắng nghe việc load app cho đối tượng này.
          */
         ((AppLoaderActivity)getActivity()).addAppDetailReceiver(this);
+
+        mSearchView.setOnQueryTextListener(this);
+        mSearchView.setOnClickListener(this);
+        mSearchView.onActionViewExpanded();
+        mSearchView.clearFocus();
+        EditText searchEditText =  mSearchView.findViewById(R.id.search_src_text);
+        if (searchEditText != null) {
+            searchEditText.setGravity(Gravity.CENTER);
+        }
 
     }
 
@@ -343,5 +363,35 @@ public class AppDrawerFragment extends Fragment implements AppDrawerAdapter.Item
     @Override
     public void onStopTrackingTouch(RangeSeekBar view, boolean isLeft) {
 
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String s) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String s) {
+        if(s==null||s.length()==0) {
+            if(mAdapter.isInSearchMode()) {
+                mAdapter.setInSearchMode(false);
+                mAdapter.notifyDataSetChanged();
+            }
+        } else {
+            if(!mAdapter.isInSearchMode()) {
+                mAdapter.setInSearchMode(true);
+                mAdapter.notifyDataSetChanged();
+            }
+        }
+        if(mAdapter.isInSearchMode()) mAdapter.getFilter().filter(s);
+
+        return true;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.search_view : mSearchView.onActionViewExpanded();break;
+        }
     }
 }

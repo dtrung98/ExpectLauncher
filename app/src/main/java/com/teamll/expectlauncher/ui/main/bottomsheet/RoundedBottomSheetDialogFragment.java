@@ -23,8 +23,8 @@ import com.teamll.expectlauncher.ui.main.LayoutSwitcher;
 import com.teamll.expectlauncher.ui.main.appdrawer.AppDrawerFragment;
 import com.teamll.expectlauncher.ui.widgets.rangeseekbar.OnRangeChangedListener;
 import com.teamll.expectlauncher.ui.widgets.rangeseekbar.RangeSeekBar;
-import com.teamll.expectlauncher.utils.PreferencesUtility;
-import com.teamll.expectlauncher.utils.Tool;
+import com.teamll.expectlauncher.util.PreferencesUtility;
+import com.teamll.expectlauncher.util.Tool;
 
 import static android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED;
 

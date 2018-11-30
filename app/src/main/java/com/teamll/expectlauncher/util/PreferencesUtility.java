@@ -1,11 +1,9 @@
-package com.teamll.expectlauncher.utils;
+package com.teamll.expectlauncher.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.preference.PreferenceManager;
-
-import com.teamll.expectlauncher.ui.main.appdrawer.AppDrawerAdapter;
 
 public final class PreferencesUtility {
     private final static String SHOW_APP_TITLE = "show_app_title";

@@ -15,7 +15,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.teamll.expectlauncher.R;
 import com.teamll.expectlauncher.model.App;
@@ -26,7 +25,7 @@ import com.teamll.expectlauncher.ui.main.LayoutSwitcher;
 import com.teamll.expectlauncher.ui.main.MainActivity;
 import com.teamll.expectlauncher.ui.main.bottomsheet.RoundedBottomSheetDialogFragment;
 import com.teamll.expectlauncher.ui.widgets.MotionRoundedBitmapFrameLayout;
-import com.teamll.expectlauncher.utils.Tool;
+import com.teamll.expectlauncher.util.Tool;
 
 import java.util.ArrayList;
 

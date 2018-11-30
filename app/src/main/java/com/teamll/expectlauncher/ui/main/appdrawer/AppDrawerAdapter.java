@@ -3,7 +3,6 @@ package com.teamll.expectlauncher.ui.main.appdrawer;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
@@ -12,11 +11,10 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationSet;
-import android.view.animation.AnimationUtils;
 import android.view.animation.RotateAnimation;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
@@ -25,21 +23,32 @@ import com.teamll.expectlauncher.model.App;
 import com.teamll.expectlauncher.model.AppDetail;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.ItemTouchHelperAdapter;
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.ItemTouchHelperViewHolder;
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.OnStartDragListener;
-import com.teamll.expectlauncher.utils.Animation;
-import com.teamll.expectlauncher.utils.PreferencesUtility;
-import com.teamll.expectlauncher.utils.Tool;
+import com.teamll.expectlauncher.util.Animation;
+import com.teamll.expectlauncher.util.PreferencesUtility;
+import com.teamll.expectlauncher.util.Tool;
+import com.teamll.expectlauncher.util.Util;
 
-public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.ViewHolder> implements ItemTouchHelperAdapter {
+public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.ViewHolder> implements ItemTouchHelperAdapter, Filterable {
     private static final String TAG="AppDrawerAdapter";
 
     private ArrayList<AppDetail> mData = new ArrayList<>();
+    private ArrayList<AppDetail> mFilterData = new ArrayList<>();
+
+    public boolean isInSearchMode() {
+        return mInSearchMode;
+    }
+
+    public void setInSearchMode(boolean mInSearchMode) {
+        this.mInSearchMode = mInSearchMode;
+    }
+
+    private boolean mInSearchMode = false;
     private final OnStartDragListener mDragStartListener;
     private Context mContext;
     Random random = new Random();
@@ -87,7 +96,11 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
-        holder.bind(mData.get(position));
+        if(!mInSearchMode) {
+            holder.bind(mData.get(position));
+        } else {
+            holder.bind(mFilterData.get(position));
+        }
     }
 
     @Override
@@ -98,7 +111,7 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
 
     @Override
     public int getItemCount() {
-        return (mData==null) ? 0 : mData.size();
+        return (mInSearchMode) ? mFilterData.size() : mData.size();
     }
 
     @Override
@@ -235,6 +248,33 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
     void setClickListener(ItemClickListener itemClickListener) {
         this.mClickListener = itemClickListener;
     }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                String charString = charSequence.toString();
+                if (charString.isEmpty()) {
+                    mFilterData = mData;
+                } else {
+                    mFilterData = Util.searchAppsFilter(mData, charString);
+                }
+
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = mFilterData;
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                mFilterData= (ArrayList<AppDetail>) filterResults.values;
+                notifyDataSetChanged();
+            }
+        };
+    }
+
+
 
     public interface ItemClickListener {
         void onItemClick(View view, AppDetail appDetail);

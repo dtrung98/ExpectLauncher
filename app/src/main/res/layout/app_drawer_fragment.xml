@@ -18,7 +18,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
                 <com.teamll.expectlauncher.ui.widgets.MotionRoundedBitmapFrameLayout
-                    android:id="@+id/search_bar"
+                    android:id="@+id/search_back_ground"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/search_bar_margin"
@@ -32,7 +32,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:alpha="0.8">
+                        android:alpha="0.8"
+                        android:visibility="gone">
                     <ImageView
                         android:id="@+id/search_image_view"
                         android:layout_width="@dimen/search_bar_height"
@@ -52,7 +53,12 @@
                         android:id="@+id/search_view"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="#AAFFFFFF"/>
+                        android:iconifiedByDefault="false"
+                        app:queryHint="@string/search_string"
+                        app:searchHintIcon="@drawable/black_search"
+                        android:focusable="true"
+                        android:background="@android:color/transparent"
+                        android:clickable="true"/>
                 </com.teamll.expectlauncher.ui.widgets.MotionRoundedBitmapFrameLayout>
             <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerview"

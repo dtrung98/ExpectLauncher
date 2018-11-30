@@ -17,8 +17,8 @@ import android.widget.ImageView;
 import com.teamll.expectlauncher.R;
 import com.teamll.expectlauncher.ui.main.appdrawer.AppDrawerFragment;
 import com.teamll.expectlauncher.ui.main.mainscreen.MainScreenFragment;
-import com.teamll.expectlauncher.utils.HomeWatcher;
-import com.teamll.expectlauncher.utils.Tool;
+import com.teamll.expectlauncher.util.HomeWatcher;
+import com.teamll.expectlauncher.util.Tool;
 
 
 public class MainActivity extends AppLoaderActivity implements Tool.WallpaperChangedNotifier,HomeWatcher.OnHomePressedListener {

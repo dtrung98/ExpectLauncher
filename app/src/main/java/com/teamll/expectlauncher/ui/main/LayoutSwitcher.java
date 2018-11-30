@@ -21,8 +21,8 @@ import com.teamll.expectlauncher.ui.main.appdrawer.AppDrawerFragment;
 import com.teamll.expectlauncher.ui.main.bottomsheet.RoundedBottomSheetDialogFragment;
 import com.teamll.expectlauncher.ui.main.mainscreen.MainScreenFragment;
 import com.teamll.expectlauncher.ui.widgets.SwipeDetectorGestureListener;
-import com.teamll.expectlauncher.utils.Animation;
-import com.teamll.expectlauncher.utils.Tool;
+import com.teamll.expectlauncher.util.Animation;
+import com.teamll.expectlauncher.util.Tool;
 
 public class LayoutSwitcher implements View.OnTouchListener {
     private static final String TAG="LayoutSwitcher";
@@ -172,7 +172,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
             int tgPos = appDrawerParams.topMargin- toggleParams.height + recyclerMarginTop;
             toggleParams.topMargin = (tgPos> toggleOriginalY) ? toggleOriginalY : tgPos;
         }
-        appDrawer.mSearchBar.requestLayout();
+        appDrawer.mSearchBackGround.requestLayout();
         appDrawerRootView.requestLayout();
         appDrawer.mRecyclerViewParent.invalidate();
         toggle.requestLayout();

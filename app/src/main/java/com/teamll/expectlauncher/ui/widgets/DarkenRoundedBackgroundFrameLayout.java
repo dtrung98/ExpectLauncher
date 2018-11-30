@@ -12,8 +12,8 @@ import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
 import com.teamll.expectlauncher.R;
-import com.teamll.expectlauncher.utils.BitmapEditor;
-import com.teamll.expectlauncher.utils.Tool;
+import com.teamll.expectlauncher.util.BitmapEditor;
+import com.teamll.expectlauncher.util.Tool;
 
 /**
  * Created by trung on 9/30/2017.
