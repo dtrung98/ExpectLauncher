@@ -3,9 +3,12 @@
     <string name="app_name">Expect Launcher</string>
     <string name="app_size">Đổi kích cỡ app</string>
     <string name="change_position">Đổi vị trí</string>
-    <string name="app_icon_editor">Sửa biểu tượng</string>
+    <string name="app_more">Nhiều hơn</string>
     <string name="icon_size">Kích thước biểu tượng</string>
     <string name="search_string">Tìm kiếm ứng dụng</string>
     <string name="hidden_app_title">Tiêu đề đang ẩn</string>
     <string name="visible_app_title">Tiêu đề đang hiện</string>
+    <string name="color_square">Vuông màu</string>
+    <string name="white_square">Vuông trắng</string>
+    <string name="normal">Bình thường</string>
 </resources>

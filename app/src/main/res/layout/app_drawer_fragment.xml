@@ -12,7 +12,8 @@
         android:background="@android:color/transparent"
         android:layout_margin="@dimen/app_drawer_margin"
         android:descendantFocusability="beforeDescendants"
-        android:focusableInTouchMode="true">
+        android:focusableInTouchMode="true"
+        app:blur="true">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -27,32 +28,13 @@
                     android:layout_marginEnd="12dp"
                     android:background="@android:color/transparent"
                     app:round_number="1"
-                    app:background_alpha="0.3">
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:alpha="0.8"
-                        android:visibility="gone">
-                    <ImageView
-                        android:id="@+id/search_image_view"
-                        android:layout_width="@dimen/search_bar_height"
-                        android:layout_height="@dimen/search_bar_height"
-                        android:src="@drawable/black_search"
-                        android:padding="8dp"/>
-                        <TextView
-                              android:id="@+id/search_text_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/search_string"
-                            android:textSize="14sp"
-                            android:layout_gravity="center_vertical"
-                            android:textColor="@android:color/black"/>
-                    </LinearLayout>
+                    app:background_alpha="0.3"
+                    app:blur="true"
+                  >
                     <android.support.v7.widget.SearchView
                         android:id="@+id/search_view"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:iconifiedByDefault="false"
                         app:queryHint="@string/search_string"
                         app:searchHintIcon="@drawable/black_search"

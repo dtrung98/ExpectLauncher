@@ -1,6 +1,7 @@
 package com.teamll.expectlauncher.ui.widgets;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
@@ -11,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 
+import com.teamll.expectlauncher.R;
 import com.teamll.expectlauncher.model.Rectangle;
 import com.teamll.expectlauncher.util.BitmapEditor;
 import com.teamll.expectlauncher.util.Tool;
@@ -21,16 +23,28 @@ public class MotionRoundedBitmapFrameLayout extends DarkenRoundedBackgroundFrame
 
     public MotionRoundedBitmapFrameLayout(@NonNull Context context) {
         super(context);
-        init();
+        init(null);
     }
 
     public MotionRoundedBitmapFrameLayout(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(attrs);
     }
-    private void init() {
+
+    public MotionRoundedBitmapFrameLayout(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init(attrs);
+    }
+
+    private void init(AttributeSet attrs) {
         mShaderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mAlphaPaint  = new Paint(Paint.ANTI_ALIAS_FLAG);
+        if(attrs!=null) {
+            TypedArray t = getContext().obtainStyledAttributes(attrs, R.styleable.MotionRoundedBitmapFrameLayout);
+
+            mShouldBlurBackground = t.getBoolean(R.styleable.MotionRoundedBitmapFrameLayout_blur,true);
+            t.recycle();
+        }
     }
     Paint mShaderPaint;
     Paint mAlphaPaint;
@@ -65,7 +79,7 @@ public class MotionRoundedBitmapFrameLayout extends DarkenRoundedBackgroundFrame
         parentWidth = s[0];
         source_bitmap = blur;
       //  source_bitmap = BitmapEditor.getResizedBitmap(original,(int)parentWidth,(int)parentHeight);
-        if(mShaderPaint ==null) init();
+        if(mShaderPaint ==null) init(null);
         mShaderPaint.setShader(new BitmapShader(source_bitmap,Shader.TileMode.REPEAT,Shader.TileMode.REPEAT));
 
 
@@ -90,9 +104,9 @@ public class MotionRoundedBitmapFrameLayout extends DarkenRoundedBackgroundFrame
         }
         invalidate();
     }
-    private boolean drawMask = true;
+    private boolean mShouldBlurBackground;
     public void setBlurred(boolean b) {
-        drawMask = b;
+        mShouldBlurBackground = b;
         invalidate();
     }
     @Override
@@ -100,7 +114,7 @@ public class MotionRoundedBitmapFrameLayout extends DarkenRoundedBackgroundFrame
 
         initBitmap();
 
-        if (source_bitmap != null&&drawMask)
+        if (source_bitmap != null&& mShouldBlurBackground)
             drawMask(canvas);
 
         super.onDraw(canvas);

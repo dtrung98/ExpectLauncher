@@ -1,6 +1,7 @@
 package com.teamll.expectlauncher.ui.main.mainscreen;
 
 import android.annotation.SuppressLint;
+import android.appwidget.AppWidgetHostView;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -47,7 +48,6 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
                 xDown = event.getRawX();
                 yDown = event.getRawY();
         }
-
         return false;
     }
     public static MainScreenFragment newInstance() {
@@ -64,7 +64,7 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
     float navigationHeight = 0;
     float oneDp = 0;
     Rectangle rect;
-    FrameLayout.LayoutParams dockParams;
+    public FrameLayout.LayoutParams dockParams;
     ImageView dockApp[] = new ImageView[4];
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -92,33 +92,45 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
         mRootView = view;
     dock = view.findViewById(R.id.dock);
     scrollView = view.findViewById(R.id.scrollview);
-    scrollView.setOnTouchListener(new View.OnTouchListener() {
-        long saved;
-        float savedPosX;
-        float savedPosY;
+//
+//    scrollView.setOnTouchListener(new View.OnTouchListener() {
+//        long saved;
+//        float savedPosX;
+//        float savedPosY;
+//        @Override
+//        public boolean onTouch(View v, MotionEvent event) {
+//            switch (event.getAction()) {
+//                case MotionEvent.ACTION_DOWN:
+//                    saved = System.currentTimeMillis();
+//                    savedPosY = event.getRawY();
+//                    savedPosX = event.getRawX();
+//
+//                    break;
+//                case MotionEvent.ACTION_UP :
+//                    if(System.currentTimeMillis() - saved>=300&&
+//                            Math.sqrt(
+//                                    (savedPosX-event.getRawX())*(savedPosX - event.getRawX())+
+//                                    (savedPosY-event.getRawY())*(savedPosY-event.getRawY()))<=100)
+//                    {
+//                        RoundedBottomSheetDialogFragment fragment =  RoundedBottomSheetDialogFragment.newInstance(LayoutSwitcher.MODE.IN_MAIN_SCREEN);
+//                         fragment.setListener(MainScreenFragment.this);
+//                        fragment.show(getActivity().getSupportFragmentManager(),
+//                                "song_popup_menu");
+//                    }
+//                    break;
+//            }
+//            return v.onTouchEvent(event);
+//        }
+//    });
+    widgetContainer.setOnLongClickListener(new View.OnLongClickListener() {
         @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    saved = System.currentTimeMillis();
-                    savedPosY = event.getRawY();
-                    savedPosX = event.getRawX();
+        public boolean onLongClick(View v) {
+            RoundedBottomSheetDialogFragment fragment =  RoundedBottomSheetDialogFragment.newInstance(LayoutSwitcher.MODE.IN_MAIN_SCREEN);
+            fragment.setListener(MainScreenFragment.this);
+            fragment.show(getActivity().getSupportFragmentManager(),
+                    "song_popup_menu");
 
-                    break;
-                case MotionEvent.ACTION_UP :
-                    if(System.currentTimeMillis() - saved>=300&&
-                            Math.sqrt(
-                                    (savedPosX-event.getRawX())*(savedPosX - event.getRawX())+
-                                    (savedPosY-event.getRawY())*(savedPosY-event.getRawY()))<=100)
-                    {
-                        RoundedBottomSheetDialogFragment fragment =  RoundedBottomSheetDialogFragment.newInstance(LayoutSwitcher.MODE.IN_MAIN_SCREEN);
-                         fragment.setListener(MainScreenFragment.this);
-                        fragment.show(getActivity().getSupportFragmentManager(),
-                                "song_popup_menu");
-                    }
-                    break;
-            }
-            return v.onTouchEvent(event);
+            return true;
         }
     });
     dockApp[0] =dock.findViewById(R.id.dockApp1);
@@ -146,6 +158,7 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
         params.topMargin = (int) (statusBarHeight + params.topMargin);
         params.height =  toggleParams.topMargin - params.topMargin - params.bottomMargin;
         params.bottomMargin = 0;
+        widgetContainer.setMinimumHeight(params.height);
         scrollView.requestLayout();
     Tool.getInstance().AddWallpaperChangedNotifier(dock);
         AppLoaderActivity ac = (AppLoaderActivity)getActivity();
@@ -181,14 +194,30 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
 
     private ArrayList<App> appInDock = new ArrayList<>();
     private String[] packageDock = {
-            "com.android.dialer" ,
-            "com.android.messaging" ,
+            "com.google.android.dialer",
+            "com.android.dialer",
+            "com.google.android.apps.messaging",
+            "com.android.messaging",
             "com.android.browser",
-            "com.android.settings"};
+            "com.android.contacts",
+            "com.android.music",
+            "com.android.settings",
+            "com.google.android.music",
+            "com.google.android.apps.photos",
+            "com.android.camera2",
+            "com.android.chrome",
+            "com.google.android.apps.docs",
+            "com.android.documentsui",
+            "com.google.android.videos",
+            "com.google.android.apps.maps",
+            "com.google.android.apps.photos",
+            "org.chromium.webview_shell",
+            "com.google.android.youtube",
+            "com.google.android.googlequicksearchbox"};
     private boolean isPackageDock(App app) {
         for (String p :
                 packageDock) {
-            if(p.equals(app.getAppInfo().packageName)) return true;
+            if(p.equals(app.getApplicationPackageName())) return true;
         }
         return false;
     }
@@ -201,7 +230,7 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
         appInDock.clear();
         for (App a :
                 apps) {
-           if(isPackageDock(a)) appInDock.add(a);
+           if(isPackageDock(a)&&appInDock.size()<4) appInDock.add(a);
         }
 
         for(int i=0;i<appInDock.size();i++) {

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="DarkenRoundedBackgroundFrameLayout">
+
         <attr name="round_number" format="float"/>
         <attr name="background_alpha" format="float"/>
         <attr name="round_back_color" format="color"/>
@@ -8,6 +9,9 @@
             <enum name="TOP" value="0"/>
             <enum name="ALL" value="1"/>
         </attr>
+    </declare-styleable>
+    <declare-styleable name="MotionRoundedBitmapFrameLayout">
+        <attr name="blur" format="boolean"/>
     </declare-styleable>
     <declare-styleable name="RangeSeekBar">
         <!--RangeSeekBar common attrs-->

@@ -256,7 +256,7 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
             protected FilterResults performFiltering(CharSequence charSequence) {
                 String charString = charSequence.toString();
                 if (charString.isEmpty()) {
-                    mFilterData = mData;
+                    mFilterData.clear();
                 } else {
                     mFilterData = Util.searchAppsFilter(mData, charString);
                 }

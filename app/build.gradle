@@ -38,11 +38,12 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
-    // Một số hàm để làm animation
-    implementation 'com.daasuu:EasingInterpolator:1.0.0'
 
     // Thay thế findViewById() bằng ButterKnife (code gọn hơn)
     implementation 'com.jakewharton:butterknife:9.0.0-rc2'
     annotationProcessor 'com.jakewharton:butterknife-compiler:9.0.0-rc2'
+
+    // Rounded ImageView
+    implementation 'com.makeramen:roundedimageview:2.3.0'
 
 }

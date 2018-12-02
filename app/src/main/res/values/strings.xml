@@ -2,7 +2,7 @@
     <string name="app_name">Expect Launcher</string>
     <string name="app_size">App Size</string>
     <string name="change_position">Change Position</string>
-    <string name="app_icon_editor">Icon Editor</string>
+    <string name="app_more">More Setting</string>
     <string name="icon_size">Icon Size</string>
 
     <string name="path_search" translatable="false">
@@ -10,5 +10,8 @@
     </string>
     <string name="search_string">Search</string>
     <string name="hidden_app_title">Show app title</string>
-    <string name="visible_app_title">Visible app title</string>
+    <string name="visible_app_title">Hide app title</string>
+    <string name="color_square">Color Square</string>
+    <string name="white_square">White Square</string>
+    <string name="normal">Normal</string>
 </resources>

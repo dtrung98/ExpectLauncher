@@ -30,6 +30,7 @@ import com.teamll.expectlauncher.model.App;
 import com.teamll.expectlauncher.model.Rectangle;
 import com.teamll.expectlauncher.ui.main.AppLoaderActivity;
 import com.teamll.expectlauncher.ui.main.LayoutSwitcher;
+import com.teamll.expectlauncher.ui.main.bottomsheet.IconAppEditorBottomSheet;
 import com.teamll.expectlauncher.ui.main.bottomsheet.RoundedBottomSheetDialogFragment;
 import com.teamll.expectlauncher.ui.widgets.MotionRoundedBitmapFrameLayout;
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.OnStartDragListener;
@@ -53,7 +54,7 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
                                                            LayoutSwitcher.EventSender,
                                                            RoundedBottomSheetDialogFragment.BottomSheetListener,
                                                            OnRangeChangedListener,
-                                                           SearchView.OnQueryTextListener {
+                                                           SearchView.OnQueryTextListener, IconAppEditorBottomSheet.AppEditorCallBack{
 
     private static final String TAG="AppDrawerFragment";
 
@@ -119,12 +120,6 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
     @BindView(R.id.search_back_ground) public MotionRoundedBitmapFrameLayout mSearchBackGround;
     FrameLayout.LayoutParams params;
 
-    @BindView(R.id.search_image_view) public ImageView mSearchImageView;
-
-    public Bitmap mBlackSearchBitmap, mWhiteSearchBitmap;
-
-    @BindView(R.id.search_text_view) public TextView mSearchTextView;
-
     @BindView(R.id.search_view) public SearchView mSearchView;
 
     @Override
@@ -166,9 +161,6 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
         rect.Top = rect.Height;
         requestLayout();
 
-
-        mBlackSearchBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.black_search);
-        mWhiteSearchBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.white_search);
 
         FrameLayout.LayoutParams rPParams = (FrameLayout.LayoutParams) mRecyclerViewParent.getLayoutParams();
         rPParams.topMargin += (int) statusBarHeight;
@@ -267,6 +259,7 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public void onItemLongPressed(View view, AppDetail appDetail) {
+        mAdaptiveApp = appDetail;
         RoundedBottomSheetDialogFragment fragment =  RoundedBottomSheetDialogFragment.newInstance(LayoutSwitcher.MODE.IN_APP_DRAWER);
 
         fragment.setAppDrawer(this);
@@ -346,7 +339,10 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
                 mAdapter.switchMode(AppDrawerAdapter.APP_DRAWER_CONFIG_MODE.MOVABLE_APP_ICON);
                 return;
             case R.id.app_icon_editor:
-                mAdapter.switchMode(AppDrawerAdapter.APP_DRAWER_CONFIG_MODE.APP_ICON_EDITOR);
+
+                IconAppEditorBottomSheet.newInstance(this).show(getActivity().getSupportFragmentManager(),
+                        "icon_app_editor");
+                return;
         }
     }
 
@@ -393,5 +389,11 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
         switch (v.getId()) {
             case R.id.search_view : mSearchView.onActionViewExpanded();break;
         }
+    }
+    private AppDetail mAdaptiveApp;
+
+    @Override
+    public AppDetail getAdaptiveApp() {
+        return mAdaptiveApp;
     }
 }

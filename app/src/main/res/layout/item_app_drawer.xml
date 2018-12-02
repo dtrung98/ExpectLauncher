@@ -2,7 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="@dimen/app_width"
     android:layout_height="@dimen/app_height"
-    >
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 <LinearLayout
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -11,16 +11,17 @@
     android:layout_gravity="center"
   >
 
-    <ImageView
+    <com.makeramen.roundedimageview.RoundedImageView
         android:id="@+id/icon"
         android:layout_width="@dimen/app_width"
         android:layout_height="@dimen/app_width"
-        android:layout_gravity="center_horizontal"/>
+        android:layout_gravity="center_horizontal"
+        />
     <TextView android:id="@+id/text"
         android:layout_width="@dimen/text_app_width"
         android:layout_gravity="center_horizontal"
         android:maxLines="1"
-        android:layout_height="20dp"
+        android:layout_height="22dp"
         android:ellipsize="end"
         android:singleLine="true"
         android:gravity="center"

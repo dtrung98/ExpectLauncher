@@ -142,7 +142,6 @@ public class LayoutSwitcher implements View.OnTouchListener {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-      //  Log.d(TAG, "onTouch: topMargin = "+appDrawerParams.topMargin);
         if(!isViewAttached()) return false;
        if(v.getId() ==recyclerView.getId()&&appDrawer.mAdapter.mConfigMode==AppDrawerAdapter.APP_DRAWER_CONFIG_MODE.NORMAL) {
           return onTouchRecyclerView(v,event);
@@ -160,22 +159,36 @@ public class LayoutSwitcher implements View.OnTouchListener {
      */
 
     void translateAppDrawerByMarginTop(int id, int pos) {
-        Log.d(TAG, "translateAppDrawerByMarginTop");
-        if(id==R.id.recyclerview) {
-            appDrawerParams.topMargin = pos;
-            int tgPos = pos- toggleParams.height + recyclerMarginTop;
-            toggleParams.topMargin = (tgPos> toggleOriginalY) ? toggleOriginalY : tgPos;
-          // if(appDrawerParams.topMargin<toggleParams.topMargin + toggleParams.height-recyclerMarginTop) motion(toggleParams.topMargin + toggleParams.height-recyclerMarginTop);
-        }
-        else {
-            appDrawerParams.topMargin = rect.Height + pos  ;
-            int tgPos = appDrawerParams.topMargin- toggleParams.height + recyclerMarginTop;
-            toggleParams.topMargin = (tgPos> toggleOriginalY) ? toggleOriginalY : tgPos;
-        }
+
+        appDrawerParams.topMargin = (id==R.id.recyclerview) ? pos : rect.Height + pos;
+
+        // topMargin ở vị trí này thì dock bắt đầu thu nhỏ dần
+        float startKeyDock = 3 / 4.0f * rect.Height - mainScreen.dockParams.height;
+
+        // đi một khoảng này thì hiệu ứng thu nhỏ tối đa
+        float distanceKey =  1/5.0f*rect.Height;
+
+        // giá trị value : 0 -> 1
+        float keyValue = (startKeyDock - appDrawerParams.topMargin)/ distanceKey;
+
+        if(keyValue<0) keyValue = 0;
+        else if(keyValue>1) keyValue = 1;
+
+        int tgPos =  appDrawerParams.topMargin - (mainScreen.dockParams.height+mainScreen.dockParams.leftMargin) - toggleParams.height + recyclerMarginTop;
+        toggleParams.topMargin = (tgPos> toggleOriginalY) ? toggleOriginalY : tgPos;
+
+        mainScreen.dockParams.topMargin = (int) (toggleParams.topMargin +toggleParams.height + keyValue*(mainScreen.dockParams.height +mainScreen.dockParams.leftMargin));
+        toggleParams.topMargin = mainScreen.dockParams.topMargin - toggleParams.height;
+
+        mainScreen.dock.setScaleX(1-0.25f*keyValue);
+        mainScreen.dock.setScaleY(1-0.25f*keyValue);
+       // mainScreen.dock.setAlpha(1-0.25f*keyValue);
+
         appDrawer.mSearchBackGround.requestLayout();
         appDrawerRootView.requestLayout();
-        appDrawer.mRecyclerViewParent.invalidate();
+
         toggle.requestLayout();
+        mainScreen.dock.requestLayout();
         if(appDrawerParams.topMargin<=0) mode =MODE.IN_APP_DRAWER;
         else if(appDrawerParams.topMargin>=appDrawerParams.height) mode = MODE.IN_MAIN_SCREEN;
         showHideMainScreenWhenModeChanged();
@@ -193,42 +206,27 @@ public class LayoutSwitcher implements View.OnTouchListener {
         toggle.setAlpha(value);
         if(value>=0.5f&&zero2One) {
             Tool.WHITE_TEXT_THEME = false;
-            appDrawer.mSearchTextView.setTextColor(Color.BLACK);
-            appDrawer.mSearchImageView.setImageBitmap(appDrawer.mBlackSearchBitmap);
-            appDrawer.mAdapter.notifyDataSetChanged();
+             appDrawer.mAdapter.notifyDataSetChanged();
         } else if(value<=0.5f&&!zero2One) {
             Tool.WHITE_TEXT_THEME = true;
-            appDrawer.mSearchTextView.setTextColor(0xFFEEEEEE);
-            appDrawer.mSearchImageView.setImageBitmap(appDrawer.mWhiteSearchBitmap);
-            appDrawer.mAdapter.notifyDataSetChanged();
+              appDrawer.mAdapter.notifyDataSetChanged();
         }
     }
 
     private void showHideMainScreenWhenModeChanged() {
-        Log.d(TAG, "showHideMainScreenWhenModeChanged: mode ="+ mode+", topMargin = "+ appDrawerParams.topMargin+", mainScreenIsHidden = "+ mainScreenIsHidden);
        if(appDrawerParams.topMargin>0&&!mainScreenIsHidden) {
            // run into effect
            mainScreenIsHidden = true;
            final ValueAnimator va = ValueAnimator.ofFloat(0,1);
-           va.setDuration(350);
-           va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-               @Override
-               public void onAnimationUpdate(ValueAnimator animation) {
-                 updateShowHideMainScreen(true, (Float) animation.getAnimatedValue());
-               }
-           });
+           va.setDuration(250);
+           va.addUpdateListener(animation -> updateShowHideMainScreen(true, (Float) animation.getAnimatedValue()));
            va.start();
 
        } else if(appDrawerParams.topMargin<=0&& mainScreenIsHidden) {
            mainScreenIsHidden = false;
            final ValueAnimator va = ValueAnimator.ofFloat(1,0);
-           va.setDuration(350);
-           va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-               @Override
-               public void onAnimationUpdate(ValueAnimator animation) {
-                  updateShowHideMainScreen(false, (Float) animation.getAnimatedValue());
-               }
-           });
+           va.setDuration(250);
+           va.addUpdateListener(animation -> updateShowHideMainScreen(false, (Float) animation.getAnimatedValue()));
            va.start();
        }
     }
@@ -259,20 +257,16 @@ public class LayoutSwitcher implements View.OnTouchListener {
         @Override
         public boolean onUp(MotionEvent e) {
 
-            Log.d(TAG, "onUp");
            if(id==R.id.container&&mode==MODE.IN_MAIN_SCREEN) {
 
                if (onMoveUp() && appDrawerParams.topMargin <= 3 / 4.0f * rect.Height)
                    motionUp();
                else motionDown();
            } else if(id ==R.id.recyclerview&&mode==MODE.IN_APP_DRAWER){
-               Log.d(TAG, " onMoveDown =  "+onMoveDown());
                if((onMoveDown())&&appDrawerParams.topMargin>=1/4.0f*rect.Height) {
-                   Log.d(TAG, "onUp: recycler should move down");
                    motionDown();
                }
                else {
-                   Log.d(TAG, "onUp: recycler should move up");
                    motionUp();
                }
            }
@@ -282,19 +276,16 @@ public class LayoutSwitcher implements View.OnTouchListener {
 
         @Override
         public boolean onMove(MotionEvent e) {
-            Log.d(TAG, "onMove, down = " + down+", assignPosY0 = "+assignPosY0);
            if(!down) {
                down = true;
                tempY0 = assignPosY0 = e.getRawY();
                direction = MOVE_DIRECTION.NONE;
-               Log.d(TAG, "onMove: down just true");
                return false;
            } else {
                float y = e.getRawY();
                direction = (y>tempY0) ? MOVE_DIRECTION.MOVE_DOWN : (y==tempY0) ? MOVE_DIRECTION.NONE : MOVE_DIRECTION.MOVE_UP;
 
                if(tempY0==assignPosY0) {
-                   Log.d(TAG, "onMove: first move after down");
 
                       if(direction == MOVE_DIRECTION.MOVE_DOWN&&id==R.id.recyclerview)
                    translateAppDrawerByMarginTop(id,(int) (e.getRawY()-assignPosY0));
@@ -333,7 +324,6 @@ public class LayoutSwitcher implements View.OnTouchListener {
 
         @Override
         public boolean onSwipeTop(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            Log.d(TAG, "onSwipeTop");
             if(id==R.id.container)
                 motionUp();
                 return true;
@@ -341,7 +331,6 @@ public class LayoutSwitcher implements View.OnTouchListener {
 
         @Override
         public boolean onSwipeBottom(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            Log.d(TAG, "onSwipeBottom");
             if(id==R.id.recyclerview)
                 motionDown();
             return true;
@@ -349,7 +338,6 @@ public class LayoutSwitcher implements View.OnTouchListener {
 
         @Override
         public boolean onDown(MotionEvent e) {
-            Log.d(TAG, "onDown");
             down = true;
            tempY0 = assignPosY0 = e.getRawY();
             return true;
@@ -357,7 +345,6 @@ public class LayoutSwitcher implements View.OnTouchListener {
 
         @Override
         public boolean onDoubleTap(MotionEvent e) {
-            Log.d(TAG, "onSingleTapConfirmed");
             if(id==R.id.container) {
                 motionUp();
                 return true;
@@ -410,7 +397,9 @@ public class LayoutSwitcher implements View.OnTouchListener {
         va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                  translateAppDrawerByMarginTop(R.id.recyclerview,(int) animation.getAnimatedValue());
+                int value = (int)animation.getAnimatedValue();
+                if(value<0) value=0;
+                  translateAppDrawerByMarginTop(R.id.recyclerview,value);
             }
         });
         va.addListener(new AnimatorListenerAdapter() {
@@ -418,15 +407,15 @@ public class LayoutSwitcher implements View.OnTouchListener {
             public void onAnimationEnd(Animator animation) {
                 isRunning = false;
             }
-        });
-        if(yFrom<yTo) {
-            va.setInterpolator(Animation.getInterpolator(4, 1.5f));
-            va.setDuration((long) (300 + 250 * Math.abs((yTo-yFrom+0.0f)/rect.Height)));
-        } else {
 
-            va.setInterpolator(Animation.getEasingInterpolator(2));
-            va.setDuration((long) (150 + 150 * Math.abs((yTo - yFrom + 0.0f) / rect.Height)));
-        }
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+        });
+
+            va.setInterpolator(Animation.getInterpolator(4, 1.5f));
+            va.setDuration((long) (300 + 200 * Math.abs((yTo-yFrom+0.0f)/rect.Height)));
         va.start();
     }
 

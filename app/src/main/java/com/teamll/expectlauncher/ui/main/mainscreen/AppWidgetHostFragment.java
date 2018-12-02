@@ -74,7 +74,7 @@ public class AppWidgetHostFragment extends Fragment {
             createWidget(data);
         }
     }
-    public LinearLayout widgetContainer;
+    public ViewGroup widgetContainer;
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -96,7 +96,6 @@ public class AppWidgetHostFragment extends Fragment {
         Bundle extras = data.getExtras();
         int appWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
         AppWidgetProviderInfo appWidgetInfo = mAppWidgetManager.getAppWidgetInfo(appWidgetId);
-
         AppWidgetHostView hostView = mAppWidgetHost.createView(getActivity(), appWidgetId, appWidgetInfo);
         hostView.setAppWidget(appWidgetId, appWidgetInfo);
         widgetContainer.addView(hostView);

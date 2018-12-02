@@ -1,6 +1,5 @@
 package com.teamll.expectlauncher.util;
 
-import android.animation.TimeInterpolator;
 import android.graphics.Color;
 import android.support.v4.view.animation.FastOutLinearInInterpolator;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
@@ -14,9 +13,6 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.OvershootInterpolator;
-
-import com.daasuu.ei.Ease;
-import com.daasuu.ei.EasingInterpolator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -102,68 +98,7 @@ public class Animation {
             default: return null;
         }
     }
-    public static TimeInterpolator getEasingInterpolator(int id) {
-        switch (id) {
-            case 0:
-                return new EasingInterpolator(Ease.LINEAR);
-            case 1:
-                return new EasingInterpolator(Ease.QUAD_IN);
-            case 2:
-                return new EasingInterpolator(Ease.QUAD_OUT);
-            case 3:
-                return new EasingInterpolator(Ease.QUAD_IN_OUT);
-            case 4:
-                return new EasingInterpolator(Ease.CUBIC_IN);
-            case 5:
-                return new EasingInterpolator(Ease.CUBIC_OUT);
-            case 6:
-                return new EasingInterpolator(Ease.CUBIC_IN_OUT);
-            case 7:
-                return new EasingInterpolator(Ease.QUART_IN);
-            case 8:
-                return new EasingInterpolator(Ease.QUART_OUT);
-            case 9:
-                return new EasingInterpolator(Ease.QUART_IN_OUT);
-            case 10:
-                return new EasingInterpolator(Ease.QUINT_IN);
-            case 11:
-                return new EasingInterpolator(Ease.QUINT_OUT);
-            case 12:
-                return new EasingInterpolator(Ease.QUINT_IN_OUT);
-            case 13:
-                return new EasingInterpolator(Ease.SINE_IN);
-            case 14:
-                return new EasingInterpolator(Ease.SINE_OUT);
-            case 15:
-                return new EasingInterpolator(Ease.SINE_IN_OUT);
-            case 16:
-                return new EasingInterpolator(Ease.BACK_IN);
-            case 17:
-                return new EasingInterpolator(Ease.BACK_OUT);
-            case 18:
-                return new EasingInterpolator(Ease.BACK_IN_OUT);
-            case 19:
-                return new EasingInterpolator(Ease.CIRC_IN);
-            case 20:
-                return new EasingInterpolator(Ease.CIRC_OUT);
-            case 21:
-                return new EasingInterpolator(Ease.CIRC_IN_OUT);
-            case 22:
-                return new EasingInterpolator(Ease.BOUNCE_IN);
-            case 23:
-                return new EasingInterpolator(Ease.BOUNCE_OUT);
-            case 24:
-                return new EasingInterpolator(Ease.BOUNCE_IN_OUT);
-            case 25:
-                return new EasingInterpolator(Ease.ELASTIC_IN);
-            case 26:
-                return new EasingInterpolator(Ease.ELASTIC_OUT);
-            case 27:
-                return new EasingInterpolator(Ease.ELASTIC_IN_OUT);
-            default:
-                return new EasingInterpolator(Ease.LINEAR);
-        }
-    }
+
 
     private static List<Interpolator> getInterpolatorList(Class aClass) {
         if (aClass == null) {

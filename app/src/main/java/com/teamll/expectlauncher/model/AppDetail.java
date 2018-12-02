@@ -3,6 +3,7 @@ package com.teamll.expectlauncher.model;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 
 import java.io.File;
 
@@ -42,7 +43,9 @@ public abstract class AppDetail {
     public Drawable getIcon() {
         if (mIcon == null) {
             if (mApkFile.exists()) {
+
                 mIcon = mInfo.loadIcon(mContext.getPackageManager());
+
                 return mIcon;
             } else {
                 mMounted = false;

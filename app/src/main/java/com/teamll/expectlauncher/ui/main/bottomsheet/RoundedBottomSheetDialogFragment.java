@@ -75,7 +75,7 @@ public class RoundedBottomSheetDialogFragment extends BottomSheetDialogFragment 
             view = inflater.inflate(R.layout.mainscreen_bottom_sheet_layout, container,
                     false);
             ids = new int[] {
-                    R.id.toggleButton, R.id.app_size, R.id.position, R.id.editor_text
+                    R.id.toggleButton, R.id.app_size, R.id.position, R.id.more_text
             };
         } else {
             view = inflater.inflate(R.layout.app_drawer_bottom_sheet_layout, container, false);
