@@ -221,16 +221,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
                 ((MotionRoundedBitmapFrameLayout)appDrawer.mRecyclerViewParent).setAlphaBlurPaint(alpha_blur, false);
                 }
         }
-
-
         toggle.setAlpha(value);
-        if(value>=0.5f&&zero2One) {
-            Tool.WHITE_TEXT_THEME = false;
-             appDrawer.mAdapter.notifyDataSetChanged();
-        } else if(value<=0.5f&&!zero2One) {
-            Tool.WHITE_TEXT_THEME = true;
-              appDrawer.mAdapter.notifyDataSetChanged();
-        }
     }
 
     private void showHideMainScreenWhenModeChanged() {
@@ -283,7 +274,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
                    motionUp();
                else motionDown();
            } else if(id ==R.id.recyclerview&&mode==MODE.IN_APP_DRAWER){
-               if((onMoveDown())&&appDrawerParams.topMargin>=1/4.0f*rect.Height) {
+               if((onMoveDown())&&appDrawerParams.topMargin>=1/5.0f*rect.Height) {
                    motionDown();
                }
                else {
@@ -435,7 +426,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
         });
 
             va.setInterpolator(Animation.getInterpolator(4, 1.5f));
-            va.setDuration((long) (600 + 250 * Math.abs((yTo-yFrom+0.0f)/rect.Height)));
+            va.setDuration((long) (400 + 350 * Math.abs((yTo-yFrom+0.0f)/rect.Height)));
         va.start();
     }
 
