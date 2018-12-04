@@ -218,7 +218,7 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
         int[] ss = Tool.getScreenSize(getActivity());
         float mRVContentWidth = ss[0] - margin - padding;
         float mRVContentHeight = mRecyclerViewParent.getLayoutParams().height
-                - resources.getDimension(R.dimen.recycler_view_margin_top);
+                - resources.getDimension(R.dimen.recycler_view_margin_top) - resources.getDimension(R.dimen.recycler_view_padding);
          float scale = PreferencesUtility.getInstance(getActivity().getApplicationContext()).getAppIconSize();
         float appWidth = resources.getDimension(R.dimen.app_width)*scale;
         float appHeight = resources.getDimension(R.dimen.app_height)*scale;

@@ -175,16 +175,18 @@ public class LayoutSwitcher implements View.OnTouchListener {
         float keyValue = (startKeyDock - appDrawerParams.topMargin)/ distanceKey;
 
         if(keyValue<0) keyValue = 0;
-        else if(keyValue>1) keyValue = 1;
+
 
         int tgPos =  appDrawerParams.topMargin - (mainScreen.dockParams.height+mainScreen.dockParams.leftMargin) - toggleParams.height + recyclerMarginTop;
         toggleParams.topMargin = (tgPos> toggleOriginalY) ? toggleOriginalY : tgPos;
+        float keyNormalize = (keyValue>1) ? 1 : keyValue;
 
-        mainScreen.dockParams.topMargin = (int) (toggleParams.topMargin +toggleParams.height + keyValue*(mainScreen.dockParams.height +mainScreen.dockParams.leftMargin));
-        toggleParams.topMargin = mainScreen.dockParams.topMargin - toggleParams.height;
+            mainScreen.dockParams.topMargin = (int) (toggleParams.topMargin + toggleParams.height + keyNormalize * (mainScreen.dockParams.height + mainScreen.dockParams.leftMargin));
+            toggleParams.topMargin = mainScreen.dockParams.topMargin - toggleParams.height;
 
-        mainScreen.dock.setScaleX(1-0.25f*keyValue);
-        mainScreen.dock.setScaleY(1-0.25f*keyValue);
+            mainScreen.dock.setScaleX(1 - 0.25f * keyNormalize);
+            mainScreen.dock.setScaleY(1 - 0.25f * keyNormalize);
+            mainScreen.setAlpha(1 - keyNormalize);
 
         if(appDrawer.mSearchBackGround instanceof MotionRoundedBitmapFrameLayout)
         appDrawer.mSearchBackGround.invalidate();
@@ -192,8 +194,10 @@ public class LayoutSwitcher implements View.OnTouchListener {
           if(appDrawer.mSearchBackGround instanceof MotionRoundedBitmapFrameLayout)
             appDrawer.mRecyclerViewParent.invalidate();
 
-        toggle.requestLayout();
-        mainScreen.dock.requestLayout();
+          toggle.requestLayout();
+        if(keyValue<=1) {
+            mainScreen.dock.requestLayout();
+        }
         if(appDrawerParams.topMargin<=0) mode =MODE.IN_APP_DRAWER;
         else if(appDrawerParams.topMargin>=appDrawerParams.height) mode = MODE.IN_MAIN_SCREEN;
         appDrawerRootView.requestLayout();
@@ -218,7 +222,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
                 }
         }
 
-        mainScreen.setAlpha(value);
+
         toggle.setAlpha(value);
         if(value>=0.5f&&zero2One) {
             Tool.WHITE_TEXT_THEME = false;
