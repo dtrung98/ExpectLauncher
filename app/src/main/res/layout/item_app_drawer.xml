@@ -16,6 +16,10 @@
         android:layout_width="@dimen/app_width"
         android:layout_height="@dimen/app_width"
         android:layout_gravity="center_horizontal"
+        android:background="@android:color/transparent"
+        app:riv_mutate_background="true"
+        android:cropToPadding="true"
+        android:padding="@dimen/dp_4"
         />
     <TextView android:id="@+id/text"
         android:layout_width="@dimen/text_app_width"
@@ -26,7 +30,7 @@
         android:singleLine="true"
         android:gravity="center"
         android:textColor="@android:color/black"
-        android:textSize="14sp"
+        android:textSize="13sp"
         android:shadowColor="#40000000"
         android:shadowRadius="2"
         />

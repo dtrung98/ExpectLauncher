@@ -2,6 +2,8 @@ package com.teamll.expectlauncher.model;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 
@@ -16,7 +18,7 @@ public abstract class AppDetail {
     private final ApplicationInfo mInfo;
 
     private String mAppLabel;
-    private Drawable mIcon;
+    protected Drawable mIcon;
 
     private boolean mMounted;
     private final File mApkFile;
@@ -24,7 +26,6 @@ public abstract class AppDetail {
     public AppDetail(Context context, ApplicationInfo info) {
         mContext = context;
         mInfo = info;
-
         mApkFile = new File(info.sourceDir);
     }
 
@@ -77,5 +78,12 @@ public abstract class AppDetail {
                 mAppLabel = label != null ? label.toString() : mInfo.packageName;
             }
         }
+    }
+    private int mDarkenAverageColor = Color.WHITE;
+    public int getDarkenAverageColor() {
+        return mDarkenAverageColor;
+    }
+    public void setDarkenAverageColor(int color) {
+        mDarkenAverageColor = color;
     }
 }

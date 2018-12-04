@@ -2,7 +2,7 @@ package com.teamll.expectlauncher.ui.main.bottomsheet;
 
 import android.app.Dialog;
 
-import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,15 +16,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.teamll.expectlauncher.R;
 
-import com.teamll.expectlauncher.model.App;
 import com.teamll.expectlauncher.model.AppDetail;
+import com.teamll.expectlauncher.ui.widgets.rangeseekbar.OnRangeChangedListener;
 import com.teamll.expectlauncher.ui.widgets.rangeseekbar.RangeSeekBar;
 import com.teamll.expectlauncher.util.PreferencesUtility;
 import com.teamll.expectlauncher.util.Tool;
@@ -39,6 +38,7 @@ public class IconAppEditorBottomSheet extends BottomSheetDialogFragment implemen
 
     public interface AppEditorCallBack {
         AppDetail getAdaptiveApp();
+        void onUpdate();
     }
     AppEditorCallBack listener;
 
@@ -97,8 +97,9 @@ public class IconAppEditorBottomSheet extends BottomSheetDialogFragment implemen
                 case R.id.type_none: setTypeButton(0,false); break;
                 case R.id.type_white_square: setTypeButton(1,false); break;
                 case R.id.type_color_square: setTypeButton(2,false); break;
-
-
+                case R.id.auto_text: setColorType(0); break;
+                case R.id.white: setColorType(1); break;
+                case R.id.black: setColorType(2); break;
 
             }
         }
@@ -164,24 +165,49 @@ public class IconAppEditorBottomSheet extends BottomSheetDialogFragment implemen
         mIconConfig = PreferencesUtility.getInstance(getContext()).getIconConfig();
         setImageForTypeButton();
         setTypeButton(mIconConfig.getShapedType(),true);
-
+        setCornerSeekBarValue(mIconConfig.getCornerRadius());
+        focusThisColorType(mIconConfig.getTitleColorType());
     }
     private void setClick() {
         mTypeNoneButton.setOnClickListener(this);
         mTypeWhiteSquareButton.setOnClickListener(this);
         mTypeColorSquareButton.setOnClickListener(this);
+        mAutoTextView.setOnClickListener(this);
+        mWhiteTextView.setOnClickListener(this);
+        mBlackTextView.setOnClickListener(this);
+        mCornerSeekBar.setOnRangeChangedListener(new OnRangeChangedListener() {
+            @Override
+            public void onRangeChanged(RangeSeekBar view, float leftValue, float rightValue, boolean isFromUser) {
+                if(isFromUser) {
+                    setCornerRadius(leftValue);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(RangeSeekBar view, boolean isLeft) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(RangeSeekBar view, boolean isLeft) {
+
+            }
+        });
     }
     private void setImageForTypeButton() {
         Drawable bitmap = null;
         if(listener!=null) {
            AppDetail iv = listener.getAdaptiveApp();
-           if(iv!=null) bitmap = iv.getIcon();
-
+           if(iv!=null) {
+               bitmap = iv.getIcon();
+               mTypeColorSquareButton.setBackgroundColor(iv.getDarkenAverageColor());
+           }
         }
         if(bitmap!=null) {
             mTypeNoneButton.setImageDrawable(bitmap);
             mTypeWhiteSquareButton.setImageDrawable(bitmap);
             mTypeColorSquareButton.setImageDrawable(bitmap);
+
         }
 
     }
@@ -205,9 +231,90 @@ public class IconAppEditorBottomSheet extends BottomSheetDialogFragment implemen
             } else {
                 mShowIfNormal.setVisibility(View.VISIBLE);
             }
+            update();
         }
     }
-    private void setCornerRadius(float value) {
+    private void update() {
+        if(listener!=null) listener.onUpdate();
+    }
 
+    // use for controller
+    private void setCornerSeekBarValue(float value) {
+        //   5  ->  10  ->  20
+        // 1/31    6/31    1/2
+        if(value<1/31f) value = 1/31f;
+       else if(value >1/2f) value = 1/2f;
+
+       if(value==6f/31) mCornerSeekBar.setValue(10);
+       else if(value>4f/62) mCornerSeekBar.setValue(10 + 10*(value- 6f/31)/(1/2f - 6f/31));
+       else mCornerSeekBar.setValue(10 - 5f*(6f/31- value)/( 6f/31 - 1f/31));
+    }
+
+    // use for seek bar
+    private void setCornerRadius(float value) {
+        //   5  ->  10  ->  20
+        // 1/31    6/31    1/2
+        float savedValue;
+        if(value==10) savedValue = 6/31f;
+        else if(value>10) savedValue = 6f/31 + (1/2f - 6/31f) * (value - 10f)/(10f);
+        else savedValue = 6f/31 - (6f/31 - 1/31f) *(10 - value) /5f;
+        mIconConfig.setCornerRadius(savedValue).applyAll();
+       update();
+
+    }
+    // use for controller
+    private void focusThisColorType(int colorType) {
+        // 0 ~ Auto, 1 ~ White, 2 ~ Black
+        TextView dest = null;
+        switch (colorType) {
+            case 0:
+                dest = mAutoTextView;
+                break;
+            case 1:
+                dest = mWhiteTextView;
+                break;
+            case 2:
+                dest = mBlackTextView;
+                break;
+        }
+        if(dest!=null) {
+           // android:textColor="@color/FlatBlue"
+           // android:textStyle="bold"
+           // android:background="@drawable/count_round"
+            dest.setTextColor(getResources().getColor(R.color.FlatBlue));
+            dest.setTypeface(Typeface.DEFAULT_BOLD);
+            dest.setBackground(getResources().getDrawable(R.drawable.count_round));
+
+        }
+    }
+    // use in code
+    private void normalAllColorType() {
+        // 0 ~ Auto, 1 ~ White, 2 ~ Black
+        TextView dest = null;
+        switch (mIconConfig.getTitleColorType()) {
+            case 0:
+                dest = mAutoTextView;
+                break;
+            case 1:
+                dest = mWhiteTextView;
+                break;
+            case 2:
+                dest = mBlackTextView;
+                break;
+        }
+        if(dest!=null) {
+            // android:textColor="@color/FlatBlue"
+            // android:textStyle="bold"
+            // android:background="@drawable/count_round"
+            dest.setTextColor(getResources().getColor(R.color.BackwardColorHeavy));
+            dest.setTypeface(Typeface.DEFAULT);
+            dest.setBackgroundColor(0);
+        }
+    }
+    private void setColorType(int colorType) {
+       normalAllColorType();
+        mIconConfig.setTitleColorType(colorType).applyAll();
+        focusThisColorType(colorType);
+       update();
     }
 }

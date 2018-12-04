@@ -54,7 +54,8 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
                                                            LayoutSwitcher.EventSender,
                                                            RoundedBottomSheetDialogFragment.BottomSheetListener,
                                                            OnRangeChangedListener,
-                                                           SearchView.OnQueryTextListener, IconAppEditorBottomSheet.AppEditorCallBack{
+                                                           SearchView.OnQueryTextListener, IconAppEditorBottomSheet.AppEditorCallBack,
+                                                            Tool.WallpaperChangedNotifier {
 
     private static final String TAG="AppDrawerFragment";
 
@@ -70,7 +71,7 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
     public AppDrawerAdapter mAdapter;
 
    @BindView(R.id.recyclerview) public RecyclerView mRecyclerView;
-   @BindView(R.id.recycler_view_parent) public MotionRoundedBitmapFrameLayout mRecyclerViewParent;
+   @BindView(R.id.recycler_view_parent) public FrameLayout mRecyclerViewParent;
 
    /**
     ViewGroup gốc mà fragment được thêm vào
@@ -117,7 +118,7 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
      */
     Rectangle rect;
 
-    @BindView(R.id.search_back_ground) public MotionRoundedBitmapFrameLayout mSearchBackGround;
+    @BindView(R.id.search_back_ground) public FrameLayout mSearchBackGround;
     FrameLayout.LayoutParams params;
 
     @BindView(R.id.search_view) public SearchView mSearchView;
@@ -167,10 +168,9 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
         rPParams.height = (int) (rect.Height - rPParams.bottomMargin - navigationHeight /*-dockHeight  - dockMargin */ - rPParams.topMargin);
         rPParams.bottomMargin = 0;
         mRecyclerViewParent.requestLayout();
-        mRecyclerViewParent.setBackGroundColor(0xFFEEEEEE);
-        mRecyclerViewParent.setRoundNumber(1.75f,true);
-        Tool.getInstance().AddWallpaperChangedNotifier(mRecyclerViewParent);
-        Tool.getInstance().AddWallpaperChangedNotifier(mSearchBackGround);
+
+        if(mRecyclerViewParent instanceof Tool.WallpaperChangedNotifier)  Tool.getInstance().AddWallpaperChangedNotifier((Tool.WallpaperChangedNotifier) mRecyclerViewParent);
+        if(mSearchBackGround instanceof Tool.WallpaperChangedNotifier)  Tool.getInstance().AddWallpaperChangedNotifier((Tool.WallpaperChangedNotifier) mSearchBackGround);
 
         mAdapter = new AppDrawerAdapter(getActivity(),this);
         mRecyclerView.setAdapter(mAdapter);
@@ -200,6 +200,11 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
         mItemTouchHelper.attachToRecyclerView(mRecyclerView);
     }
 
+    @Override
+    public void onUpdate() {
+        if(mAdapter!=null) mAdapter.notifyDataSetChanged();
+    }
+
     /**
      * Hàm này cài đặt GridLayoutManager cho mRecyclerView
      * Tính toán số lượng cột phù hợp để hiển thị vừa vặn độ rộng màn hình
@@ -213,9 +218,7 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
         int[] ss = Tool.getScreenSize(getActivity());
         float mRVContentWidth = ss[0] - margin - padding;
         float mRVContentHeight = mRecyclerViewParent.getLayoutParams().height
-                - resources.getDimension(R.dimen.search_bar_height)
-                - 2*resources.getDimension(R.dimen.search_bar_margin)
-                - padding;
+                - resources.getDimension(R.dimen.recycler_view_margin_top);
          float scale = PreferencesUtility.getInstance(getActivity().getApplicationContext()).getAppIconSize();
         float appWidth = resources.getDimension(R.dimen.app_width)*scale;
         float appHeight = resources.getDimension(R.dimen.app_height)*scale;
@@ -395,5 +398,10 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
     @Override
     public AppDetail getAdaptiveApp() {
         return mAdaptiveApp;
+    }
+
+    @Override
+    public void onWallpaperChanged(Bitmap original, Bitmap blur) {
+        onUpdate();
     }
 }

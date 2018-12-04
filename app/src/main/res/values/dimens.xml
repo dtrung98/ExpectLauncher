@@ -24,12 +24,13 @@
     <dimen name="size_floating_button">85dp</dimen>
     <dimen name="text_app_width">60dp</dimen>
     <dimen name="text_app_margin">2dp</dimen>
-    <dimen name="recycler_view_padding">5dp</dimen>
+    <dimen name="recycler_view_padding">0dp</dimen>
     <dimen name="search_bar_height">40dp</dimen>
-    <dimen name="search_bar_margin">15dp</dimen>
+    <dimen name="search_bar_margin">12dp</dimen>
     <dimen name="dp_2">2dp</dimen>
     <dimen name="dp_4">4dp</dimen>
     <dimen name="dp_0">0dp</dimen>
+    <dimen name="recycler_view_margin_top">64dp</dimen>
 
     <integer name="duration_bar">800</integer>
     <integer name="duration_search">800</integer>

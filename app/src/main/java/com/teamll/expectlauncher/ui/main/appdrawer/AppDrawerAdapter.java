@@ -3,7 +3,10 @@ package com.teamll.expectlauncher.ui.main.appdrawer;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.NonNull;
+import android.support.v4.graphics.ColorUtils;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,10 +17,10 @@ import android.view.ViewGroup;
 import android.view.animation.RotateAnimation;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 
+import com.makeramen.roundedimageview.RoundedImageView;
 import com.teamll.expectlauncher.R;
 import com.teamll.expectlauncher.model.App;
 import com.teamll.expectlauncher.model.AppDetail;
@@ -30,6 +33,7 @@ import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.ItemTouchHelperAdapt
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.ItemTouchHelperViewHolder;
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.OnStartDragListener;
 import com.teamll.expectlauncher.util.Animation;
+import com.teamll.expectlauncher.util.BitmapEditor;
 import com.teamll.expectlauncher.util.PreferencesUtility;
 import com.teamll.expectlauncher.util.Tool;
 import com.teamll.expectlauncher.util.Util;
@@ -73,6 +77,7 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
         mDragStartListener = dragStartListener;
     }
     public void setData(List<App> data) {
+        Log.d(TAG, "setData");
         mData.clear();
         if (data!=null) {
             mData.addAll(data);
@@ -105,7 +110,7 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
 
     @Override
     public void onViewRecycled(@NonNull ViewHolder holder) {
-        holder.icon.clearAnimation();
+        holder.mIcon.clearAnimation();
         super.onViewRecycled(holder);
     }
 
@@ -131,15 +136,15 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener, ItemTouchHelperViewHolder {
-       ImageView icon;
-       TextView text;
-       View root;
+       RoundedImageView mIcon;
+       TextView mTitle;
+       View mRoot;
 
         ViewHolder(View itemView) {
             super(itemView);
-            root = itemView;
-           icon = itemView.findViewById(R.id.icon);
-           text = itemView.findViewById(R.id.text);
+            mRoot = itemView;
+           mIcon = itemView.findViewById(R.id.icon);
+           mTitle = itemView.findViewById(R.id.text);
            itemView.setOnClickListener(this);
            itemView.setOnLongClickListener(this);
         }
@@ -163,18 +168,19 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
             }
         }
         void bind(AppDetail appDetail) {
-            text.setText(appDetail.getLabel());
-            icon.setImageDrawable(appDetail.getIcon());
+            Log.d(TAG, "bind");
+            mTitle.setText(appDetail.getLabel());
+            mIcon.setImageDrawable(appDetail.getIcon());
 
             bindMovableIcon();
-            bindAppSize();
+            bindAppSizeAndType(appDetail);
             bindAppTitleTextView();
         }
 
         @SuppressLint("ClickableViewAccessibility")
         private void bindMovableIcon() {
             if(mConfigMode!=APP_DRAWER_CONFIG_MODE.MOVABLE_APP_ICON) return;
-                icon.setOnTouchListener(new View.OnTouchListener() {
+                mIcon.setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
                         if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN) {
@@ -192,10 +198,33 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
 
                 rotateAnimation.setStartOffset(next);
                 rotateAnimation.setInterpolator(Animation.getInterpolator(9));
-                icon.clearAnimation();
-                icon.startAnimation(rotateAnimation);
+                mIcon.clearAnimation();
+                mIcon.startAnimation(rotateAnimation);
         }
-        private void bindAppSize() {
+        private void bindAppIconType(float appSize, AppDetail app) {
+            PreferencesUtility.IconEditorConfig iec = PreferencesUtility.getInstance(mContext).getIconConfig();
+            switch (iec.getShapedType()) {
+                case 0:
+                    mIcon.setBackgroundColor(0);
+                    mIcon.setCornerRadius(0);
+                    mIcon.setPadding(0,0,0,0);
+                    break;
+                case 1:
+                    mIcon.setBackgroundColor(Color.WHITE);
+                //    Log.d(TAG, "bindAppIconType: "+iec.getCornerRadius());
+                    mIcon.setCornerRadius(iec.getCornerRadius()*appSize);
+                    int pd = (int) (2f/31*appSize);
+                    mIcon.setPadding(pd,pd,pd,pd);
+                    break;
+                case 2:
+                   mIcon.setBackgroundColor(app.getDarkenAverageColor());
+                    mIcon.setCornerRadius(iec.getCornerRadius()*appSize);
+                    int pd2 = (int) (2f/31*appSize);
+                    mIcon.setPadding(pd2,pd2,pd2,pd2);
+                    break;
+            }
+        }
+        private void bindAppSizeAndType(AppDetail app) {
 
             Resources resources = mContext.getResources();
             float w = resources.getDimension(R.dimen.app_width);
@@ -207,29 +236,39 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
             int nw = (int) (w*scale);
             int nh = (int) (w*scale);
 
-            ViewGroup.LayoutParams iconParams = icon.getLayoutParams();
+            ViewGroup.LayoutParams iconParams = mIcon.getLayoutParams();
            iconParams.width  = nw;
            iconParams.height = nh;
 
-           ViewGroup.LayoutParams textParams = text.getLayoutParams();
+           ViewGroup.LayoutParams textParams = mTitle.getLayoutParams();
            textParams.width = nw-marginText;
 
-            ViewGroup.LayoutParams rootParams = root.getLayoutParams();
+            ViewGroup.LayoutParams rootParams = mRoot.getLayoutParams();
             rootParams.width = nw;
             rootParams.height = nh + textParams.height;
-
-            root.requestLayout();
-            icon.requestLayout();
-            text.requestLayout();
+            bindAppIconType(nw, app);
+            mRoot.requestLayout();
+            mIcon.requestLayout();
+            mTitle.requestLayout();
         }
         private void bindAppTitleTextView() {
             if(PreferencesUtility.getInstance(mContext.getApplicationContext()).isShowAppTitle()) {
-                text.setVisibility(View.VISIBLE);
-                if(Tool.WHITE_TEXT_THEME) text.setTextColor(0xFFEEEEEE);
-                else text.setTextColor(0xFF333333);
+                mTitle.setVisibility(View.VISIBLE);
 
+                PreferencesUtility.IconEditorConfig iec = PreferencesUtility.getInstance(mContext).getIconConfig();
+              if(Tool.WHITE_TEXT_THEME)  switch (iec.getTitleColorType()) {
+                    case 0:
+                        boolean isDarkWallpaper = Tool.getInstance().isDarkWallpaper();
+                        if(isDarkWallpaper) mTitle.setTextColor(0xFFEEEEEE);
+                        else mTitle.setTextColor(0xFF111111);
+                        //mTitle.setTextColor(Tool.getContrastVersionForColor(Tool.getInstance().getAverageColor()));
+                            break;
+                    case 1: mTitle.setTextColor(0xFFEEEEEE); break;
+                    case 2: mTitle.setTextColor(0xFF111111); break;
+
+                } else mTitle.setTextColor(0xFF333333);
             }
-            else text.setVisibility(View.GONE);
+            else mTitle.setVisibility(View.GONE);
         }
 
         @Override

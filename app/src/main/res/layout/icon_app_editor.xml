@@ -4,7 +4,8 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_marginBottom="@dimen/dp_8"
-    android:layout_marginTop="@dimen/dp_8">
+    android:layout_marginTop="@dimen/dp_8"
+    android:paddingBottom="8dp">
     <ImageView
         android:id="@+id/toggleButton"
         android:layout_width="35dp"
@@ -193,6 +194,7 @@
         android:textColor="#FF444444"
         android:textSize="16sp"
         android:textStyle="bold"
+        android:layout_marginBottom="8dp"
         />
     <TextView
         android:id="@+id/auto_text"
@@ -200,13 +202,12 @@
         android:layout_height="wrap_content"
         android:text="Auto"
         android:padding="10dp"
-        android:textColor="@color/FlatBlue"
+        android:textColor="@color/BackwardColorHeavy"
         app:layout_constraintTop_toTopOf="@id/background_color_label"
         app:layout_constraintBottom_toBottomOf="@id/background_color_label"
         app:layout_constraintStart_toEndOf="@id/background_color_label"
         app:layout_constraintEnd_toStartOf="@id/white"
-        android:textStyle="bold"
-        android:background="@drawable/count_round"/>
+      />
     <TextView
         android:id="@+id/white"
         android:layout_width="wrap_content"

@@ -16,12 +16,15 @@ public final class PreferencesUtility {
     private static PreferencesUtility sInstance;
 
     private static SharedPreferences mPreferences;
-    private static Context context;
+    private Context context;
     private ConnectivityManager connManager = null;
 
     public PreferencesUtility(final Context context) {
         this.context = context;
         mPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+    }
+    public static void destroy() {
+        if(sInstance!=null) sInstance = null;
     }
 
     public static final PreferencesUtility getInstance(final Context context) {
@@ -50,13 +53,15 @@ public final class PreferencesUtility {
         editor.putBoolean(SHOW_APP_TITLE,value);
         editor.apply();
     }
+    private IconEditorConfig iec;
     public IconEditorConfig getIconConfig() {
-        IconEditorConfig iec = new IconEditorConfig();
-        iec.mShapedType = mPreferences.getInt(IconEditorConfig.SHAPE_TYPE,0);
+        if(iec !=null) return this.iec;
+        iec = new IconEditorConfig();
+        iec.mShapedType = mPreferences.getInt(IconEditorConfig.SHAPE_TYPE,0); // 0 mean normal, 1 mean white square, 2 mean color square
         iec.mWhiteBackground = mPreferences.getBoolean(IconEditorConfig.WHITE_BACKGROUND,true);
         iec.mPadding = mPreferences.getFloat(IconEditorConfig.PADDING,4.0f/62);
         iec.mAutoTextColor = mPreferences.getBoolean(IconEditorConfig.AUTO_TEXT_COLOR,true);
-        iec.mTextColor = mPreferences.getInt(IconEditorConfig.TEXT_COLOR, Color.WHITE);
+        iec.mTextColor = mPreferences.getInt(IconEditorConfig.TEXT_COLOR, 0); // 0 means auto, 1 means white, 2 means black
         iec.mCornerRadius = mPreferences.getFloat(IconEditorConfig.CORNER_RADIUS,6/31.0f);
         return iec;
     }
@@ -113,11 +118,11 @@ public final class PreferencesUtility {
         }
 
 
-        public int getTextColor() {
+        public int getTitleColorType() {
             return mTextColor;
         }
 
-        public IconEditorConfig setTextColor(int mTextColor) {
+        public IconEditorConfig setTitleColorType(int mTextColor) {
             this.mTextColor = mTextColor;
             return this;
         }

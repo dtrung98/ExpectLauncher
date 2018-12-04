@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
@@ -13,6 +14,7 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
+import android.support.annotation.ColorInt;
 import android.support.annotation.RequiresApi;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -177,18 +179,47 @@ public class Tool {
             // nếu ảnh gốc chưa được load lần đầu
             if(origin ==null) {
                 tool.originalWallPaper = tool.getCropCenterScreenBitmap(tool.getActiveWallPaper());
-                tool.blurWallPaper = tool.getCropCenterScreenBitmap(tool.blurWallBitmap());
+                makeWallPaper();
                 return true;
             }
             // ngược lại ta so sánh ảnh mới và ảnh gốc
             Bitmap newOrigin = tool.getCropCenterScreenBitmap(tool.getActiveWallPaper());
             if(!origin.sameAs(newOrigin)) {
                 tool.originalWallPaper = newOrigin;
-                tool.blurWallPaper = tool.getCropCenterScreenBitmap(tool.blurWallBitmap());
+                makeWallPaper();
                 return true;
             } else return false;
         }
+        private void makeWallPaper() {
+            Bitmap tmpBlur = tool.blurWallBitmap();
+            int[] c = BitmapEditor.getAverageColorRGB(tmpBlur);
+            tool.mAverageColor = Color.rgb(c[0],c[1],c[2]);
+            tool.mDarkWallpaper =  BitmapEditor.PerceivedBrightness(160,c);
+            tool.blurWallPaper = tool.getCropCenterScreenBitmap(tmpBlur);
+            tmpBlur.recycle();
+        }
     }
+    private boolean mDarkWallpaper = false;
+    private int mAverageColor = Color.WHITE;
+    public int getAverageColor() {
+        return mAverageColor;
+    }
+    public boolean isDarkWallpaper() {
+        return mDarkWallpaper;
+    }
+    public static int getContrastVersionForColor(int color) {
+        float[] hsv = new float[3];
+        Color.RGBToHSV(Color.red(color), Color.green(color), Color.blue(color),
+                hsv);
+        if (hsv[2] < 0.5) {
+            hsv[2] = 0.7f;
+        } else {
+            hsv[2] = 0.3f;
+        }
+        hsv[1] = hsv[1] * 0.2f;
+        return Color.HSVToColor(hsv);
+    }
+
 
     private static int GlobalColor = 0xffff4081;
     private static int SurfaceColor =0xff00dbde;
@@ -433,7 +464,7 @@ public class Tool {
         toast.show();
         //   TextView textView = (TextView) toast.getView().findViewById(android.R.id.message);
         //  textView.setBackgroundColor(Color.WHITE);
-        //textView.setTextColor(Color.BLACK);
+        //textView.setTitleColorType(Color.BLACK);
         //   ((View)textView.getParent()).setBackground(R.drawable.corner_layout);
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {

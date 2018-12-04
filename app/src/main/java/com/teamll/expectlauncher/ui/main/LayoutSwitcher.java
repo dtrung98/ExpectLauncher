@@ -20,6 +20,8 @@ import com.teamll.expectlauncher.ui.main.appdrawer.AppDrawerAdapter;
 import com.teamll.expectlauncher.ui.main.appdrawer.AppDrawerFragment;
 import com.teamll.expectlauncher.ui.main.bottomsheet.RoundedBottomSheetDialogFragment;
 import com.teamll.expectlauncher.ui.main.mainscreen.MainScreenFragment;
+import com.teamll.expectlauncher.ui.widgets.DarkenRoundedBackgroundFrameLayout;
+import com.teamll.expectlauncher.ui.widgets.MotionRoundedBitmapFrameLayout;
 import com.teamll.expectlauncher.ui.widgets.SwipeDetectorGestureListener;
 import com.teamll.expectlauncher.util.Animation;
 import com.teamll.expectlauncher.util.Tool;
@@ -160,6 +162,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
 
     void translateAppDrawerByMarginTop(int id, int pos) {
 
+        int saved = appDrawerParams.topMargin;
         appDrawerParams.topMargin = (id==R.id.recyclerview) ? pos : rect.Height + pos;
 
         // topMargin ở vị trí này thì dock bắt đầu thu nhỏ dần
@@ -182,25 +185,38 @@ public class LayoutSwitcher implements View.OnTouchListener {
 
         mainScreen.dock.setScaleX(1-0.25f*keyValue);
         mainScreen.dock.setScaleY(1-0.25f*keyValue);
-       // mainScreen.dock.setAlpha(1-0.25f*keyValue);
 
-        appDrawer.mSearchBackGround.requestLayout();
-        appDrawerRootView.requestLayout();
+        if(appDrawer.mSearchBackGround instanceof MotionRoundedBitmapFrameLayout)
+        appDrawer.mSearchBackGround.invalidate();
+
+          if(appDrawer.mSearchBackGround instanceof MotionRoundedBitmapFrameLayout)
+            appDrawer.mRecyclerViewParent.invalidate();
 
         toggle.requestLayout();
         mainScreen.dock.requestLayout();
         if(appDrawerParams.topMargin<=0) mode =MODE.IN_APP_DRAWER;
         else if(appDrawerParams.topMargin>=appDrawerParams.height) mode = MODE.IN_MAIN_SCREEN;
-        showHideMainScreenWhenModeChanged();
+        appDrawerRootView.requestLayout();
+      //  appDrawerParams.topMargin = saved;
+        // appDrawerRootView.setTranslationY(pos);
 
+        updateShowHideMainScreen(false,appDrawerParams.topMargin/(rect.Height+0.0f));
     }
     private void updateShowHideMainScreen(boolean zero2One, float value) {
-        appDrawer.mRecyclerViewParent.setRoundNumber(0.5f + value*(1.75f-0.5f),true);
+
 
         float alpha_blur = value/max_value;
         if(alpha_blur>1) alpha_blur = 1;
-        appDrawer.mRecyclerViewParent.setAlphaBlurPaint(alpha_blur,false);
-        appDrawer.mRecyclerViewParent.setAlphaBackground(value*max_value);
+
+        if(appDrawer.mRecyclerViewParent instanceof DarkenRoundedBackgroundFrameLayout) {
+
+            ((DarkenRoundedBackgroundFrameLayout) appDrawer.mRecyclerViewParent).setRoundNumber(0.5f + value * (1.75f - 0.5f), true);
+            ((DarkenRoundedBackgroundFrameLayout)appDrawer.mRecyclerViewParent).setAlphaBackground(value * max_value);
+
+            if(appDrawer.mRecyclerViewParent instanceof MotionRoundedBitmapFrameLayout) {
+                ((MotionRoundedBitmapFrameLayout)appDrawer.mRecyclerViewParent).setAlphaBlurPaint(alpha_blur, false);
+                }
+        }
 
         mainScreen.setAlpha(value);
         toggle.setAlpha(value);
@@ -415,7 +431,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
         });
 
             va.setInterpolator(Animation.getInterpolator(4, 1.5f));
-            va.setDuration((long) (300 + 200 * Math.abs((yTo-yFrom+0.0f)/rect.Height)));
+            va.setDuration((long) (600 + 250 * Math.abs((yTo-yFrom+0.0f)/rect.Height)));
         va.start();
     }
 

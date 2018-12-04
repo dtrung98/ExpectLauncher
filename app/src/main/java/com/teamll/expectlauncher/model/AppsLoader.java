@@ -3,7 +3,11 @@ package com.teamll.expectlauncher.model;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.support.v4.content.AsyncTaskLoader;
+
+import com.teamll.expectlauncher.util.BitmapEditor;
 
 import java.text.Collator;
 import java.util.ArrayList;
@@ -46,6 +50,8 @@ public class AppsLoader extends AsyncTaskLoader<ArrayList<App>> {
             if (context.getPackageManager().getLaunchIntentForPackage(pkg) != null) {
                 App app = new App(context, apps.get(i));
                 app.loadLabel(context);
+               // app.getIcon();
+              setAverageColor(app);
                 items.add(app);
             }
         }
@@ -54,6 +60,19 @@ public class AppsLoader extends AsyncTaskLoader<ArrayList<App>> {
         Collections.sort(items, ALPHA_COMPARATOR);
 
         return items;
+    }
+    private void setAverageColor(App app) {
+        if(app.getIcon() instanceof BitmapDrawable) {
+             BitmapDrawable bd = (BitmapDrawable) app.getIcon();
+            int[] c =  BitmapEditor.getAverageColorRGB(bd.getBitmap());
+            // int c2 = Tool.getContrastVersionForColor(Color.rgb(c[0],c[1],c[2]));
+            int c2 = Color.rgb(c[0],c[1],c[2]);
+            c2 = BitmapEditor.darkenColor(c2);
+            app.setDarkenAverageColor(c2);
+            // mIcon.setBackgroundColor(c2);
+        } else {
+            app.setDarkenAverageColor(Color.WHITE);
+        }
     }
 
     @Override

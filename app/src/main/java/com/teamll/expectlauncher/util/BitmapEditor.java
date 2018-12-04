@@ -22,6 +22,7 @@ import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.RenderScript;
 import android.renderscript.ScriptIntrinsicBlur;
+import android.support.annotation.ColorInt;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -297,7 +298,49 @@ public final class BitmapEditor {
     {
         double TBT= Math.sqrt(c[0] * c[0] * .241 +c[1] * c[1] * .691 +c[2] * c[2] * .068);
         //    Log.d("themee",TBT+"");
-        return (TBT > will_White) ? false: true;
+        return !(TBT > will_White);
+    }
+    public static int manipulateColor(int color, float factor) {
+        int a = Color.alpha(color);
+        int r = Math.round(Color.red(color) * factor);
+        int g = Math.round(Color.green(color) * factor);
+        int b = Math.round(Color.blue(color) * factor);
+        return Color.argb(a,
+                Math.min(r,255),
+                Math.min(g,255),
+                Math.min(b,255));
+    }
+    @ColorInt
+   public static int darkenColor(@ColorInt int color) {
+        float[] hsv = new float[3];
+        Color.colorToHSV(color, hsv);
+        hsv[2] *= 0.9f;
+        return Color.HSVToColor(hsv);
+    }
+    public static boolean isDark(Bitmap bitmap){
+        boolean dark=false;
+
+        float darkThreshold = bitmap.getWidth()*bitmap.getHeight()*0.45f;
+        int darkPixels=0;
+
+        int[] pixels = new int[bitmap.getWidth()*bitmap.getHeight()];
+        bitmap.getPixels(pixels,0,bitmap.getWidth(),0,0,bitmap.getWidth(),bitmap.getHeight());
+
+        for(int pixel : pixels){
+            int color = pixel;
+            int r = Color.red(color);
+            int g = Color.green(color);
+            int b = Color.blue(color);
+            double luminance = (0.299*r+0.0f + 0.587*g+0.0f + 0.114*b+0.0f);
+            if (luminance<150) {
+                darkPixels++;
+            }
+        }
+
+        if (darkPixels >= darkThreshold) {
+            dark = true;
+        }
+        return dark;
     }
 
     public static int[] getAverageColorRGB(Bitmap bitmap) {
@@ -953,7 +996,7 @@ public final class BitmapEditor {
      * @param bitmap image to crop
      * @return square bitmap with the cropped image
      */
-    public Bitmap crop (Bitmap bitmap){
+    public static Bitmap crop (Bitmap bitmap){
 
         int height = bitmap.getHeight();
         int width = bitmap.getWidth();
@@ -964,7 +1007,7 @@ public final class BitmapEditor {
 
         int top = 0;
         int left = 0;
-        int botton = height;
+        int bottom = height;
         int right = width;
 
         for (int y = 0; y < height; y++) {
@@ -978,13 +1021,13 @@ public final class BitmapEditor {
         for (int y = height - 1; y > top; y--) {
             bitmap.getPixels(buffer, 0, width, 0, y, width, 1);
             if (!Arrays.equals(empty, buffer)) {
-                botton = y;
+                bottom = y;
                 break;
             }
         }
 
 
-        int bufferSize = botton -top +1;
+        int bufferSize = bottom -top +1;
         empty = new int[bufferSize];
         buffer = new int[bufferSize];
         Arrays.fill(empty,0);
@@ -1006,7 +1049,37 @@ public final class BitmapEditor {
             }
         }
 
-        Bitmap cropedBitmap = Bitmap.createBitmap(bitmap, left, top, right-left, botton-top);
+        Bitmap cropedBitmap = Bitmap.createBitmap(bitmap, left, top, right-left, bottom-top);
         return cropedBitmap;
     }
-}
+   public static Bitmap CropBitmapTransparency(Bitmap sourceBitmap)
+    {
+        int minX = sourceBitmap.getWidth();
+        int minY = sourceBitmap.getHeight();
+        int maxX = -1;
+        int maxY = -1;
+        for(int y = 0; y < sourceBitmap.getHeight(); y++)
+        {
+            for(int x = 0; x < sourceBitmap.getWidth(); x++)
+            {
+                int alpha = (sourceBitmap.getPixel(x, y) >> 24) & 255;
+                if(alpha > 0)   // pixel is not 100% transparent
+                {
+                    if(x < minX)
+                        minX = x;
+                    if(x > maxX)
+                        maxX = x;
+                    if(y < minY)
+                        minY = y;
+                    if(y > maxY)
+                        maxY = y;
+                }
+            }
+        }
+        if((maxX < minX) || (maxY < minY))
+            return null; // Bitmap is entirely transparent
+
+        // crop bitmap to non-transparent area and return:
+        return Bitmap.createBitmap(sourceBitmap, minX, minY, (maxX - minX) + 1, (maxY - minY) + 1);
+    }
+    }
