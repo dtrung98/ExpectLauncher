@@ -6,7 +6,7 @@ the launcher you always expect
 ##### Widget
 ##### Custom icon size, type and more
 ##### etc
-##### Screenshots
+## Screenshots
 </br>
 <div align="center">
    <table align="center" border="0" >
