@@ -20,6 +20,8 @@ src="https://user-images.githubusercontent.com/33343210/49483606-6a629b80-f866-1
 </br>
 
 ## Download
+Download Apk from [here](https://github.com/dtrung98/Source/raw/master/expect_launcher_4_12_2.apk) or copy this link
 ```
-Download Apk from [here](https://github.com/dtrung98/Source/raw/master/expect_launcher_4_12_2.apk)
+https://github.com/dtrung98/Source/raw/master/expect_launcher_4_12_2.apk
 ```
+</br>
