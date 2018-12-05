@@ -2,7 +2,11 @@
 the launcher you always expect
 
 ## Features
-## Screenshots
+##### Home and App drawer supports
+##### Widget
+##### Custom icon size, type and more
+##### etc
+##### Screenshots
 </br>
 <div align="center">
    <table align="center" border="0" >
