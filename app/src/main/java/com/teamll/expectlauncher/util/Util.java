@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import com.teamll.expectlauncher.model.App;
 import com.teamll.expectlauncher.model.AppDetail;
 
 import java.util.ArrayList;
@@ -59,4 +60,32 @@ public class Util {
         }
         return false;
     }
+
+    public static int findPackageName(ArrayList<AppDetail> appList, String packageName) {
+        int id = -1;
+
+        int count = appList.size();
+        for (int index = 0; index < count; index++) {
+            if (appList.get(index).getApplicationPackageName().equals(packageName)) {
+                id = index;
+                break;
+            }
+        }
+
+        return id;
+    }
+
+//    public static int findPackageName(ArrayList<App> appList, String packageName) {
+//        int id = -1;
+//
+//        int count = appList.size();
+//        for (int index = 0; index < count; index++) {
+//            if (appList.get(index).getApplicationPackageName().equals(packageName)) {
+//                id = index;
+//                break;
+//            }
+//        }
+//
+//        return id;
+//    }
 }

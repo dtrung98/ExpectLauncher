@@ -24,6 +24,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.teamll.expectlauncher.R;
 import com.teamll.expectlauncher.model.App;
@@ -403,5 +404,18 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onWallpaperChanged(Bitmap original, Bitmap blur) {
         onUpdate();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        ((AppDrawerAdapter)mRecyclerView.getAdapter()).backupApps();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((AppDrawerAdapter)mRecyclerView.getAdapter()).restoreApps();
+        ((AppDrawerAdapter)mRecyclerView.getAdapter()).notifyDataSetChanged();
     }
 }

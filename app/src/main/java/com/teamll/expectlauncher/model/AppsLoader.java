@@ -1,13 +1,19 @@
 package com.teamll.expectlauncher.model;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.v4.content.AsyncTaskLoader;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.teamll.expectlauncher.util.BitmapEditor;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.text.Collator;
 import java.util.ArrayList;
@@ -30,8 +36,23 @@ public class AppsLoader extends AsyncTaskLoader<ArrayList<App>> {
         mPm = context.getPackageManager();
     }
 
+    private int findItem(ArrayList<App> appList, String packageName) {
+        int id = -1;
+
+        int count = appList.size();
+        for (int index = 0; index < count; index++) {
+            if (appList.get(index).getApplicationPackageName().equals(packageName)) {
+                id = index;
+                break;
+            }
+        }
+
+        return id;
+    }
     @Override
     public ArrayList<App> loadInBackground() {
+        SharedPreferences pref = getContext().getSharedPreferences("app-data", Context.MODE_PRIVATE);
+        String appString = pref.getString("app-list", "");
         // retrieve the list of installed applications
         List<ApplicationInfo> apps = mPm.getInstalledApplications(0);
 
@@ -43,9 +64,9 @@ public class AppsLoader extends AsyncTaskLoader<ArrayList<App>> {
 
         // create corresponding apps and load their labels
         ArrayList<App> items = new ArrayList<App>(apps.size());
+        ArrayList<App> resultItems = new ArrayList<App>();
         for (int i = 0; i < apps.size(); i++) {
             String pkg = apps.get(i).packageName;
-
             // only apps which are launchable
             if (context.getPackageManager().getLaunchIntentForPackage(pkg) != null) {
                 App app = new App(context, apps.get(i));
@@ -57,9 +78,31 @@ public class AppsLoader extends AsyncTaskLoader<ArrayList<App>> {
         }
 
         // sort the list
-        Collections.sort(items, ALPHA_COMPARATOR);
+        if (appString.equals("")) {
+            Collections.sort(items, ALPHA_COMPARATOR);
+            resultItems = items;
+        }
+        else {
+            try {
+                JSONArray appsJson = new JSONArray(appString);
+                int count = appsJson.length();
+                for (int index = 0; index < count; index++) {
+                    int id = findItem(items, appsJson.get(index).toString());
+                    if (id > -1) {
+                        resultItems.add(items.get(id));
+                        items.remove(id);
+                    }
+                }
+                count = items.size();
+                for (int index = 0; index < count; index++) {
+                    resultItems.add(items.get(index));
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
 
-        return items;
+        return resultItems;
     }
     private void setAverageColor(App app) {
         if(app.getIcon() instanceof BitmapDrawable) {

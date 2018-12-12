@@ -2,6 +2,7 @@ package com.teamll.expectlauncher.ui.main.appdrawer;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
@@ -18,6 +19,7 @@ import android.view.animation.RotateAnimation;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.makeramen.roundedimageview.RoundedImageView;
@@ -37,6 +39,9 @@ import com.teamll.expectlauncher.util.BitmapEditor;
 import com.teamll.expectlauncher.util.PreferencesUtility;
 import com.teamll.expectlauncher.util.Tool;
 import com.teamll.expectlauncher.util.Util;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.ViewHolder> implements ItemTouchHelperAdapter, Filterable {
     private static final String TAG="AppDrawerAdapter";
@@ -318,5 +323,53 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
     public interface ItemClickListener {
         void onItemClick(View view, AppDetail appDetail);
         void onItemLongPressed(View view, AppDetail appDetail);
+    }
+
+    public void clear() {
+        mData.clear();
+    }
+
+    public void backupApps() {
+        SharedPreferences pref = mContext.getSharedPreferences("app-data", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+
+        JSONArray appsJson = new JSONArray();
+        int count = mData.size();
+        for (int index = 0; index < count; index++) {
+            appsJson.put(mData.get(index).getApplicationPackageName());
+        }
+
+        editor.putString("app-list", appsJson.toString());
+        editor.commit();
+        Log.v("appsList: ", appsJson.toString());
+    }
+
+
+
+    public void restoreApps() {
+        SharedPreferences pref = mContext.getSharedPreferences("app-data", Context.MODE_PRIVATE);
+        String appString = pref.getString("app-list", "");
+        if (!appString.equals("")){
+            try {
+                ArrayList<AppDetail> items = new ArrayList<AppDetail>();
+                JSONArray appsJson = new JSONArray(appString);
+                int count = appsJson.length();
+                for (int index = 0; index < count; index++) {
+                    int id = Util.findPackageName(mData, appsJson.get(index).toString());
+                    if (id > -1) {
+                        items.add(mData.get(id));
+                        mData.remove(id);
+                    }
+
+                }
+                count = mData.size();
+                for (int index = 0; index < count; index++) {
+                    items.add(mData.get(index));
+                }
+                mData = items;
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
