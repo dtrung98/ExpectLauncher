@@ -409,13 +409,15 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onPause() {
         super.onPause();
-        ((AppDrawerAdapter)mRecyclerView.getAdapter()).backupApps();
+        if(mAdapter!=null)
+            mAdapter.backupApps();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        ((AppDrawerAdapter)mRecyclerView.getAdapter()).restoreApps();
-        ((AppDrawerAdapter)mRecyclerView.getAdapter()).notifyDataSetChanged();
+//        if(mAdapter!=null)
+//            mAdapter.restoreApps();
+
     }
 }

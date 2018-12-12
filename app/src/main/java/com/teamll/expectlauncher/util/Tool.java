@@ -43,12 +43,16 @@ public class Tool {
 
     public void destroy() {
         stopWallpaperTracking();
+        clear();
         context = null;
         tool = null;
     }
     public static Tool getInstance() {
         return tool;
     }
+
+
+
     private ArrayList<WallpaperChangedNotifier> notifiers = new ArrayList<>();
     private ArrayList<Boolean> CallFirstTime = new ArrayList<>();
     public void AddWallpaperChangedNotifier(WallpaperChangedNotifier notifier) {

@@ -169,6 +169,9 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
             if(mConfigMode==APP_DRAWER_CONFIG_MODE.NORMAL)
             if (mClickListener != null) {
                 int pos = getAdapterPosition();
+                if(isInSearchMode())
+                    mClickListener.onItemClick(view,mFilterData.get(pos));
+                else
                 mClickListener.onItemClick(view,mData.get(pos));
             }
         }
@@ -371,5 +374,6 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
                 e.printStackTrace();
             }
         }
+        notifyDataSetChanged();
     }
 }

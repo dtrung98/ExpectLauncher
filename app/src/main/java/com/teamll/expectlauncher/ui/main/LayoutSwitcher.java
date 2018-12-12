@@ -5,12 +5,14 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
@@ -242,6 +244,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
        }
     }
     public void onBackPressed() {
+
         if(mode==MODE.IN_APP_DRAWER) {
             if(appDrawer.mAdapter.mConfigMode!=AppDrawerAdapter.APP_DRAWER_CONFIG_MODE.NORMAL)
                 appDrawer.mAdapter.switchMode(AppDrawerAdapter.APP_DRAWER_CONFIG_MODE.NORMAL);

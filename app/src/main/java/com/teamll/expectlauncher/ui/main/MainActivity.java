@@ -1,5 +1,6 @@
 package com.teamll.expectlauncher.ui.main;
 
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Build;
@@ -10,8 +11,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 
 import com.teamll.expectlauncher.R;
@@ -81,6 +84,12 @@ public class MainActivity extends AppLoaderActivity implements Tool.WallpaperCha
     }
     @Override
     public void onBackPressed() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+
         if(switcher!=null) switcher.onBackPressed();
     }
     private LayoutSwitcher switcher;
@@ -198,7 +207,18 @@ public class MainActivity extends AppLoaderActivity implements Tool.WallpaperCha
 
     @Override
     public void onHomePressed() {
+
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+
         if(inResuming&&switcher!=null) switcher.onBackPressed();
+        else {
+            // Check if no view has focus:
+
+        }
     }
 
     @Override
