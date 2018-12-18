@@ -11,4 +11,6 @@
     <string name="color_square">Vuông màu</string>
     <string name="white_square">Vuông trắng</string>
     <string name="normal">Bình thường</string>
+    <string name="folder">Thư mục</string>
+    <string name="preference">Cài đặt giao diện</string>
 </resources>

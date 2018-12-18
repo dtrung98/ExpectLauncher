@@ -5,7 +5,6 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.teamll.expectlauncher.model.App;
-import com.teamll.expectlauncher.model.AppDetail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +27,9 @@ public class Util {
      * @param charString searching char sequence
      * @return filtered follower list
      */
-    public static ArrayList<AppDetail> searchAppsFilter(List<AppDetail> list, String charString) {
-        ArrayList<AppDetail> filteredTempList = new ArrayList<>();
-        for (AppDetail app : list) {
+    public static ArrayList<App> searchAppsFilter(List<App> list, String charString) {
+        ArrayList<App> filteredTempList = new ArrayList<>();
+        for (App app : list) {
             if (app != null ) {
                 // Filter by user name and user id
                 if (containsIgnoreCase(app.getLabel(), charString)
@@ -61,7 +60,7 @@ public class Util {
         return false;
     }
 
-    public static int findPackageName(ArrayList<AppDetail> appList, String packageName) {
+    public static int findPackageName(ArrayList<App> appList, String packageName) {
         int id = -1;
 
         int count = appList.size();

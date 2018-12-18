@@ -14,4 +14,7 @@
     <string name="color_square">Color Square</string>
     <string name="white_square">White Square</string>
     <string name="normal">Normal</string>
+    <string name="folder">Folder</string>
+    <string name="preference">Preference</string>
+    <string name="package_name" translatable="false">com.teamll.expectlauncher</string>
 </resources>

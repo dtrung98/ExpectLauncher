@@ -2,30 +2,35 @@ package com.teamll.expectlauncher.ui.main.appdrawer;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
+import android.graphics.PorterDuff;
+import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.v4.graphics.ColorUtils;
 import android.support.v4.view.MotionEventCompat;
+import android.support.v7.widget.MenuPopupWindow;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.AnimationSet;
 import android.view.animation.RotateAnimation;
+import android.view.animation.ScaleAnimation;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.teamll.expectlauncher.R;
 import com.teamll.expectlauncher.model.App;
-import com.teamll.expectlauncher.model.AppDetail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +40,6 @@ import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.ItemTouchHelperAdapt
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.ItemTouchHelperViewHolder;
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.OnStartDragListener;
 import com.teamll.expectlauncher.util.Animation;
-import com.teamll.expectlauncher.util.BitmapEditor;
 import com.teamll.expectlauncher.util.PreferencesUtility;
 import com.teamll.expectlauncher.util.Tool;
 import com.teamll.expectlauncher.util.Util;
@@ -43,11 +47,15 @@ import com.teamll.expectlauncher.util.Util;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.ViewHolder> implements ItemTouchHelperAdapter, Filterable {
     private static final String TAG="AppDrawerAdapter";
 
-    private ArrayList<AppDetail> mData = new ArrayList<>();
-    private ArrayList<AppDetail> mFilterData = new ArrayList<>();
+    private ArrayList<App> mData = new ArrayList<>();
+    private ArrayList<App> mFilterData = new ArrayList<>();
 
     public boolean isInSearchMode() {
         return mInSearchMode;
@@ -71,10 +79,20 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
         APP_ICON_EDITOR
     }
 
-    public APP_DRAWER_CONFIG_MODE mConfigMode = APP_DRAWER_CONFIG_MODE.NORMAL;
+    private APP_DRAWER_CONFIG_MODE mConfigMode = APP_DRAWER_CONFIG_MODE.NORMAL;
+    private boolean mOldConfigModeIsMovable = false;
     public void switchMode(APP_DRAWER_CONFIG_MODE newMode) {
+
+        if(mConfigMode==APP_DRAWER_CONFIG_MODE.MOVABLE_APP_ICON&&newMode!=APP_DRAWER_CONFIG_MODE.MOVABLE_APP_ICON) {
+            mOldConfigModeIsMovable = true;
+        }
+        else mOldConfigModeIsMovable = false;
+
         mConfigMode = newMode;
         notifyDataSetChanged();
+    }
+    public APP_DRAWER_CONFIG_MODE getMode() {
+        return mConfigMode;
     }
 
     AppDrawerAdapter(Context mContext, OnStartDragListener dragStartListener) {
@@ -100,7 +118,7 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view =LayoutInflater.from(parent.getContext()).inflate(R.layout.item_app_drawer, parent, false);
+        View view =LayoutInflater.from(parent.getContext()).inflate(R.layout.item_app_drawer_v2, parent, false);
         return new ViewHolder(view);
     }
 
@@ -140,22 +158,21 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
         notifyItemRemoved(position);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener, ItemTouchHelperViewHolder {
-       RoundedImageView mIcon;
-       TextView mTitle;
-       View mRoot;
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener, ItemTouchHelperViewHolder, View.OnAttachStateChangeListener {
+        @BindView(R.id.icon) RoundedImageView mIcon;
+        @BindView(R.id.text) TextView mTitle;
+        @BindView(R.id.x_button) ImageView mXButton;
+
 
         ViewHolder(View itemView) {
             super(itemView);
-            mRoot = itemView;
-           mIcon = itemView.findViewById(R.id.icon);
-           mTitle = itemView.findViewById(R.id.text);
-           itemView.setOnClickListener(this);
-           itemView.setOnLongClickListener(this);
+            ButterKnife.bind(this,itemView);
+
         }
 
         @Override
         public boolean onLongClick(View view) {
+
             if(mConfigMode==APP_DRAWER_CONFIG_MODE.NORMAL)
             if (mClickListener != null) {
                 int pos = getAdapterPosition();
@@ -163,7 +180,18 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
             }
             return true;
         }
+        @OnClick(R.id.x_button)
+        void onClickXButton(View v) {
+            Intent intent = new Intent(Intent.ACTION_UNINSTALL_PACKAGE);
+            String pkn;
+            if(isInSearchMode()) pkn = mFilterData.get(getAdapterPosition()).getApplicationPackageName();
+            else pkn = mData.get(getAdapterPosition()).getApplicationPackageName();
+            intent.setData(Uri.parse(String.format("package:%s", pkn)));
 
+            if(mContext!=null) {
+               mContext.startActivity(intent);
+           }
+        }
         @Override
         public void onClick(View view) {
             if(mConfigMode==APP_DRAWER_CONFIG_MODE.NORMAL)
@@ -175,19 +203,124 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
                 mClickListener.onItemClick(view,mData.get(pos));
             }
         }
-        void bind(AppDetail appDetail) {
-            Log.d(TAG, "bind");
-            mTitle.setText(appDetail.getLabel());
-            mIcon.setImageDrawable(appDetail.getIcon());
 
+        void bind(App app) {
+            Log.d(TAG, "bind item "+getAdapterPosition());
+            mTitle.setText(app.getLabel());
+            mIcon.setImageDrawable(app.getIcon());
             bindMovableIcon();
-            bindAppSizeAndType(appDetail);
+            bindAppSizeAndType(app);
             bindAppTitleTextView();
+        }
+        @SuppressLint("ClickableViewAccessibility")
+        void setResponseOnTouch() {
+            GestureDetector gd = new GestureDetector(new GestureDetector.SimpleOnGestureListener(){
+                @Override
+                public void onLongPress(MotionEvent e) {
+                    onLongClick(itemView);
+                }
+
+                @Override
+                public boolean onSingleTapConfirmed(MotionEvent e) {
+                    itemView.performClick();
+                    onClick(itemView);
+                    return true;
+                }
+
+            });
+            mIcon.setOnTouchListener(new View.OnTouchListener() {
+
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+
+                    gd.onTouchEvent(event);
+                    switch (event.getAction()) {
+                        case MotionEvent.ACTION_DOWN: {
+                            ImageView view = (ImageView) v;
+                            //overlay is black with transparency of 0x77 (119)
+                            view.getDrawable().setColorFilter(0x22000000,PorterDuff.Mode.SRC_ATOP);
+                            view.getBackground().setColorFilter(0x22000000,PorterDuff.Mode.SRC_ATOP);
+                            view.setAlpha(0.85f);
+                            view.invalidate();
+                            return true;
+                        }
+                        case MotionEvent.ACTION_UP:
+                        case MotionEvent.ACTION_CANCEL: {
+                            ImageView view = (ImageView) v;
+                            //clear the overlay
+                            view.getDrawable().clearColorFilter();
+                            view.getBackground().clearColorFilter();
+                            view.setAlpha(1f);
+                            view.invalidate();
+                            break;
+                        }
+                    }
+
+                    return false;
+                }
+            });
+        }
+
+        private void bindDeleteIcon(float appSize){
+
+            if(mConfigMode!=APP_DRAWER_CONFIG_MODE.MOVABLE_APP_ICON) {
+                if(mXButton.getVisibility()==View.VISIBLE&&mOldConfigModeIsMovable) {
+                    Log.d(TAG, "bindDeleteIcon: "+getAdapterPosition());
+                    ScaleAnimation sa = new ScaleAnimation(1f,0f,1f,0f,ScaleAnimation.RELATIVE_TO_SELF,0.5f, ScaleAnimation.RELATIVE_TO_SELF,0.5f);
+                    sa.setDuration(250);
+                    // sa.setInterpolator(new OvershootInterpolator());
+                    sa.setFillAfter(true);
+                    sa.setAnimationListener(new android.view.animation.Animation.AnimationListener() {
+                        @Override
+                        public void onAnimationStart(android.view.animation.Animation animation) {
+                        }
+
+                        @Override
+                        public void onAnimationEnd(android.view.animation.Animation animation) {
+                            mXButton.setVisibility(View.GONE);
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(android.view.animation.Animation animation) {
+
+                        }
+                    });
+
+                    mXButton.startAnimation(sa);
+                } else mXButton.setVisibility(View.GONE);
+                return;
+            }
+            if(mData.get(getAdapterPosition()).getApplicationPackageName().equals(mContext.getPackageName())) return;
+
+            ViewGroup.LayoutParams params = mXButton.getLayoutParams();
+            float h = appSize*20/62f;
+            int padding = (int) (h*3/20f);
+            params.width = params.height = (int) h;
+            if(params instanceof ViewGroup.MarginLayoutParams) {
+                ViewGroup.MarginLayoutParams params1 = (ViewGroup.MarginLayoutParams) params;
+                params1.topMargin = params1.leftMargin = padding;
+            }
+            mXButton.requestLayout();
+            mXButton.setPadding(padding,padding,padding,padding);
+
+            ScaleAnimation sa = new ScaleAnimation(0f,1f,0f,1f,ScaleAnimation.RELATIVE_TO_SELF,0.5f, ScaleAnimation.RELATIVE_TO_SELF,0.5f);
+            sa.setDuration(250);
+           // sa.setInterpolator(new OvershootInterpolator());
+            sa.setFillAfter(true);
+
+            mXButton.setVisibility(View.VISIBLE);
+            mXButton.startAnimation(sa);
         }
 
         @SuppressLint("ClickableViewAccessibility")
         private void bindMovableIcon() {
-            if(mConfigMode!=APP_DRAWER_CONFIG_MODE.MOVABLE_APP_ICON) return;
+
+            if(mConfigMode!=APP_DRAWER_CONFIG_MODE.MOVABLE_APP_ICON) {
+               setResponseOnTouch();
+               itemView.removeOnAttachStateChangeListener(this);
+                itemView.clearAnimation();
+                return;
+            }
                 mIcon.setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
@@ -198,18 +331,23 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
                     }
                 });
 
-                RotateAnimation rotateAnimation = new RotateAnimation(-5,5,40f,50f);
-                rotateAnimation.setRepeatCount(android.view.animation.Animation.INFINITE);
-                rotateAnimation.setRepeatMode(android.view.animation.Animation.REVERSE);
-                rotateAnimation.setDuration(85);
-                int next = 3 - random.nextInt(6);
+            hang(itemView);
+            itemView.addOnAttachStateChangeListener(this);
 
-                rotateAnimation.setStartOffset(next);
-                rotateAnimation.setInterpolator(Animation.getInterpolator(9));
-                mIcon.clearAnimation();
-                mIcon.startAnimation(rotateAnimation);
         }
-        private void bindAppIconType(float appSize, AppDetail app) {
+        private void hang(View itemView) {
+            RotateAnimation rotateAnimation = new RotateAnimation(-3,3,RotateAnimation.RELATIVE_TO_SELF,0.4f,RotateAnimation.RELATIVE_TO_SELF,0.45f);
+            rotateAnimation.setRepeatCount(android.view.animation.Animation.INFINITE);
+            rotateAnimation.setRepeatMode(android.view.animation.Animation.REVERSE);
+            rotateAnimation.setDuration(120);
+            int next = 3 - random.nextInt(6);
+
+            rotateAnimation.setStartOffset(next);
+            rotateAnimation.setInterpolator(Animation.getInterpolator(9));
+            itemView.clearAnimation();
+            itemView.startAnimation(rotateAnimation);
+        }
+        private void bindAppIconType(float appSize, App app) {
             PreferencesUtility.IconEditorConfig iec = PreferencesUtility.getInstance(mContext).getIconConfig();
             switch (iec.getShapedType()) {
                 case 0:
@@ -232,7 +370,7 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
                     break;
             }
         }
-        private void bindAppSizeAndType(AppDetail app) {
+        private void bindAppSizeAndType(App app) {
 
             Resources resources = mContext.getResources();
             float w = resources.getDimension(R.dimen.app_width);
@@ -251,11 +389,12 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
            ViewGroup.LayoutParams textParams = mTitle.getLayoutParams();
            textParams.width = nw-marginText;
 
-            ViewGroup.LayoutParams rootParams = mRoot.getLayoutParams();
+            ViewGroup.LayoutParams rootParams = itemView.getLayoutParams();
             rootParams.width = nw;
             rootParams.height = nh + textParams.height;
             bindAppIconType(nw, app);
-            mRoot.requestLayout();
+            bindDeleteIcon(nw);
+            itemView.requestLayout();
             mIcon.requestLayout();
             mTitle.requestLayout();
         }
@@ -281,14 +420,62 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
 
         @Override
         public void onItemSelected() {
-            itemView.setScaleX(1.1f);
-            itemView.setScaleY(1.1f);
+            itemView.clearAnimation();
+            AnimationSet as = new AnimationSet(false);
+            ScaleAnimation sa = new ScaleAnimation(1f,1.2f,1f,1.2f,50,50);
+            AlphaAnimation aa = new AlphaAnimation(1f,0.85f);
+            as.addAnimation(sa);
+            as.addAnimation(aa);
+            as.setDuration(85);
+            as.setFillAfter(true);
+
+            itemView.setAnimation(as);
+           // itemView.setScaleX(1.1f);
+          //  itemView.setScaleY(1.1f);
         }
 
         @Override
         public void onItemClear() {
-            itemView.setScaleX(1);
-            itemView.setScaleY(1);
+//            itemView.setScaleX(1);
+//            itemView.setScaleY(1);
+
+            itemView.clearAnimation();
+            AnimationSet as = new AnimationSet(false);
+            ScaleAnimation sa = new ScaleAnimation(1.2f,1f,1.2f,1f,50,50);
+            AlphaAnimation aa = new AlphaAnimation(0.85f,1f);
+            as.addAnimation(sa);
+            as.addAnimation(aa);
+            as.setDuration(85);
+            as.setFillAfter(true);
+
+
+            RotateAnimation rotateAnimation = new RotateAnimation(-3,3,40f,50f);
+            rotateAnimation.setRepeatCount(android.view.animation.Animation.INFINITE);
+            rotateAnimation.setRepeatMode(android.view.animation.Animation.REVERSE);
+            rotateAnimation.setDuration(85);
+            int next = 3 - random.nextInt(6);
+
+            rotateAnimation.setStartOffset(next);
+            rotateAnimation.setInterpolator(Animation.getInterpolator(9));
+           // itemView.clearAnimation();
+
+         //   itemView.startAnimation(rotateAnimation);
+            as.addAnimation(rotateAnimation);
+            itemView.setAnimation(as);
+
+        }
+
+        @Override
+        public void onViewAttachedToWindow(View v) {
+            if(mConfigMode==APP_DRAWER_CONFIG_MODE.MOVABLE_APP_ICON) {
+                itemView.clearAnimation();
+                hang(itemView);
+            }
+        }
+
+        @Override
+        public void onViewDetachedFromWindow(View v) {
+
         }
     }
 
@@ -315,7 +502,7 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
 
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                mFilterData= (ArrayList<AppDetail>) filterResults.values;
+                mFilterData= (ArrayList<App>) filterResults.values;
                 notifyDataSetChanged();
             }
         };
@@ -324,8 +511,8 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
 
 
     public interface ItemClickListener {
-        void onItemClick(View view, AppDetail appDetail);
-        void onItemLongPressed(View view, AppDetail appDetail);
+        void onItemClick(View view, App app);
+        void onItemLongPressed(View view, App app);
     }
 
     public void clear() {
@@ -354,7 +541,7 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
         String appString = pref.getString("app-list", "");
         if (!appString.equals("")){
             try {
-                ArrayList<AppDetail> items = new ArrayList<AppDetail>();
+                ArrayList<App> items = new ArrayList<App>();
                 JSONArray appsJson = new JSONArray(appString);
                 int count = appsJson.length();
                 for (int index = 0; index < count; index++) {

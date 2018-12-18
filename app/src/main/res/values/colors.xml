@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">@color/FlatGreen</color>
-    <color name="colorPrimaryDark">@color/FlatGreen</color>
-    <color name="colorAccent">#D81B60</color>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
     <color name= "SurfaceColor">#FFCC00</color>
     <color name="BackwardColorHeavy">#B0000000</color>
     <color name="BackwardColor">#A0000000</color>

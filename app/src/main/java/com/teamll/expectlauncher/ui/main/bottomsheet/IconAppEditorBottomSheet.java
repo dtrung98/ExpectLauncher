@@ -22,7 +22,7 @@ import android.widget.TextView;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.teamll.expectlauncher.R;
 
-import com.teamll.expectlauncher.model.AppDetail;
+import com.teamll.expectlauncher.model.App;
 import com.teamll.expectlauncher.ui.widgets.rangeseekbar.OnRangeChangedListener;
 import com.teamll.expectlauncher.ui.widgets.rangeseekbar.RangeSeekBar;
 import com.teamll.expectlauncher.util.PreferencesUtility;
@@ -37,7 +37,7 @@ public class IconAppEditorBottomSheet extends BottomSheetDialogFragment implemen
 
 
     public interface AppEditorCallBack {
-        AppDetail getAdaptiveApp();
+        App getAdaptiveApp();
         void onUpdate();
     }
     AppEditorCallBack listener;
@@ -197,7 +197,7 @@ public class IconAppEditorBottomSheet extends BottomSheetDialogFragment implemen
     private void setImageForTypeButton() {
         Drawable bitmap = null;
         if(listener!=null) {
-           AppDetail iv = listener.getAdaptiveApp();
+           App iv = listener.getAdaptiveApp();
            if(iv!=null) {
                bitmap = iv.getIcon();
                mTypeColorSquareButton.setBackgroundColor(iv.getDarkenAverageColor());

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@android:color/transparent">
+<TextView
+    android:id="@+id/text1"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:text="Text 1"
+    android:textColor="@color/FlatBlue"
+    android:textStyle="bold"
+    app:layout_constraintTop_toTopOf="parent"/>
+    <TextView
+        android:id="@+id/text2"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:text="Text 3"
+        android:textColor="@color/FlatBlue"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/text1"/>
+    <TextView
+        android:id="@+id/text3"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:text="Text 3"
+        android:textColor="@color/FlatBlue"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/text2"/>
+    <TextView
+        android:id="@+id/text4"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:text="Text 4"
+        android:textColor="@color/FlatBlue"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/text3"/>
+</android.support.constraint.ConstraintLayout>

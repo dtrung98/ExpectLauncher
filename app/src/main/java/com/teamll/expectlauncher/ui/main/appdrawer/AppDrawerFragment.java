@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,31 +12,28 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.teamll.expectlauncher.R;
-import com.teamll.expectlauncher.model.App;
 import com.teamll.expectlauncher.model.Rectangle;
 import com.teamll.expectlauncher.ui.main.AppLoaderActivity;
 import com.teamll.expectlauncher.ui.main.LayoutSwitcher;
 import com.teamll.expectlauncher.ui.main.bottomsheet.IconAppEditorBottomSheet;
 import com.teamll.expectlauncher.ui.main.bottomsheet.RoundedBottomSheetDialogFragment;
-import com.teamll.expectlauncher.ui.widgets.MotionRoundedBitmapFrameLayout;
+import com.teamll.expectlauncher.model.App;
+import com.teamll.expectlauncher.ui.widgets.BoundItemDecoration;
+import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.CustomItemTouchHelper;
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.OnStartDragListener;
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.SimpleItemTouchHelperCallback;
-import com.teamll.expectlauncher.model.AppDetail;
-import com.teamll.expectlauncher.ui.widgets.BoundItemDecoration;
 import com.teamll.expectlauncher.ui.widgets.rangeseekbar.OnRangeChangedListener;
 import com.teamll.expectlauncher.ui.widgets.rangeseekbar.RangeSeekBar;
 import com.teamll.expectlauncher.util.PreferencesUtility;
@@ -50,7 +46,7 @@ import butterknife.ButterKnife;
 
 public class AppDrawerFragment extends Fragment implements View.OnClickListener,
                                                             AppDrawerAdapter.ItemClickListener,
-                                                           OnStartDragListener,
+                                                            OnStartDragListener,
                                                            AppLoaderActivity.AppDetailReceiver,
                                                            LayoutSwitcher.EventSender,
                                                            RoundedBottomSheetDialogFragment.BottomSheetListener,
@@ -83,7 +79,7 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
     /**
      * Đối tượng helper xử lý cử chỉ đổi vị trí các ứng dụng
      */
-    ItemTouchHelper mItemTouchHelper;
+    CustomItemTouchHelper mItemTouchHelper;
 
     /**
      * Chiều cao của thanh trạng thái
@@ -174,6 +170,8 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
         if(mSearchBackGround instanceof Tool.WallpaperChangedNotifier)  Tool.getInstance().AddWallpaperChangedNotifier((Tool.WallpaperChangedNotifier) mSearchBackGround);
 
         mAdapter = new AppDrawerAdapter(getActivity(),this);
+
+
         mRecyclerView.setAdapter(mAdapter);
         mAdapter.setClickListener(this);
         setLayoutManager();
@@ -196,8 +194,8 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
     }
 
     private void initTouchHelper() {
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
-        mItemTouchHelper = new ItemTouchHelper(callback);
+        CustomItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
+        mItemTouchHelper = new CustomItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(mRecyclerView);
     }
 
@@ -238,6 +236,8 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
         mRecyclerView.setLayoutManager(gridLayoutManager);
         BoundItemDecoration itemDecoration = new BoundItemDecoration(mRVContentWidth, mRVContentHeight,numberColumn,numberRow,(int) (verticalMargin*0.9f),(int)(horizontalMargin*0.9f));
         mRecyclerView.addItemDecoration(itemDecoration);
+
+
     }
 
     /**
@@ -257,20 +257,45 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
     }
 
     @Override
-    public void onItemClick(View view, AppDetail app) {
+    public void onItemClick(View view, App app) {
         openApp(view,app);
     }
 
     @Override
-    public void onItemLongPressed(View view, AppDetail appDetail) {
-        mAdaptiveApp = appDetail;
+    public void onItemLongPressed(View view, App app) {
+        mAdaptiveApp = app;
+//        dismissMenu();
+//        mPopupMenu = new PopupMenu(getContext(),view);
+//        mPopupMenu.inflate(R.menu.my_menu);
+//        mPopupMenu.setGravity(Gravity.TOP);
+//        mPopupMenu.show();
+//        if(true) return;
         RoundedBottomSheetDialogFragment fragment =  RoundedBottomSheetDialogFragment.newInstance(LayoutSwitcher.MODE.IN_APP_DRAWER);
 
         fragment.setAppDrawer(this);
-        fragment.show(getActivity().getSupportFragmentManager(),
+        fragment.show(getChildFragmentManager(),
                 "song_popup_menu");
     }
+    PopupMenu mPopupMenu;
+    public void dismissMenu() {
+        if(null!=mPopupMenu) {
+            mPopupMenu.dismiss();
+            mPopupMenu = null;
+        }
+    }
 
+    public boolean isMenuShown() {
+        return null!=mPopupMenu;
+    }
+
+    public boolean handleIfMenuIsShown() {
+        if(false&& isMenuShown()) {
+            dismissMenu();
+            mAdapter.switchMode(AppDrawerAdapter.APP_DRAWER_CONFIG_MODE.MOVABLE_APP_ICON);
+            return true;
+        }
+        return false;
+    }
     /**
      * Cập nhật vị trí mới cho App Drawer
      * Dùng nó để di chuyển App Drawer từ dưới lên
@@ -291,8 +316,8 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
         }
     }
 
-    void openApp(View v, AppDetail appDetail) {
-        ((AppLoaderActivity)getActivity()).openApp(v,appDetail);
+    void openApp(View v, App app) {
+        ((AppLoaderActivity)getActivity()).openApp(v, app);
     }
     void showHideAppTitle(View v) {
        PreferencesUtility pu =  PreferencesUtility.getInstance(getActivity().getApplicationContext());
@@ -394,10 +419,10 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
             case R.id.search_view : mSearchView.onActionViewExpanded();break;
         }
     }
-    private AppDetail mAdaptiveApp;
+    private App mAdaptiveApp;
 
     @Override
-    public AppDetail getAdaptiveApp() {
+    public App getAdaptiveApp() {
         return mAdaptiveApp;
     }
 

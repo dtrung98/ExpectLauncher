@@ -7,9 +7,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.v4.content.AsyncTaskLoader;
-import android.util.Log;
-import android.widget.Toast;
 
+import com.teamll.expectlauncher.R;
 import com.teamll.expectlauncher.util.BitmapEditor;
 
 import org.json.JSONArray;
@@ -71,15 +70,28 @@ public class AppsLoader extends AsyncTaskLoader<ArrayList<App>> {
             if (context.getPackageManager().getLaunchIntentForPackage(pkg) != null) {
                 App app = new App(context, apps.get(i));
                 app.loadLabel(context);
-               // app.getIcon();
-              setAverageColor(app);
-                items.add(app);
+              createAverageColor(app);
+
+              // Rename itself label
+              if(app.getApplicationPackageName().equals(context.getPackageName()))
+                  app.setLabel(context.getResources().getString(R.string.preference));
+
+             items.add(app);
             }
         }
 
         // sort the list
         if (appString.equals("")) {
             Collections.sort(items, ALPHA_COMPARATOR);
+
+            // Preference is the first item by default
+            for(int i=0;i<items.size();i++) {
+                if(items.get(i).getApplicationPackageName().equals(context.getPackageName())) {
+                    items.add(1, items.remove(i));
+                    break;
+                }
+            }
+
             resultItems = items;
         }
         else {
@@ -101,10 +113,13 @@ public class AppsLoader extends AsyncTaskLoader<ArrayList<App>> {
                 e.printStackTrace();
             }
         }
+        AppFolder appFolder = new AppFolder(context);
+        appFolder.set(resultItems.subList(0,5));
+        resultItems.add(appFolder);
 
         return resultItems;
     }
-    private void setAverageColor(App app) {
+    private void createAverageColor(App app) {
         if(app.getIcon() instanceof BitmapDrawable) {
              BitmapDrawable bd = (BitmapDrawable) app.getIcon();
             int[] c =  BitmapEditor.getAverageColorRGB(bd.getBitmap());

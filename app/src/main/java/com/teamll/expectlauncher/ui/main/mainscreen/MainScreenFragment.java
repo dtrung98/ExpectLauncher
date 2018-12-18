@@ -1,7 +1,6 @@
 package com.teamll.expectlauncher.ui.main.mainscreen;
 
 import android.annotation.SuppressLint;
-import android.appwidget.AppWidgetHostView;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -19,7 +18,6 @@ import android.widget.TextView;
 
 import com.teamll.expectlauncher.R;
 import com.teamll.expectlauncher.model.App;
-import com.teamll.expectlauncher.model.AppDetail;
 import com.teamll.expectlauncher.model.Rectangle;
 import com.teamll.expectlauncher.ui.main.AppLoaderActivity;
 import com.teamll.expectlauncher.ui.main.LayoutSwitcher;
@@ -237,8 +235,8 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
             dockApp[i].setImageDrawable(appInDock.get(i).getIcon());
         }
     }
-    void openApp(View v, AppDetail appDetail) {
-        ((AppLoaderActivity)getActivity()).openApp(v,appDetail);
+    void openApp(View v, App app) {
+        ((AppLoaderActivity)getActivity()).openApp(v, app);
     }
 
     @Override

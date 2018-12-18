@@ -24,7 +24,7 @@
     <dimen name="size_floating_button">85dp</dimen>
     <dimen name="text_app_width">60dp</dimen>
     <dimen name="text_app_margin">2dp</dimen>
-    <dimen name="recycler_view_padding">2dp</dimen>
+    <dimen name="recycler_view_padding">6dp</dimen>
     <dimen name="search_bar_height">40dp</dimen>
     <dimen name="search_bar_margin">12dp</dimen>
     <dimen name="dp_2">2dp</dimen>

@@ -5,14 +5,10 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
-import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
@@ -147,7 +143,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         if(!isViewAttached()) return false;
-       if(v.getId() ==recyclerView.getId()&&appDrawer.mAdapter.mConfigMode==AppDrawerAdapter.APP_DRAWER_CONFIG_MODE.NORMAL) {
+       if(v.getId() ==recyclerView.getId()&&appDrawer.mAdapter.getMode()==AppDrawerAdapter.APP_DRAWER_CONFIG_MODE.NORMAL) {
           return onTouchRecyclerView(v,event);
        } else if(v.getId() == container.getId()) {
            if(event.getAction()==MotionEvent.ACTION_UP) mainScreen.onUp(event);
@@ -246,7 +242,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
     public void onBackPressed() {
 
         if(mode==MODE.IN_APP_DRAWER) {
-            if(appDrawer.mAdapter.mConfigMode!=AppDrawerAdapter.APP_DRAWER_CONFIG_MODE.NORMAL)
+            if(appDrawer.mAdapter.getMode()!=AppDrawerAdapter.APP_DRAWER_CONFIG_MODE.NORMAL)
                 appDrawer.mAdapter.switchMode(AppDrawerAdapter.APP_DRAWER_CONFIG_MODE.NORMAL);
             else
             motionDown();
@@ -290,6 +286,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
 
         @Override
         public boolean onMove(MotionEvent e) {
+
            if(!down) {
                down = true;
                tempY0 = assignPosY0 = e.getRawY();
@@ -386,6 +383,8 @@ public class LayoutSwitcher implements View.OnTouchListener {
         return b||c;
     }
     private boolean onTouchRecyclerView(View v, MotionEvent event) {
+        if(appDrawer!=null&&appDrawer.handleIfMenuIsShown())
+        return true;
         return (checkOnTop()) &&_onTouch(v,event);
     }
 

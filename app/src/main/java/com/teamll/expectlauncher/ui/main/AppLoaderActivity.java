@@ -1,26 +1,20 @@
 package com.teamll.expectlauncher.ui.main;
 
 import android.app.ActivityOptions;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
 import com.teamll.expectlauncher.R;
 import com.teamll.expectlauncher.model.App;
-import com.teamll.expectlauncher.model.AppDetail;
 import com.teamll.expectlauncher.model.AppsLoader;
-
-import org.json.JSONArray;
 
 import java.util.ArrayList;
 
@@ -83,9 +77,14 @@ public abstract class AppLoaderActivity extends AppCompatActivity implements Loa
                     Math.cos(mFrequency * time) + 1);
         }
     }
-    public void openApp(View v, AppDetail appDetail) {
-        if (appDetail != null) {
-            Intent intent =getPackageManager().getLaunchIntentForPackage(appDetail.getApplicationPackageName());
+    public void openApp(View v, App app) {
+        if (app != null) {
+            if(app.getApplicationPackageName().equals(getResources().getString(R.string.package_name))) {
+                Toast.makeText(this,"Preference will be available soon...",Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Intent intent =getPackageManager().getLaunchIntentForPackage(app.getApplicationPackageName());
             if (intent != null) {
                 int left = 0, top = 0;
                 int width = v.getMeasuredWidth(), height = v.getMeasuredHeight();
@@ -100,4 +99,5 @@ public abstract class AppLoaderActivity extends AppCompatActivity implements Loa
             }
         }
     }
+
 }
