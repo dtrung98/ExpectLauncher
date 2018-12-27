@@ -16,43 +16,44 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/app_size"
+        android:id="@+id/add_widget"
         android:layout_width="@dimen/size_floating_button"
         android:layout_height="@dimen/size_floating_button"
         android:layout_marginTop="16dp"
         android:clickable="true"
         android:focusable="true"
         android:scaleType="center"
-        android:src="@drawable/plus_black"
+        app:srcCompat="@drawable/ic_widgets_black_24dp"
         app:backgroundTint="#FBFFBD"
         app:fabCustomSize="@dimen/size_floating_button"
-        app:layout_constraintEnd_toStartOf="@+id/position"
+        app:layout_constraintEnd_toStartOf="@+id/wallpaper"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toggleButton" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/position"
+        android:id="@+id/wallpaper"
         android:layout_width="@dimen/size_floating_button"
         android:layout_height="@dimen/size_floating_button"
         android:layout_marginTop="16dp"
         android:clickable="true"
         android:focusable="true"
         android:scaleType="center"
-        android:src="@drawable/picture"
+        app:srcCompat="@drawable/ic_image_black_24dp"
         app:backgroundTint="#FBFFBD"
         app:fabCustomSize="@dimen/size_floating_button"
-        app:layout_constraintEnd_toStartOf="@id/app_icon_editor"
-        app:layout_constraintStart_toEndOf="@id/app_size"
+        app:layout_constraintEnd_toStartOf="@id/wall_editor"
+        app:layout_constraintStart_toEndOf="@id/add_widget"
         app:layout_constraintTop_toBottomOf="@id/toggleButton" />
     <android.support.design.widget.FloatingActionButton
         android:layout_marginTop="16dp"
-        android:id="@+id/app_icon_editor"
+        android:id="@+id/wall_editor"
         android:layout_width="@dimen/size_floating_button"
         android:layout_height="@dimen/size_floating_button"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/position"
+        app:layout_constraintStart_toEndOf="@id/wallpaper"
         app:layout_constraintTop_toBottomOf="@id/toggleButton"
-        android:src="@drawable/editor"
+        app:srcCompat="@drawable/ic_delete_black_24dp"
+        android:tint="@color/Gray"
         app:fabCustomSize="@dimen/size_floating_button"
         android:scaleType="center"
         app:backgroundTint="#FBFFBD"
@@ -61,15 +62,15 @@
         />
 
     <TextView
-        android:id="@+id/app_size_text"
+        android:id="@+id/add_widget_text"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:gravity="center"
         android:text="Add Widget"
         android:textColor="#444"
-        app:layout_constraintEnd_toStartOf="@id/position"
+        app:layout_constraintEnd_toStartOf="@id/wallpaper"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/app_size" />
+        app:layout_constraintTop_toBottomOf="@id/add_widget" />
 
     <TextView
         android:id="@+id/position_text"
@@ -78,19 +79,19 @@
         android:gravity="center"
         android:text="Wallpaper"
         android:textColor="#444"
-        app:layout_constraintEnd_toStartOf="@+id/app_icon_editor"
-        app:layout_constraintStart_toEndOf="@id/app_size"
-        app:layout_constraintTop_toBottomOf="@id/position" />
+        app:layout_constraintEnd_toStartOf="@+id/wall_editor"
+        app:layout_constraintStart_toEndOf="@id/add_widget"
+        app:layout_constraintTop_toBottomOf="@id/wallpaper" />
 
     <TextView
         android:id="@+id/more_text"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:gravity="center"
-        android:text="Wallpaper Editor"
+        android:text="Remove last widget"
         android:textColor="#444"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/position"
-        app:layout_constraintTop_toBottomOf="@id/app_icon_editor" />
+        app:layout_constraintStart_toEndOf="@id/wallpaper"
+        app:layout_constraintTop_toBottomOf="@id/wall_editor" />
 
 </android.support.constraint.ConstraintLayout>

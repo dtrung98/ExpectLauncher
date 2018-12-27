@@ -17,13 +17,11 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.teamll.expectlauncher.R;
@@ -400,10 +398,8 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
                 mAdapter.switchMode(AppDrawerAdapter.APP_DRAWER_CONFIG_MODE.MOVABLE_APP_ICON);
                 return;
             case R.id.app_icon_editor:
-
                 IconAppEditorBottomSheet.newInstance(this).show(getActivity().getSupportFragmentManager(),
-                        "icon_app_editor");
-                return;
+                        "icon_app_editor");;
         }
     }
 

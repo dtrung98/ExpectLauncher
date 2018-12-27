@@ -13,7 +13,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:background="@color/FlatRed"
+        android:background="@color/FlatOrange"
         app:layout_constraintBottom_toBottomOf="@id/back_button"/>
     <ImageView
         android:id="@+id/back_button"

@@ -49,7 +49,7 @@
     <color name="FloatingButtonColor">#FBFFBD</color>
 
     <color name="focus_color">#FF0B19</color>
-    <color name="panel_background">#FFFFFF</color>
+    <color name="panel_background">#DDFFFFFF</color>
     <color name="main_background">#212121</color>
     <color name="setting_label_color">#444444</color>
     <color name="success_stroke_color">#A5DC86</color>

@@ -10,11 +10,13 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.FloatingActionButton;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 
@@ -29,6 +31,7 @@ import com.teamll.expectlauncher.util.Tool;
 import static android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED;
 
 public class RoundedBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
+    private static final String TAG ="RoundedBottomSheetDialogFragment";
 
 
     public interface BottomSheetListener {
@@ -75,7 +78,7 @@ public class RoundedBottomSheetDialogFragment extends BottomSheetDialogFragment 
             view = inflater.inflate(R.layout.mainscreen_bottom_sheet_layout, container,
                     false);
             ids = new int[] {
-                    R.id.toggleButton, R.id.app_size, R.id.position, R.id.more_text
+                    R.id.toggleButton, R.id.add_widget, R.id.wallpaper, R.id.wall_editor
             };
         } else {
             view = inflater.inflate(R.layout.app_drawer_bottom_sheet_layout, container, false);
@@ -98,7 +101,11 @@ public class RoundedBottomSheetDialogFragment extends BottomSheetDialogFragment 
         // set on click for all buttons
         for (int i:
                 ids) {
-            view.findViewById(i).setOnClickListener(this);
+            View img = view.findViewById(i);
+            img.setOnClickListener(this);
+            if(img instanceof FloatingActionButton) {
+                ((FloatingActionButton)img).setColorFilter(Tool.getSurfaceColor());
+            }
         }
 
         return view;

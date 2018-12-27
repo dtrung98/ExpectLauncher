@@ -95,7 +95,7 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
         return mConfigMode;
     }
 
-    AppDrawerAdapter(Context mContext, OnStartDragListener dragStartListener) {
+    public AppDrawerAdapter(Context mContext, OnStartDragListener dragStartListener) {
         this.mContext = mContext;
         mDragStartListener = dragStartListener;
     }
@@ -530,7 +530,7 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
         }
 
         editor.putString("app-list", appsJson.toString());
-        editor.commit();
+        editor.apply();
         Log.v("appsList: ", appsJson.toString());
     }
 
@@ -539,7 +539,7 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
     public void restoreApps() {
         SharedPreferences pref = mContext.getSharedPreferences("app-data", Context.MODE_PRIVATE);
         String appString = pref.getString("app-list", "");
-        if (!appString.equals("")){
+        if (appString!=null&&!appString.isEmpty()){
             try {
                 ArrayList<App> items = new ArrayList<App>();
                 JSONArray appsJson = new JSONArray(appString);

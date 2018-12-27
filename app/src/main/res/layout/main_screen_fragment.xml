@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <ScrollView
+    <android.support.v4.widget.NestedScrollView
     android:id="@+id/scrollview"
     android:layout_width="match_parent"
     android:layout_height="370dp">
@@ -11,21 +11,23 @@
         android:id="@+id/widget_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" />
-    </ScrollView>
+        android:orientation="vertical"
+        android:minHeight="370dp"
+       />
+    </android.support.v4.widget.NestedScrollView>
     <com.teamll.expectlauncher.ui.widgets.MotionRoundedBitmapFrameLayout
         android:id="@+id/dock"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dock_height"
         android:layout_margin="@dimen/dock_margin"
-
         android:background="@android:color/transparent">
         <LinearLayout
             android:id="@+id/appDockLinear"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:weightSum="4">
+            android:weightSum="4"
+            android:visibility="visible">
             <ImageView
                 android:id="@+id/dockApp1"
                 android:layout_width="0dp"
@@ -51,6 +53,13 @@
                 android:layout_weight="1"
                 android:padding="15dp"/>
         </LinearLayout>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:overScrollMode="never"
+            android:visibility="gone"
+            />
     </com.teamll.expectlauncher.ui.widgets.MotionRoundedBitmapFrameLayout>
     <ImageView
         android:id="@+id/toggleButton"

@@ -6,6 +6,13 @@ import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.preference.PreferenceManager;
 
+import com.teamll.expectlauncher.model.App;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.util.ArrayList;
+
 public final class PreferencesUtility {
     private final static String SHOW_APP_TITLE = "show_app_title";
 
@@ -53,6 +60,49 @@ public final class PreferencesUtility {
         editor.putBoolean(SHOW_APP_TITLE,value);
         editor.apply();
     }
+    public ArrayList<Integer> getWidgetLists()
+    {
+        ArrayList<Integer> list = new ArrayList<>();
+        String data =  mPreferences.getString("widget_list","");
+        if(data.isEmpty()) return list;
+
+            try {
+
+                JSONArray appsJson = new JSONArray(data);
+                int count = appsJson.length();
+                for (int index = 0; index < count; index++) {
+                    list.add(appsJson.getInt(index));
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+        }
+
+        return list;
+    }
+    public void savedWidgetLists(int[] list) {
+        final  SharedPreferences.Editor editor = mPreferences.edit();
+        JSONArray appsJson = new JSONArray();
+        int count = list.length;
+        for (int index = 0; index < count; index++) {
+                appsJson.put(list[index]);
+        }
+
+        editor.putString("widget_list", appsJson.toString());
+        editor.apply();
+    }
+    public void savedWidgetLists(ArrayList<Integer> list) {
+        final  SharedPreferences.Editor editor = mPreferences.edit();
+        JSONArray appsJson = new JSONArray();
+        int count = list.size();
+        for (int index = 0; index < count; index++) {
+            appsJson.put(list.get(index));
+        }
+
+        editor.putString("widget_list", appsJson.toString());
+        editor.apply();
+    }
+
     private IconEditorConfig iec;
     public IconEditorConfig getIconConfig() {
         if(iec !=null) return this.iec;
@@ -83,6 +133,7 @@ public final class PreferencesUtility {
         private IconEditorConfig() {
 
         }
+
 
         public int getShapedType() {
             return mShapedType;

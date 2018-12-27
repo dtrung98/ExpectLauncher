@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.NestedScrollView;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -13,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.teamll.expectlauncher.R;
@@ -24,17 +25,24 @@ import com.teamll.expectlauncher.ui.main.LayoutSwitcher;
 import com.teamll.expectlauncher.ui.main.MainActivity;
 import com.teamll.expectlauncher.ui.main.bottomsheet.RoundedBottomSheetDialogFragment;
 import com.teamll.expectlauncher.ui.widgets.MotionRoundedBitmapFrameLayout;
+import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.CustomItemTouchHelper;
+import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.OnStartDragListener;
 import com.teamll.expectlauncher.util.Tool;
 
 import java.util.ArrayList;
 
-public class MainScreenFragment extends AppWidgetHostFragment implements View.OnTouchListener, LayoutSwitcher.EventSender,AppLoaderActivity.AppDetailReceiver, RoundedBottomSheetDialogFragment.BottomSheetListener {
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+public class MainScreenFragment extends AppWidgetHostFragment implements View.OnTouchListener, LayoutSwitcher.EventSender,AppLoaderActivity.AppDetailReceiver, RoundedBottomSheetDialogFragment.BottomSheetListener{
     private static final String TAG="MainScreenFragment";
 
     private long savedTime;
     private float xDown;
     private float yDown;
     private View adaptiveDock;
+    private CustomItemTouchHelper mItemTouchHelper;
+
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         Log.d(TAG, "onTouch: ");
@@ -56,7 +64,8 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
 
     private View mRootView;
     private TextView appDrawerButton;
-    public MotionRoundedBitmapFrameLayout dock;
+    @BindView(R.id.dock) public MotionRoundedBitmapFrameLayout dock;
+
     private MainActivity activity;
     float statusBarHeight  = 0;
     float navigationHeight = 0;
@@ -81,45 +90,14 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.main_screen_fragment,container,false);
     }
-    ScrollView scrollView;
+   @BindView(R.id.scrollview) NestedScrollView scrollView;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view,savedInstanceState);
+    ButterKnife.bind(this,view);
         mRootView = view;
-    dock = view.findViewById(R.id.dock);
-    scrollView = view.findViewById(R.id.scrollview);
-//
-//    scrollView.setOnTouchListener(new View.OnTouchListener() {
-//        long saved;
-//        float savedPosX;
-//        float savedPosY;
-//        @Override
-//        public boolean onTouch(View v, MotionEvent event) {
-//            switch (event.getAction()) {
-//                case MotionEvent.ACTION_DOWN:
-//                    saved = System.currentTimeMillis();
-//                    savedPosY = event.getRawY();
-//                    savedPosX = event.getRawX();
-//
-//                    break;
-//                case MotionEvent.ACTION_UP :
-//                    if(System.currentTimeMillis() - saved>=300&&
-//                            Math.sqrt(
-//                                    (savedPosX-event.getRawX())*(savedPosX - event.getRawX())+
-//                                    (savedPosY-event.getRawY())*(savedPosY-event.getRawY()))<=100)
-//                    {
-//                        RoundedBottomSheetDialogFragment fragment =  RoundedBottomSheetDialogFragment.newInstance(LayoutSwitcher.MODE.IN_MAIN_SCREEN);
-//                         fragment.setListener(MainScreenFragment.this);
-//                        fragment.show(getActivity().getSupportFragmentManager(),
-//                                "song_popup_menu");
-//                    }
-//                    break;
-//            }
-//            return v.onTouchEvent(event);
-//        }
-//    });
     widgetContainer.setOnLongClickListener(new View.OnLongClickListener() {
         @Override
         public boolean onLongClick(View v) {
@@ -246,13 +224,15 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
     @Override
     public void onClickButtonInsideBottomSheet(View view) {
         switch (view.getId()) {
-            case R.id.app_size:selectWidget(); break;
-            case R.id.position:
+            case R.id.add_widget:selectWidget(); break;
+            case R.id.wallpaper:
                 //TODO: call replace wallpaper function;
                 Intent wallpagerIntent = new Intent(Intent.ACTION_SET_WALLPAPER);
                 startActivity(Intent.createChooser(wallpagerIntent, "Select Wallpaper"));
                 break;
-            case R.id.app_icon_editor:
+            case R.id.wall_editor:
+                Log.d(TAG, "onClickButtonInsideBottomSheet: app_icon_editor");
+                removeWidgetMenuSelected();
                 break;
         }
     }
@@ -262,4 +242,6 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
         widgetContainer.setAlpha(value);
         dock.setAlpha(value);
     }
+
+
 }

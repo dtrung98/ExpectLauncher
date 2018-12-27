@@ -6,19 +6,25 @@ import android.appwidget.AppWidgetHostView;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProviderInfo;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.teamll.expectlauncher.R;
+import com.teamll.expectlauncher.util.PreferencesUtility;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
@@ -30,6 +36,7 @@ public class AppWidgetHostFragment extends Fragment {
 
     AppWidgetManager mAppWidgetManager;
     AppWidgetHost mAppWidgetHost;
+    private ArrayList<Integer> mID = new ArrayList<>();
    public void selectWidget() {
         int appWidgetId = this.mAppWidgetHost.allocateAppWidgetId();
         Intent pickIntent = new Intent(AppWidgetManager.ACTION_APPWIDGET_PICK);
@@ -79,13 +86,22 @@ public class AppWidgetHostFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         widgetContainer = view.findViewById(R.id.widget_container);
+        ArrayList<Integer> list = PreferencesUtility.getInstance(getContext()).getWidgetLists();
+        for (Integer i :
+                list) {
+            createWidget(i);
+        }
     }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAppWidgetManager = AppWidgetManager.getInstance(getActivity());
-        mAppWidgetHost = new AppWidgetHost(getActivity(), getResources().getInteger(R.integer.APPWIDGET_HOST_ID));
+        mAppWidgetManager = AppWidgetManager.getInstance(getActivity().getApplicationContext());
+        mAppWidgetHost = new AppWidgetHost(getActivity().getApplicationContext(),getResources().getInteger(R.integer.APPWIDGET_HOST_ID));
+
+     //   mAppWidgetManager = AppWidgetManager.getInstance(getActivity());
+     //   mAppWidgetHost = new AppWidgetHost(getActivity(), getResources().getInteger(R.integer.APPWIDGET_HOST_ID));
 
     }
 
@@ -95,12 +111,21 @@ public class AppWidgetHostFragment extends Fragment {
     public void createWidget(Intent data) {
         Bundle extras = data.getExtras();
         int appWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
-        AppWidgetProviderInfo appWidgetInfo = mAppWidgetManager.getAppWidgetInfo(appWidgetId);
-        AppWidgetHostView hostView = mAppWidgetHost.createView(getActivity(), appWidgetId, appWidgetInfo);
-        hostView.setAppWidget(appWidgetId, appWidgetInfo);
-        widgetContainer.addView(hostView);
+        createWidget(appWidgetId);
+    }
+    public void createWidget(int appWidgetId ) {
 
-        Log.i(TAG, "The widget size is: " + appWidgetInfo.minWidth + "*" + appWidgetInfo.minHeight);
+        AppWidgetProviderInfo appWidgetInfo = mAppWidgetManager.getAppWidgetInfo(appWidgetId);
+
+        AppWidgetHostView hostView = mAppWidgetHost.createView(getActivity().getApplicationContext(), appWidgetId, appWidgetInfo);
+      if(hostView!=null) {
+          // hostView.setAppWidget(appWidgetId, appWidgetInfo);
+          widgetContainer.addView(hostView);
+          if(!mID.contains(appWidgetId))
+          mID.add(appWidgetId);
+//          Log.i(TAG, "The widget size is: " + appWidgetInfo.minWidth + "*" + appWidgetInfo.minHeight);
+
+      }
     }
 
     @Override
@@ -115,6 +140,14 @@ public class AppWidgetHostFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
+        if(mAppWidgetHost!=null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                PreferencesUtility.getInstance(getContext()).savedWidgetLists(mAppWidgetHost.getAppWidgetIds());
+            } else {
+                PreferencesUtility.getInstance(getContext()).savedWidgetLists(mID);
+            }
+        }
+        assert mAppWidgetHost != null;
         mAppWidgetHost.stopListening();
     }
 
@@ -128,7 +161,9 @@ public class AppWidgetHostFragment extends Fragment {
 
     public void removeWidgetMenuSelected() {
         int childCount = widgetContainer.getChildCount();
-        if (childCount > 1) {
+        Log.d(TAG, "removeWidgetMenuSelected: "+childCount);
+
+        if (childCount > 0) {
                 View view = widgetContainer.getChildAt(childCount - 1);
             if (view instanceof AppWidgetHostView) {
                 removeWidget((AppWidgetHostView) view);
