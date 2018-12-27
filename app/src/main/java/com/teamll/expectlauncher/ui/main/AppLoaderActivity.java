@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
@@ -19,6 +20,9 @@ import com.teamll.expectlauncher.model.AppsLoader;
 import java.util.ArrayList;
 
 public abstract class AppLoaderActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<ArrayList<App>>  {
+    private static final String TAG ="AppLoaderActivity";
+
+
     private ArrayList<AppDetailReceiver> listeners = new ArrayList<>();
     private ArrayList<App> appData = new ArrayList<>();
     public void addAppDetailReceiver(AppDetailReceiver receiver) {
@@ -33,6 +37,14 @@ public abstract class AppLoaderActivity extends AppCompatActivity implements Loa
         super.onCreate(savedInstanceState);
         getSupportLoaderManager().initLoader(0, null,  this);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        overridePendingTransition(R.anim.launcher_scale_in,R.anim.app_exit);
+
+    }
+
 
     @NonNull
     @Override
@@ -77,27 +89,73 @@ public abstract class AppLoaderActivity extends AppCompatActivity implements Loa
                     Math.cos(mFrequency * time) + 1);
         }
     }
+    public void onOpenPreference(View v, App app) {
+        Toast.makeText(this,"Preference will be available soon...",Toast.LENGTH_SHORT).show();
+    }
     public void openApp(View v, App app) {
         if (app != null) {
             if(app.getApplicationPackageName().equals(getResources().getString(R.string.package_name))) {
-                Toast.makeText(this,"Preference will be available soon...",Toast.LENGTH_SHORT).show();
+                onOpenPreference(v,app);
                 return;
             }
 
             Intent intent =getPackageManager().getLaunchIntentForPackage(app.getApplicationPackageName());
             if (intent != null) {
-                int left = 0, top = 0;
-                int width = v.getMeasuredWidth(), height = v.getMeasuredHeight();
-                ActivityOptions options = ActivityOptions.makeScaleUpAnimation(v,left,top,width,height);
-                // getActivity().overridePendingTransition(R.anim.zoom_in,R.anim.zoom_out);
                 final android.view.animation.Animation myAnim = AnimationUtils.loadAnimation(this, R.anim.bound);
                 MyBounceInterpolator interpolator = new MyBounceInterpolator(0.1, 30);
                 myAnim.setInterpolator(interpolator);
-                startActivity(intent, options.toBundle());
+               startActivityType2(v,intent);
                 v.startAnimation(myAnim);
                  //   root.startAnimation(myAnim);
             }
         }
+    }
+    public void startActivityType1(View v,Intent intent) {
+        startActivity(intent);
+        overridePendingTransition(R.anim.zoom_in,R.anim.zoom_out);
+
+    }
+    public static final String KEY_ANIM_START_X = "android:activity.animStartX";
+
+    /**
+     * Start Y position of thumbnail animation.
+     * @hide
+     */
+    public static final String KEY_ANIM_START_Y = "android:activity.animStartY";
+
+    /**
+     * Initial width of the animation.
+     * @hide
+     */
+    public static final String KEY_ANIM_WIDTH = "android:activity.animWidth";
+
+    /**
+     * Initial height of the animation.
+     * @hide
+     */
+    public static final String KEY_ANIM_HEIGHT = "android:activity.animHeight";
+
+    public void startActivityType2(View v,Intent intent) {
+        int left = 0, top = 0;
+        int width = v.getMeasuredWidth(), height = v.getMeasuredHeight();
+        ActivityOptions options = ActivityOptions.makeScaleUpAnimation(v,left,top,width,height);
+
+        final android.view.animation.Animation myAnim = AnimationUtils.loadAnimation(this, R.anim.bound);
+        MyBounceInterpolator interpolator = new MyBounceInterpolator(0.1, 30);
+        myAnim.setInterpolator(interpolator);
+        Bundle b= options.toBundle();
+
+        Log.d(TAG, "startActivityType2: startX = "+b.getInt(KEY_ANIM_START_X,-1)+", startY = "+b.getInt(KEY_ANIM_START_Y,-1));
+
+//        b.remove(KEY_ANIM_START_X);
+//        b.remove(KEY_ANIM_START_Y);
+//        b.putInt(KEY_ANIM_START_X, 700);
+//        b.putInt(KEY_ANIM_START_Y, 0);
+
+        startActivity(intent, b);
+
+        v.startAnimation(myAnim);
+
     }
 
 }

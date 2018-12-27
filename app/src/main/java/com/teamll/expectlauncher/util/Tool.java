@@ -198,6 +198,7 @@ public class Tool {
             Bitmap tmpBlur = tool.blurWallBitmap();
             int[] c = BitmapEditor.getAverageColorRGB(tmpBlur);
             tool.mAverageColor = Color.rgb(c[0],c[1],c[2]);
+            Tool.setSurfaceColor(tool.mAverageColor);
             tool.mDarkWallpaper =  BitmapEditor.PerceivedBrightness(160,c);
             tool.blurWallPaper = tool.getCropCenterScreenBitmap(tmpBlur);
             tmpBlur.recycle();
@@ -227,8 +228,9 @@ public class Tool {
 
     private static int GlobalColor = 0xffff4081;
     private static int SurfaceColor =0xff00dbde;
-    public static void setSurfaceColor(int surfaceColor) {
-        SurfaceColor = surfaceColor;
+    public static void setSurfaceColor(int globalColor) {
+        SurfaceColor = ColorReferTo(globalColor);
+
     }
 
     /**
@@ -304,6 +306,21 @@ public class Tool {
             return i;
         }
     }
+    private static int ColorReferTo(int cmc) {
+        float[] hsv = new float[3];
+        Color.colorToHSV(cmc, hsv);
+        //     Log.d(hsv[0] + "|" + hsv[1] + "|" + hsv[2], "ColorMe");
+        float alpha_7basic = hsv[1];
+        float toEight = hsv[0] / 45 + 0.5f;
+        if (toEight > 8 | toEight <= 1) return 0xffFF3B30;
+        if (toEight <= 2) return 0xffFF9500;
+        if (toEight <= 3) return 0xffFFCC00;
+        if (toEight <= 4) return 0xff4CD964;
+        if (toEight <= 5) return 0xff5AC8FA;
+        if (toEight <= 6) return 0xff007AFF;
+        if (toEight <= 7) return 0xff5855D6;
+        return 0xffFF2D55;
+    }
     public static int Path_Is_Exist(String dir_path)
     {
         File dir = new File(dir_path);
@@ -313,7 +330,7 @@ public class Tool {
         return 0;
     }
     public static int StatusHeight = -1;
-    public static  int getStatusHeight(Resources myR)
+    public static int getStatusHeight(Resources myR)
     {
         if(StatusHeight!=-1) return StatusHeight;
         int height;

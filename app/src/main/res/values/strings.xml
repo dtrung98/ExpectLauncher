@@ -17,4 +17,10 @@
     <string name="folder">Folder</string>
     <string name="preference">Preference</string>
     <string name="package_name" translatable="false">com.teamll.expectlauncher</string>
+    <string name="launcher_setting">Launcher Setting</string>
+    <string name="folders">Folders</string>
+    <string name="app_drawer">App Drawer</string>
+    <string name="dock">Dock</string>
+    <string name="about">About</string>
+    <string name="app">Applications</string>
 </resources>

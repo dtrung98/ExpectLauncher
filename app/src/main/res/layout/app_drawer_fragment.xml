@@ -39,7 +39,7 @@
                 app:fastScrollEnableThumbInactiveColor="true"
 
            />
-        <com.teamll.expectlauncher.ui.widgets.DarkenRoundedBackgroundFrameLayout
+        <com.teamll.expectlauncher.ui.widgets.MotionRoundedBitmapFrameLayout
             android:id="@+id/search_back_ground"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -48,8 +48,9 @@
             android:layout_marginTop="@dimen/search_bar_margin"
             android:background="@android:color/transparent"
             app:round_number="1"
-            app:background_alpha="0.3"
+            app:background_alpha="0.35"
             app:blur="false"
+            app:round_back_color="@android:color/black"
             >
             <android.support.v7.widget.SearchView
                 android:id="@+id/search_view"
@@ -57,10 +58,13 @@
                 android:layout_height="@dimen/search_bar_height"
                 android:iconifiedByDefault="false"
                 app:queryHint="@string/search_string"
-                app:searchHintIcon="@drawable/black_search"
+
                 android:focusable="true"
                 android:background="@android:color/transparent"
-                android:clickable="true"/>
-        </com.teamll.expectlauncher.ui.widgets.DarkenRoundedBackgroundFrameLayout>
+                android:clickable="true"
+                android:queryBackground="@android:color/transparent"
+                app:queryBackground="@android:color/transparent"
+                />
+        </com.teamll.expectlauncher.ui.widgets.MotionRoundedBitmapFrameLayout>
     </com.teamll.expectlauncher.ui.widgets.DarkenRoundedBackgroundFrameLayout>
 </FrameLayout>

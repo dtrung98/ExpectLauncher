@@ -11,6 +11,8 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         renderscriptTargetApi 18
         renderscriptSupportModeEnabled true
+        vectorDrawables.useSupportLibrary = true
+
     }
     buildTypes {
         release {

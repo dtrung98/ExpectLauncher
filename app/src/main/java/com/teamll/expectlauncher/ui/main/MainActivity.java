@@ -14,12 +14,19 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 
 import com.teamll.expectlauncher.R;
+import com.teamll.expectlauncher.model.App;
 import com.teamll.expectlauncher.ui.main.appdrawer.AppDrawerFragment;
 import com.teamll.expectlauncher.ui.main.mainscreen.MainScreenFragment;
+import com.teamll.expectlauncher.ui.main.setting.Blank;
+import com.teamll.expectlauncher.ui.main.setting.DashBoardSetting;
+import com.teamll.expectlauncher.ui.widgets.fragmentnavigationcontroller.FragmentNavigationController;
+import com.teamll.expectlauncher.ui.widgets.fragmentnavigationcontroller.PresentStyle;
+import com.teamll.expectlauncher.ui.widgets.fragmentnavigationcontroller.SupportFragment;
 import com.teamll.expectlauncher.util.HomeWatcher;
 import com.teamll.expectlauncher.util.Tool;
 
@@ -28,6 +35,8 @@ public class MainActivity extends AppLoaderActivity implements Tool.WallpaperCha
     private static final String TAG="MainActivity";
 
     private static final int MY_PERMISSIONS_READ_STORAGE = 1;
+
+    FragmentNavigationController mNavigationController;
     @Override
     protected void onResume() {
         Log.d(TAG, "onResume");
@@ -72,6 +81,7 @@ public class MainActivity extends AppLoaderActivity implements Tool.WallpaperCha
 
         } else {
             initScreen();
+            initBackStack(savedInstanceState);
         }
         initHomeWatcher();
         GetPermission();
@@ -89,8 +99,9 @@ public class MainActivity extends AppLoaderActivity implements Tool.WallpaperCha
             InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
-
+        if(!(isNavigationControllerInit() && dismiss()))
         if(switcher!=null) switcher.onBackPressed();
+
     }
     private LayoutSwitcher switcher;
     private MainScreenFragment mainScreenFragment;
@@ -214,6 +225,15 @@ public class MainActivity extends AppLoaderActivity implements Tool.WallpaperCha
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
 
+        if(isNavigationControllerInit() && mNavigationController.getFragmentCount()==2) {
+            dismiss();
+        } else if(isNavigationControllerInit() && mNavigationController.getFragmentCount()>2)
+        {
+            while (mNavigationController.getFragmentCount() >= 3) {
+                dismiss();
+            }
+            dismiss();
+        } else
         if(inResuming&&switcher!=null) switcher.onBackPressed();
         else {
             // Check if no view has focus:
@@ -224,5 +244,73 @@ public class MainActivity extends AppLoaderActivity implements Tool.WallpaperCha
     @Override
     public void onHomeLongPressed() {
 
+    }
+
+    @Override
+    public void onOpenPreference(View v, App app) {
+       presentFragment(new DashBoardSetting());
+
+    }
+
+    public static int PRESENT_STYLE_DEFAULT = PresentStyle.SLIDE_LEFT;
+
+
+    private void initBackStack(Bundle savedInstanceState) {
+        FragmentManager fm = getSupportFragmentManager();
+        mNavigationController = FragmentNavigationController.navigationController(fm, R.id.fragment_container);
+        mNavigationController.setPresentStyle(PRESENT_STYLE_DEFAULT);
+        mNavigationController.setDuration(250);
+        mNavigationController.setInterpolator(new AccelerateDecelerateInterpolator());
+        mNavigationController.presentFragment(new Blank());
+       // mNavigationController.presentFragment(new MainFragment());
+
+    }
+    private boolean isNavigationControllerInit() {
+        return null!= mNavigationController;
+    }
+    public void presentFragment(SupportFragment fragment) {
+        if(isNavigationControllerInit()) {
+//            Random r = new Random();
+//            mNavigationController.setPresentStyle(r.nextInt(39)+1); //exclude NONE present style
+            mNavigationController.setPresentStyle(fragment.getPresentTransition());
+
+            setTheme(fragment.isWhiteTheme());
+            mNavigationController.presentFragment(fragment, true);
+
+        }
+    }
+
+    protected void setTheme(boolean white) {
+        Log.d(TAG, "setTheme: "+white);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            View root = findViewById(R.id.root);
+            if(root!=null&&!white)
+                root.setSystemUiVisibility(0);
+            else if(root!=null)
+                root.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        }
+
+    }
+    public boolean dismiss() {
+        if(isNavigationControllerInit()) {
+
+           boolean b = mNavigationController.dismissFragment();
+           setTheme(mNavigationController.getTopFragment().isWhiteTheme());
+           return b;
+        } return false;
+    }
+
+    public void presentFragment(SupportFragment fragment, boolean animated) {
+        if(isNavigationControllerInit()) {
+            mNavigationController.presentFragment(fragment,animated);
+        }
+    }
+    public boolean dismiss(boolean animated) {
+        if(isNavigationControllerInit()) {
+            boolean b = mNavigationController.dismissFragment(animated);
+            setTheme(mNavigationController.getTopFragment().isWhiteTheme());
+        return b;
+        }
+        return false;
     }
 }

@@ -264,7 +264,7 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
         private void bindDeleteIcon(float appSize){
 
             if(mConfigMode!=APP_DRAWER_CONFIG_MODE.MOVABLE_APP_ICON) {
-                if(mXButton.getVisibility()==View.VISIBLE&&mOldConfigModeIsMovable) {
+                if(mXButton.getVisibility()==View.VISIBLE&&mOldConfigModeIsMovable&&!mData.get(getAdapterPosition()).getApplicationPackageName().equals(mContext.getPackageName())) {
                     Log.d(TAG, "bindDeleteIcon: "+getAdapterPosition());
                     ScaleAnimation sa = new ScaleAnimation(1f,0f,1f,0f,ScaleAnimation.RELATIVE_TO_SELF,0.5f, ScaleAnimation.RELATIVE_TO_SELF,0.5f);
                     sa.setDuration(250);

@@ -6,6 +6,7 @@ import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,12 +16,14 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.teamll.expectlauncher.R;
@@ -31,6 +34,7 @@ import com.teamll.expectlauncher.ui.main.bottomsheet.IconAppEditorBottomSheet;
 import com.teamll.expectlauncher.ui.main.bottomsheet.RoundedBottomSheetDialogFragment;
 import com.teamll.expectlauncher.model.App;
 import com.teamll.expectlauncher.ui.widgets.BoundItemDecoration;
+import com.teamll.expectlauncher.ui.widgets.DarkenRoundedBackgroundFrameLayout;
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.CustomItemTouchHelper;
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.OnStartDragListener;
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.SimpleItemTouchHelperCallback;
@@ -169,6 +173,7 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
         if(mRecyclerViewParent instanceof Tool.WallpaperChangedNotifier)  Tool.getInstance().AddWallpaperChangedNotifier((Tool.WallpaperChangedNotifier) mRecyclerViewParent);
         if(mSearchBackGround instanceof Tool.WallpaperChangedNotifier)  Tool.getInstance().AddWallpaperChangedNotifier((Tool.WallpaperChangedNotifier) mSearchBackGround);
 
+        Tool.getInstance().AddWallpaperChangedNotifier(this);
         mAdapter = new AppDrawerAdapter(getActivity(),this);
 
 
@@ -186,9 +191,35 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
         mSearchView.setOnClickListener(this);
         mSearchView.onActionViewExpanded();
         mSearchView.clearFocus();
+
+        updateSearchViewTheme(true);
+    }
+
+    private void updateSearchViewTheme(boolean textColorWhite) {
+        Log.d(TAG, "updateSearchViewTheme: "+textColorWhite);
         EditText searchEditText =  mSearchView.findViewById(R.id.search_src_text);
-        if (searchEditText != null) {
-            searchEditText.setGravity(Gravity.CENTER);
+//        ImageView searchButton = mSearchView.findViewById(android.support.v7.appcompat.R.id.search_button);
+        if (searchEditText != null)
+        {
+
+          //  searchEditText.setGravity(Gravity.CENTER);
+            if(textColorWhite) {
+  //              searchEditText.setHintTextColor(Color.WHITE);
+                searchEditText.setTextColor(Color.WHITE);
+            } else {
+//                searchEditText.setHintTextColor(Color.BLACK);
+                searchEditText.setTextColor(Color.BLACK);
+            }
+        }
+//        if(searchButton!=null) {
+//            Log.d(TAG, "updateSearchViewTheme search icon detected");
+//         //   if(textColorWhite) searchButton.setImageResource(R.drawable.white_search);
+//           // else
+//                searchButton.setImageResource(R.drawable.black_search);
+//        }
+        if(mSearchBackGround instanceof DarkenRoundedBackgroundFrameLayout) {
+            if(textColorWhite) ((DarkenRoundedBackgroundFrameLayout)mSearchBackGround).setBackGroundColor(Color.BLACK);
+            else ((DarkenRoundedBackgroundFrameLayout)mSearchBackGround).setBackGroundColor(Color.WHITE);
         }
 
     }
@@ -201,6 +232,7 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public void onUpdate() {
+
         if(mAdapter!=null) mAdapter.notifyDataSetChanged();
     }
 
@@ -428,6 +460,15 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public void onWallpaperChanged(Bitmap original, Bitmap blur) {
+        boolean isDarkWallpaper =  Tool.getInstance().isDarkWallpaper();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            View root = getActivity().findViewById(R.id.root);
+            if(root!=null&&isDarkWallpaper)
+                root.setSystemUiVisibility(0);
+            else if(root!=null)
+            root.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        }
+        updateSearchViewTheme(!isDarkWallpaper);
         onUpdate();
     }
 
@@ -441,8 +482,8 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onResume() {
         super.onResume();
-//        if(mAdapter!=null)
-//            mAdapter.restoreApps();
+        if(mAdapter!=null)
+            mAdapter.restoreApps();
 
     }
 }

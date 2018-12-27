@@ -6,6 +6,7 @@ import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -111,12 +112,12 @@ public class LayoutSwitcher implements View.OnTouchListener {
                      gestureListener.tempY0 = gestureListener.assignPosY0 = event.getRawY() + ( rect.Height -  toggleParams.topMargin - toggleParams.height + recyclerMarginTop);
                        gestureListener.down =true;
                         motion(toggleParams.topMargin + toggleParams.height-recyclerMarginTop);;
-                   //     _onTouch(container,event);
+                   //     onTouchBoth(container,event);
                         break;
                     case MotionEvent.ACTION_MOVE:
-                        return _onTouch(container,event);
+                        return onTouchBoth(container,event);
                     case MotionEvent.ACTION_UP:
-                        _onTouch(container,event);
+                        onTouchBoth(container,event);
                         if(System.currentTimeMillis() - savedTime <=300) {
                             motionUp();
                             return true;
@@ -132,7 +133,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
         appDrawerRootView = appDrawer.getRoot();
         appDrawerParams = (FrameLayout.LayoutParams) appDrawerRootView.getLayoutParams();
 
-        recyclerView = (RecyclerView)appDrawer.mRecyclerView;
+        recyclerView = appDrawer.mRecyclerView;
 
         container.setOnTouchListener(this);
         recyclerView.setOnTouchListener(this);
@@ -142,12 +143,18 @@ public class LayoutSwitcher implements View.OnTouchListener {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouch(View v, MotionEvent event) {
+        if(v.getId()==recyclerView.getId()) {
+        }
         if(!isViewAttached()) return false;
        if(v.getId() ==recyclerView.getId()&&appDrawer.mAdapter.getMode()==AppDrawerAdapter.APP_DRAWER_CONFIG_MODE.NORMAL) {
-          return onTouchRecyclerView(v,event);
+           {
+               Log.d(TAG, "onTouch: recycler on touch "+logAction(event));
+
+               return onTouchRecyclerView(v, event);
+           }
        } else if(v.getId() == container.getId()) {
            if(event.getAction()==MotionEvent.ACTION_UP) mainScreen.onUp(event);
-         return _onTouch(v,event);
+         return onTouchBoth(v,event);
        }
        return false;
     }
@@ -252,7 +259,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
     public SwipeGestureListener gestureListener = new SwipeGestureListener();
     class SwipeGestureListener extends SwipeDetectorGestureListener {
         public boolean down = false;
-
+        private boolean flingMasked = false;
         public float assignPosY0 ;
         private MOVE_DIRECTION direction;
 
@@ -266,7 +273,11 @@ public class LayoutSwitcher implements View.OnTouchListener {
 
         @Override
         public boolean onUp(MotionEvent e) {
-
+            if(flingMasked) {
+                flingMasked = false;
+                Log.d(TAG, "onUp: fling mask, cancelled handle");
+                return true;
+            }
            if(id==R.id.container&&mode==MODE.IN_MAIN_SCREEN) {
 
                if (onMoveUp() && appDrawerParams.topMargin <= 3 / 4.0f * rect.Height)
@@ -335,17 +346,41 @@ public class LayoutSwitcher implements View.OnTouchListener {
 
         @Override
         public boolean onSwipeTop(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            if(id==R.id.container)
+           if(mode == MODE.IN_MAIN_SCREEN) Log.d(TAG, "detect onFling top, from main screen.");
+           else Log.d(TAG, "detect onFling top, but not from main screen.");
+            if(mode == MODE.IN_MAIN_SCREEN) {
+                flingMasked = true;
                 motionUp();
+            }
                 return true;
         }
 
         @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            Log.d(TAG, "detect onFling");
+             if(!super.onFling(e1, e2, velocityX, velocityY)) {
+                 if(mode ==MODE.IN_APP_DRAWER) {
+                     Log.d(TAG, "onFling: auto redirect to on wipe bottom.");
+                     return onSwipeBottom(e1,e2,velocityX,velocityY);
+                 }
+                 else
+                     Log.d(TAG, "onFling: you are not in appdrawer mode");
+             }
+            Log.d(TAG, "onFling: another swipe handled");
+             return true;
+        }
+
+        @Override
         public boolean onSwipeBottom(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            if(id==R.id.recyclerview)
+            if(mode == MODE.IN_APP_DRAWER) Log.d(TAG, "detect onFling bottom, from app drawer.");
+            else Log.d(TAG, "detect onFling bottom, but not from app drawer.");
+            if(mode == MODE.IN_APP_DRAWER) {
+                flingMasked = true;
                 motionDown();
+            }
             return true;
         }
+        
 
         @Override
         public boolean onDown(MotionEvent e) {
@@ -369,8 +404,16 @@ public class LayoutSwitcher implements View.OnTouchListener {
         return !recyclerView.canScrollVertically(-1);
     }
 
-
-    private boolean _onTouch(View v, MotionEvent event) {
+    private String logAction(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:return "Down";
+            case MotionEvent.ACTION_MOVE:return "Move";
+            case MotionEvent.ACTION_UP:return "UP";
+        }
+        return "Unsupported";
+    }
+    private boolean onTouchBoth(View v, MotionEvent event) {
+        Log.d(TAG, "onTouchBoth: event = "+logAction(event));
         v.performClick();
         gestureListener.setAdaptiveView(v);
 
@@ -385,7 +428,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
     private boolean onTouchRecyclerView(View v, MotionEvent event) {
         if(appDrawer!=null&&appDrawer.handleIfMenuIsShown())
         return true;
-        return (checkOnTop()) &&_onTouch(v,event);
+        return (checkOnTop()) && onTouchBoth(v,event);
     }
 
     private void motion(int to){
@@ -399,12 +442,16 @@ public class LayoutSwitcher implements View.OnTouchListener {
     }
 
     private void motion(int yFrom, int yTo) {
+
+        Log.d(TAG, "motion: you are going to motion.");
         if(yTo ==appDrawerParams.topMargin) return;
         if(va!=null&&isRunning) {
+            Log.d(TAG, "motion: motion cancelled.");
             va.cancel();
             yFrom = appDrawerParams.topMargin;
           //  return;
         }
+        Log.d(TAG, "motion: motion is running");
         isRunning = true;
         va = ValueAnimator.ofInt(yFrom,yTo);
         va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -427,8 +474,8 @@ public class LayoutSwitcher implements View.OnTouchListener {
             }
         });
 
-            va.setInterpolator(Animation.getInterpolator(4, 1.5f));
-            va.setDuration((long) (400 + 350 * Math.abs((yTo-yFrom+0.0f)/rect.Height)));
+            va.setInterpolator(Animation.getInterpolator(4, 0.5f));
+            va.setDuration((long) (300 + 200 * Math.abs((yTo-yFrom+0.0f)/rect.Height)));
         va.start();
     }
 

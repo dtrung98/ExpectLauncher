@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="activity_transition_time">300</integer>
+<integer name="dialog_out_animation_time">250</integer>
+<integer name="app_transition_time">300</integer>
+<integer name="app_enter_fade_duration">150</integer>
+<integer name="app_exit_fade_start_offset">250</integer>
+<integer name="transition_animation_duration">450</integer>
+<integer name="transition_animation_fadein_duration">270</integer>
+<integer name="folder_open_animation_duration">500</integer>
+<integer name="folder_open_title_fade_in_start_offset">250</integer>
+<integer name="folder_open_title_fade_in_duration">250</integer>
+</resources>
