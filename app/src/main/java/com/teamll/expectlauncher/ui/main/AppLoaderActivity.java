@@ -31,6 +31,13 @@ public abstract class AppLoaderActivity extends AppCompatActivity implements Loa
            if(appData.size()!=0) receiver.onLoadComplete(appData);
         }
     }
+    public void removeAppDetailReceiver(AppDetailReceiver receiver) {
+        if(listeners.contains(receiver)) {
+
+            listeners.remove(receiver);
+
+        }
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

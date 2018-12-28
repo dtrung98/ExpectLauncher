@@ -34,4 +34,8 @@
 
     <integer name="duration_bar">800</integer>
     <integer name="duration_search">800</integer>
+
+    <!-- Dock Setting -->
+    <dimen name="dock_app_margin_left">10dp</dimen>
+    <dimen name="dock_app_margin_right">10dp</dimen>
 </resources>

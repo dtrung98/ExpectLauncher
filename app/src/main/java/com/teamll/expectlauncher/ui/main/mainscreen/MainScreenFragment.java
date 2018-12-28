@@ -15,6 +15,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.teamll.expectlauncher.R;
 import com.teamll.expectlauncher.model.App;
@@ -25,6 +26,7 @@ import com.teamll.expectlauncher.ui.main.MainActivity;
 import com.teamll.expectlauncher.ui.main.bottomsheet.RoundedBottomSheetDialogFragment;
 import com.teamll.expectlauncher.ui.widgets.MotionRoundedBitmapFrameLayout;
 import com.teamll.expectlauncher.util.Tool;
+import com.teamll.expectlauncher.util.Util;
 
 import java.util.ArrayList;
 
@@ -192,18 +194,18 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
 
     private ArrayList<App> appInDock = new ArrayList<>();
     private String[] packageDock = {
-            "com.google.android.dialer",
             "com.android.dialer",
-            "com.google.android.apps.messaging",
+            "com.google.android.dialer",
             "com.android.messaging",
-            "com.android.browser",
-            "com.android.contacts",
-            "com.android.music",
-            "com.android.settings",
-            "com.google.android.music",
-            "com.google.android.apps.photos",
-            "com.android.camera2",
+            "com.google.android.apps.messaging",
             "com.android.chrome",
+            "com.android.browser",
+            "com.google.android.music",
+            "com.android.music",
+            "com.android.contacts",
+            "com.google.android.apps.photos",
+            "com.android.settings",
+            "com.android.camera2",
             "com.google.android.apps.docs",
             "com.android.documentsui",
             "com.google.android.videos",
@@ -212,6 +214,7 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
             "org.chromium.webview_shell",
             "com.google.android.youtube",
             "com.google.android.googlequicksearchbox"};
+
     private boolean isPackageDock(App app) {
         for (String p :
                 packageDock) {
@@ -219,16 +222,50 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
         }
         return false;
     }
+
+    private void setDockAppForFirst() {
+        App app;
+        for (String packageName : packageDock) {
+            app = Util.findApp(apps, packageName);
+
+            if (app != null) {
+                if (appInDock.size() < 4) {
+                    appInDock.add(app);
+                }
+                else {
+                    break;
+                }
+            }
+        }
+    }
     private ArrayList<App> apps = new ArrayList<>();
     @Override
     public void onLoadComplete(ArrayList<App> data) {
-       apps.clear();
+        String dockAppPackageNames[];
+        apps.clear();
         apps.addAll(data);
 
         appInDock.clear();
-        for (App a :
-                apps) {
-           if(isPackageDock(a)&&appInDock.size()<4) appInDock.add(a);
+
+        dockAppPackageNames = Util.getDockAppPackageNames(getActivity());
+        if (dockAppPackageNames == null) {
+//            for (App a :
+//                    apps) {
+//                if(isPackageDock(a)&&appInDock.size()<4) appInDock.add(a);
+//            }
+            setDockAppForFirst();
+
+            dockAppPackageNames = new String[4];
+            for (int index = 0; index < 4; index++) {
+                dockAppPackageNames[index] = appInDock.get(index).getApplicationPackageName();
+            }
+
+            Util.saveDockAppPackageNames(getActivity(), dockAppPackageNames);
+        }
+        else {
+            for (String packageName : dockAppPackageNames) {
+                appInDock.add(Util.findApp(apps, packageName));
+            }
         }
 
         for(int i=0;i<appInDock.size();i++) {
@@ -241,6 +278,7 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
 
     @Override
     public void onLoadReset() {
+
     }
 
     @Override
@@ -261,5 +299,20 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
         Log.d(TAG, "setAlpha: "+value);
         widgetContainer.setAlpha(value);
         dock.setAlpha(value);
+    }
+
+    public void updateDock() {
+        String dockAppPackageNames[] = Util.getDockAppPackageNames(getActivity());
+
+        if (dockAppPackageNames != null) {
+            appInDock.clear();
+            for (String packageName : dockAppPackageNames) {
+                appInDock.add(Util.findApp(apps, packageName));
+            }
+
+            for(int i=0;i<appInDock.size();i++) {
+                dockApp[i].setImageDrawable(appInDock.get(i).getIcon());
+            }
+        }
     }
 }

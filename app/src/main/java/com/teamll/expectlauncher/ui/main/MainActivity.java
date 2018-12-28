@@ -313,4 +313,8 @@ public class MainActivity extends AppLoaderActivity implements Tool.WallpaperCha
         }
         return false;
     }
+
+    public MainScreenFragment getMainScreenFragment() {
+        return mainScreenFragment;
+    }
 }
