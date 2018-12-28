@@ -2,44 +2,46 @@ package com.teamll.expectlauncher.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import com.teamll.expectlauncher.ExpectLauncher;
+import com.teamll.expectlauncher.R;
 import com.teamll.expectlauncher.model.App;
+import com.teamll.expectlauncher.model.AppFolder;
+import com.teamll.expectlauncher.model.AppInstance;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public final class PreferencesUtility {
+    private static final String TAG ="PreferencesUtility";
+
     private final static String SHOW_APP_TITLE = "show_app_title";
 
     private final static String APP_ICON_SIZE ="app_icon_size";
+    private final static String FONT_TITLE_SIZE = "font_title_size";
+    private final static String SAVED_APP_INSTANCES ="saved_app_instances";
 
     private final static String APP_POSITION = "app_position";
 
-    private static PreferencesUtility sInstance;
 
-    private static SharedPreferences mPreferences;
-    private Context context;
+    private SharedPreferences mPreferences;
+
     private ConnectivityManager connManager = null;
 
     public PreferencesUtility(final Context context) {
-        this.context = context;
         mPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
-    public static void destroy() {
-        if(sInstance!=null) sInstance = null;
-    }
 
-    public static final PreferencesUtility getInstance(final Context context) {
-        if (sInstance == null) {
-            sInstance = new PreferencesUtility(context.getApplicationContext());
-        }
-        return sInstance;
-    }
     public void setOnSharedPreferenceChangeListener(SharedPreferences.OnSharedPreferenceChangeListener listener) {
         mPreferences.registerOnSharedPreferenceChangeListener(listener);
     }
@@ -52,6 +54,45 @@ public final class PreferencesUtility {
         editor.putFloat(APP_ICON_SIZE, value);
         editor.apply();
     }
+
+    public int getFontTitleSize(Context context) {
+        return mPreferences.getInt(FONT_TITLE_SIZE,context.getResources().getInteger(R.integer.font_title_size_integer));
+    }
+    public void setFontTitleSize(int value) {
+        final SharedPreferences.Editor editor = mPreferences.edit();
+        if(value<1f) value = 1;
+        editor.putInt(FONT_TITLE_SIZE, value);
+        editor.apply();
+    }
+    public AppInstance[] getSavedAppInstance() {
+        String data = mPreferences.getString(SAVED_APP_INSTANCES,"");
+        if(data.isEmpty()) return new AppInstance[0];
+        AppInstance[] array = new GsonBuilder().create().fromJson(data,AppInstance[].class);
+        return array;
+    }
+    public AppInstance createAppInstance(App app,int index) {
+        AppInstance appInstance = new AppInstance();
+        appInstance.setIndex(index);
+        appInstance.setPackageName(app.getApplicationPackageName());
+        appInstance.setBackground1(app.getDarkenAverageColor());
+        appInstance.setPadding(4.0f/62);
+        appInstance.setApps(new ArrayList<>());
+        if(app instanceof AppFolder) appInstance.setIsFolder(true);
+        return appInstance;
+    }
+    public void saveAppInstance(ArrayList<App> data) {
+        ArrayList<AppInstance> app = new ArrayList<>();
+        for (App a : data) {
+            app.add(a.getAppSavedInstance());
+        }
+        Type listType = new TypeToken<ArrayList<AppInstance>>() {}.getType();
+        String json = new GsonBuilder().create().toJson(app,listType);
+        Log.d(TAG, "saveAppInstance: "+json);
+        final SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putString(SAVED_APP_INSTANCES,json);
+        editor.apply();
+    }
+
     public boolean isShowAppTitle() {
         return mPreferences.getBoolean(SHOW_APP_TITLE,true);
     }
@@ -117,12 +158,12 @@ public final class PreferencesUtility {
     }
     public static class IconEditorConfig {
 
-        public static String SHAPE_TYPE ="ic_shape_type";
-        public static String WHITE_BACKGROUND = "ic_white_background";
-        public static String PADDING = "ic_padding";
-        public static String TEXT_COLOR="ic_text_color";
-        public static String AUTO_TEXT_COLOR = "ic_auto_text_color";
-        public static String CORNER_RADIUS ="ic_corner_radius";
+        static String SHAPE_TYPE ="ic_shape_type";
+        static String WHITE_BACKGROUND = "ic_white_background";
+        static String PADDING = "ic_padding";
+        static String TEXT_COLOR="ic_text_color";
+        static String AUTO_TEXT_COLOR = "ic_auto_text_color";
+        static String CORNER_RADIUS ="ic_corner_radius";
 
         int mShapedType;
         boolean mWhiteBackground;
@@ -162,7 +203,7 @@ public final class PreferencesUtility {
         }
         public IconEditorConfig applyPadding(float mPadding) {
             setPadding(mPadding);
-            final SharedPreferences.Editor editor = mPreferences.edit();
+            final SharedPreferences.Editor editor = ExpectLauncher.getInstance().getPreferencesUtility().mPreferences.edit();
             editor.putFloat(IconEditorConfig.PADDING,mPadding);
             editor.apply();
             return this;
@@ -187,7 +228,7 @@ public final class PreferencesUtility {
             return this;
         }
         public IconEditorConfig applyAll() {
-            final  SharedPreferences.Editor editor = mPreferences.edit();
+            final  SharedPreferences.Editor editor = ExpectLauncher.getInstance().getPreferencesUtility().mPreferences.edit();
 
             editor.putInt(IconEditorConfig.SHAPE_TYPE, mShapedType);
             editor.putBoolean(IconEditorConfig.WHITE_BACKGROUND,mWhiteBackground);

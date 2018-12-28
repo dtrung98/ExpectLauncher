@@ -24,18 +24,23 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.teamll.expectlauncher.ExpectLauncher;
 import com.teamll.expectlauncher.R;
 import com.teamll.expectlauncher.model.Rectangle;
 import com.teamll.expectlauncher.ui.main.AppLoaderActivity;
 import com.teamll.expectlauncher.ui.main.LayoutSwitcher;
-import com.teamll.expectlauncher.ui.main.bottomsheet.IconAppEditorBottomSheet;
-import com.teamll.expectlauncher.ui.main.bottomsheet.RoundedBottomSheetDialogFragment;
+import com.teamll.expectlauncher.ui.main.MainActivity;
+import com.teamll.expectlauncher.ui.main.bottomsheet.EditAppConfigBottomSheet;
+import com.teamll.expectlauncher.ui.main.bottomsheet.MoreSettingBottomSheet;
+import com.teamll.expectlauncher.ui.main.bottomsheet.CommonSettingBottomSheet;
 import com.teamll.expectlauncher.model.App;
+import com.teamll.expectlauncher.ui.main.setting.DashBoardSetting;
 import com.teamll.expectlauncher.ui.widgets.BoundItemDecoration;
 import com.teamll.expectlauncher.ui.widgets.DarkenRoundedBackgroundFrameLayout;
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.CustomItemTouchHelper;
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.OnStartDragListener;
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.SimpleItemTouchHelperCallback;
+import com.teamll.expectlauncher.ui.widgets.numberpicker.NumberPicker;
 import com.teamll.expectlauncher.ui.widgets.rangeseekbar.OnRangeChangedListener;
 import com.teamll.expectlauncher.ui.widgets.rangeseekbar.RangeSeekBar;
 import com.teamll.expectlauncher.util.PreferencesUtility;
@@ -46,14 +51,15 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class AppDrawerFragment extends Fragment implements View.OnClickListener,
+public class AppDrawerFragment extends Fragment implements View.OnClickListener,EditAppConfigBottomSheet.UpdateItemListener,
                                                             AppDrawerAdapter.ItemClickListener,
                                                             OnStartDragListener,
                                                            AppLoaderActivity.AppDetailReceiver,
                                                            LayoutSwitcher.EventSender,
-                                                           RoundedBottomSheetDialogFragment.BottomSheetListener,
+                                                           CommonSettingBottomSheet.BottomSheetListener,
                                                            OnRangeChangedListener,
-                                                           SearchView.OnQueryTextListener, IconAppEditorBottomSheet.AppEditorCallBack,
+                                                            NumberPicker.OnValueChangeListener,
+                                                           SearchView.OnQueryTextListener, MoreSettingBottomSheet.AppEditorCallBack,
                                                             Tool.WallpaperChangedNotifier {
 
     private static final String TAG="AppDrawerFragment";
@@ -234,6 +240,11 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
         if(mAdapter!=null) mAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void onUpdateItem(int item) {
+        if(mAdapter!=null) mAdapter.notifyItemChanged(item);
+    }
+
     /**
      * Hàm này cài đặt GridLayoutManager cho mRecyclerView
      * Tính toán số lượng cột phù hợp để hiển thị vừa vặn độ rộng màn hình
@@ -248,12 +259,12 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
         float mRVContentWidth = ss[0] - margin - padding;
         float mRVContentHeight = mRecyclerViewParent.getLayoutParams().height
                 - resources.getDimension(R.dimen.recycler_view_margin_top) - resources.getDimension(R.dimen.recycler_view_padding);
-         float scale = PreferencesUtility.getInstance(getActivity().getApplicationContext()).getAppIconSize();
+         float scale = ExpectLauncher.getInstance().getPreferencesUtility().getAppIconSize();
         float appWidth = resources.getDimension(R.dimen.app_width)*scale;
         float appHeight = resources.getDimension(R.dimen.app_height)*scale;
-        if(!PreferencesUtility.getInstance(getActivity().getApplicationContext()).isShowAppTitle())
+        if(!ExpectLauncher.getInstance().getPreferencesUtility().isShowAppTitle())
             appHeight = appWidth;
-        float minWidthZone = appWidth*1.4f;
+        float minWidthZone = appWidth*1.35f;
         float minHeightZone = appHeight*1.35f;
 
         int numberColumn = (int) (mRVContentWidth/minWidthZone);
@@ -262,13 +273,14 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
         float verticalMargin = (mRVContentHeight - numberRow*appHeight)/(numberRow+1);
         if(numberColumn<1) numberColumn = 1;
         if(numberRow<1) numberRow = 1;
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(activity,numberColumn,GridLayoutManager.VERTICAL,false);
-        mRecyclerView.setLayoutManager(gridLayoutManager);
+        mGridLayoutManager = new GridLayoutManager(activity,numberColumn,GridLayoutManager.VERTICAL,false);
+        mRecyclerView.setLayoutManager(mGridLayoutManager);
         BoundItemDecoration itemDecoration = new BoundItemDecoration(mRVContentWidth, mRVContentHeight,numberColumn,numberRow,(int) (verticalMargin*0.9f),(int)(horizontalMargin*0.9f));
         mRecyclerView.addItemDecoration(itemDecoration);
 
 
     }
+    GridLayoutManager mGridLayoutManager;
 
     /**
      * Hàm thay đổi kích thước biểu tượng ứng dụng
@@ -276,7 +288,7 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
      * @param scale tỉ lệ zoom từ kích thước mặc định ( scale từ 0.5 -> 3 )
      */
     public void setAppIconSize(float scale) {
-        PreferencesUtility.getInstance(getActivity().getApplicationContext()).setAppIconSize(scale);
+        ExpectLauncher.getInstance().getPreferencesUtility().setAppIconSize(scale);
         mAdapter.notifyDataSetChanged();
         setLayoutManager();
     }
@@ -292,15 +304,16 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
     }
 
     @Override
-    public void onItemLongPressed(View view, App app) {
+    public void onItemLongPressed(View view, App app, int index) {
         mAdaptiveApp = app;
+        mAdaptiveIndex = index;
 //        dismissMenu();
 //        mPopupMenu = new PopupMenu(getContext(),view);
 //        mPopupMenu.inflate(R.menu.my_menu);
 //        mPopupMenu.setGravity(Gravity.TOP);
 //        mPopupMenu.show();
 //        if(true) return;
-        RoundedBottomSheetDialogFragment fragment =  RoundedBottomSheetDialogFragment.newInstance(LayoutSwitcher.MODE.IN_APP_DRAWER);
+        CommonSettingBottomSheet fragment =  CommonSettingBottomSheet.newInstance(LayoutSwitcher.MODE.IN_APP_DRAWER);
 
         fragment.setAppDrawer(this);
         fragment.show(getChildFragmentManager(),
@@ -349,14 +362,18 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
     void openApp(View v, App app) {
         ((AppLoaderActivity)getActivity()).openApp(v, app);
     }
-    void showHideAppTitle(View v) {
-       PreferencesUtility pu =  PreferencesUtility.getInstance(getActivity().getApplicationContext());
+
+    @Override
+    public void showHideAppTitle(View v) {
+       PreferencesUtility pu =  ExpectLauncher.getInstance().getPreferencesUtility();
        boolean isShow = !pu.isShowAppTitle();
        pu.setShowAppTitle(
                isShow
         );
        mAdapter.notifyDataSetChanged();
+       if(v instanceof FloatingActionButton)
       updateShowHideTitleButton(v,isShow);
+        setLayoutManager();
     }
     private void updateShowHideTitleButton(View v,boolean isShow) {
         FloatingActionButton fab = (FloatingActionButton) v;
@@ -369,7 +386,7 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
             fab.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
             tv.setText(R.string.hidden_app_title);
         }
-        setLayoutManager();
+
     }
 
     @Override
@@ -398,8 +415,33 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
                 mAdapter.switchMode(AppDrawerAdapter.APP_DRAWER_CONFIG_MODE.MOVABLE_APP_ICON);
                 return;
             case R.id.app_icon_editor:
-                IconAppEditorBottomSheet.newInstance(this).show(getActivity().getSupportFragmentManager(),
-                        "icon_app_editor");;
+                MoreSettingBottomSheet.newInstance(this).show(getActivity().getSupportFragmentManager(),
+                        "icon_app_editor_bottom_sheet");
+                break;
+            case R.id.app_config:
+                //mRecyclerView.getLayoutManager().smoothScrollToPosition(mRecyclerView,RecyclerView.Mo,mAdaptiveIndex);
+              //  mRecyclerView.smoothScrollToPosition(mAdaptiveIndex);
+
+                mRecyclerView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        int[] pos = new int[2];
+                        RecyclerView.ViewHolder vh = mRecyclerView.findViewHolderForAdapterPosition(mAdaptiveIndex);
+                        if(vh ==null) return;
+                        View view = vh.itemView;
+                      view.getLocationInWindow(pos);
+                      int[] pos2 = new int[2];
+                      mRecyclerView.getLocationInWindow(pos2);
+                 //       Log.d(TAG, "run: recyclerHeight = "+mRecyclerView.getHeight()+", posY = "+pos2[1]+", item posy ="+pos[1]);
+                      mRecyclerView.smoothScrollBy(0,pos[1] - pos2[1]-view.getHeight());
+
+                    }
+                },500);
+                EditAppConfigBottomSheet.newInstance(this,getAdaptiveApp(),mAdaptiveIndex).show(getActivity().getSupportFragmentManager(),"app_config");
+                break;
+                case R.id.launcher_setting:
+                ((MainActivity)getActivity()).presentFragment(new DashBoardSetting());
+            break;
         }
     }
 
@@ -448,6 +490,7 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
         }
     }
     private App mAdaptiveApp;
+    private int mAdaptiveIndex;
 
     @Override
     public App getAdaptiveApp() {
@@ -481,5 +524,10 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
         if(mAdapter!=null)
             mAdapter.restoreApps();
 
+    }
+
+    @Override
+    public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+       if(mAdapter!=null) mAdapter.setFontValue(oldVal,newVal);
     }
 }

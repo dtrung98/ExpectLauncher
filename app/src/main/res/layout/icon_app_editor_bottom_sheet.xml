@@ -79,6 +79,7 @@
         android:background="@color/FlatOrange"
         app:riv_mutate_background="true"
         app:riv_corner_radius="12dp"
+        android:src="@drawable/editor"
 
         app:riv_border_color="@color/FlatBlue"
         />
@@ -229,7 +230,19 @@
         app:layout_constraintTop_toTopOf="@id/background_color_label"
         app:layout_constraintBottom_toBottomOf="@id/background_color_label"
         app:layout_constraintStart_toEndOf="@id/white"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toStartOf="@id/hide_text"/>
+    <TextView
+        android:id="@+id/hide_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hidden"
+        android:padding="10dp"
+        android:textColor="@color/BackwardColor"
+        app:layout_constraintTop_toTopOf="@id/background_color_label"
+        app:layout_constraintBottom_toBottomOf="@id/background_color_label"
+        app:layout_constraintStart_toEndOf="@id/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="15dp"/>
     <View
         android:id="@+id/show_if_normal_type"
         android:layout_width="0dp"

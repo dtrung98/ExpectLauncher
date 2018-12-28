@@ -17,7 +17,7 @@ import com.teamll.expectlauncher.R;
 import com.teamll.expectlauncher.model.Rectangle;
 import com.teamll.expectlauncher.ui.main.appdrawer.AppDrawerAdapter;
 import com.teamll.expectlauncher.ui.main.appdrawer.AppDrawerFragment;
-import com.teamll.expectlauncher.ui.main.bottomsheet.RoundedBottomSheetDialogFragment;
+import com.teamll.expectlauncher.ui.main.bottomsheet.CommonSettingBottomSheet;
 import com.teamll.expectlauncher.ui.main.mainscreen.MainScreenFragment;
 import com.teamll.expectlauncher.ui.widgets.DarkenRoundedBackgroundFrameLayout;
 import com.teamll.expectlauncher.ui.widgets.MotionRoundedBitmapFrameLayout;
@@ -335,7 +335,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
         public void onLongPress(MotionEvent e) {
           // mainScreen.selectWidget();
 
-           RoundedBottomSheetDialogFragment fragment =  RoundedBottomSheetDialogFragment.newInstance(mode);
+           CommonSettingBottomSheet fragment =  CommonSettingBottomSheet.newInstance(mode);
            if(mode ==MODE.IN_MAIN_SCREEN)
            fragment.setListener(mainScreen);
            else

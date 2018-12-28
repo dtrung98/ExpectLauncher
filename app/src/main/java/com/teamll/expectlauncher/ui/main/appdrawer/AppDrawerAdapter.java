@@ -13,6 +13,7 @@ import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.MenuPopupWindow;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -29,6 +30,7 @@ import android.widget.TextView;
 
 
 import com.makeramen.roundedimageview.RoundedImageView;
+import com.teamll.expectlauncher.ExpectLauncher;
 import com.teamll.expectlauncher.R;
 import com.teamll.expectlauncher.model.App;
 
@@ -57,11 +59,11 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
     private ArrayList<App> mData = new ArrayList<>();
     private ArrayList<App> mFilterData = new ArrayList<>();
 
-    public boolean isInSearchMode() {
+    boolean isInSearchMode() {
         return mInSearchMode;
     }
 
-    public void setInSearchMode(boolean mInSearchMode) {
+    void setInSearchMode(boolean mInSearchMode) {
         this.mInSearchMode = mInSearchMode;
     }
 
@@ -71,6 +73,21 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
     Random random = new Random();
 
     private ItemClickListener mClickListener;
+    float mFontValue;
+    float mIntFontValue;
+    public void initFontValue() {
+        mIntFontValue = ExpectLauncher.getInstance().getPreferencesUtility().getFontTitleSize(mContext);
+        float one_sp = mContext.getResources().getDimensionPixelSize(R.dimen.one_sp);
+        mFontValue = one_sp*mIntFontValue;
+    }
+
+    public void setFontValue(int oldVal, int newVal) {
+        ExpectLauncher.getInstance().getPreferencesUtility().setFontTitleSize(newVal);
+        float one_sp = mContext.getResources().getDimensionPixelSize(R.dimen.one_sp);
+        mIntFontValue = newVal;
+        mFontValue = one_sp*mIntFontValue;
+        notifyDataSetChanged();
+    }
 
 
     public enum APP_DRAWER_CONFIG_MODE {
@@ -98,6 +115,7 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
     public AppDrawerAdapter(Context mContext, OnStartDragListener dragStartListener) {
         this.mContext = mContext;
         mDragStartListener = dragStartListener;
+        initFontValue();
     }
     public void setData(List<App> data) {
         Log.d(TAG, "setData");
@@ -176,7 +194,7 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
             if(mConfigMode==APP_DRAWER_CONFIG_MODE.NORMAL)
             if (mClickListener != null) {
                 int pos = getAdapterPosition();
-                mClickListener.onItemLongPressed(view,mData.get(pos));
+                mClickListener.onItemLongPressed(view,mData.get(pos),pos);
             }
             return true;
         }
@@ -206,8 +224,13 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
 
         void bind(App app) {
             Log.d(TAG, "bind item "+getAdapterPosition());
-            mTitle.setText(app.getLabel());
-            mIcon.setImageDrawable(app.getIcon());
+
+            String custom = app.getAppSavedInstance().getCustomTitle();
+            if(custom.isEmpty())
+             mTitle.setText(app.getLabel());
+           else mTitle.setText(custom);
+
+           mIcon.setImageDrawable(app.getIcon());
             bindMovableIcon();
             bindAppSizeAndType(app);
             bindAppTitleTextView();
@@ -348,7 +371,7 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
             itemView.startAnimation(rotateAnimation);
         }
         private void bindAppIconType(float appSize, App app) {
-            PreferencesUtility.IconEditorConfig iec = PreferencesUtility.getInstance(mContext).getIconConfig();
+            PreferencesUtility.IconEditorConfig iec = ExpectLauncher.getInstance().getPreferencesUtility().getIconConfig();
             switch (iec.getShapedType()) {
                 case 0:
                     mIcon.setBackgroundColor(0);
@@ -359,13 +382,13 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
                     mIcon.setBackgroundColor(Color.WHITE);
                 //    Log.d(TAG, "bindAppIconType: "+iec.getCornerRadius());
                     mIcon.setCornerRadius(iec.getCornerRadius()*appSize);
-                    int pd = (int) (2f/31*appSize);
+                    int pd = (int) (app.getAppSavedInstance().getPadding()*appSize);
                     mIcon.setPadding(pd,pd,pd,pd);
                     break;
                 case 2:
                    mIcon.setBackgroundColor(app.getDarkenAverageColor());
                     mIcon.setCornerRadius(iec.getCornerRadius()*appSize);
-                    int pd2 = (int) (2f/31*appSize);
+                    int pd2 = (int) (app.getAppSavedInstance().getPadding()*appSize);
                     mIcon.setPadding(pd2,pd2,pd2,pd2);
                     break;
             }
@@ -377,7 +400,7 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
             float h = resources.getDimension(R.dimen.app_height);
             int marginText = (int) resources.getDimension(R.dimen.text_app_margin);
 
-            float scale = PreferencesUtility.getInstance(mContext.getApplicationContext()).getAppIconSize();
+            float scale = ExpectLauncher.getInstance().getPreferencesUtility().getAppIconSize();
 
             int nw = (int) (w*scale);
             int nh = (int) (w*scale);
@@ -399,10 +422,10 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
             mTitle.requestLayout();
         }
         private void bindAppTitleTextView() {
-            if(PreferencesUtility.getInstance(mContext.getApplicationContext()).isShowAppTitle()) {
+            if(ExpectLauncher.getInstance().getPreferencesUtility().isShowAppTitle()) {
                 mTitle.setVisibility(View.VISIBLE);
 
-                PreferencesUtility.IconEditorConfig iec = PreferencesUtility.getInstance(mContext).getIconConfig();
+                PreferencesUtility.IconEditorConfig iec = ExpectLauncher.getInstance().getPreferencesUtility().getIconConfig();
               if(Tool.WHITE_TEXT_THEME)  switch (iec.getTitleColorType()) {
                     case 0:
                         boolean isDarkWallpaper = Tool.getInstance().isDarkWallpaper();
@@ -414,6 +437,7 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
                     case 2: mTitle.setTextColor(0xFF111111); break;
 
                 } else mTitle.setTextColor(0xFF333333);
+              mTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP,mIntFontValue);
             }
             else mTitle.setVisibility(View.GONE);
         }
@@ -512,7 +536,7 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
 
     public interface ItemClickListener {
         void onItemClick(View view, App app);
-        void onItemLongPressed(View view, App app);
+        void onItemLongPressed(View view, App app, int index);
     }
 
     public void clear() {
@@ -532,6 +556,8 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
         editor.putString("app-list", appsJson.toString());
         editor.apply();
         Log.v("appsList: ", appsJson.toString());
+
+        ExpectLauncher.getInstance().getPreferencesUtility().saveAppInstance(mData);
     }
 
 

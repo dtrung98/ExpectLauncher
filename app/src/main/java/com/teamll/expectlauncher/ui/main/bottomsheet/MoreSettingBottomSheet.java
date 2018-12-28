@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 
 import com.makeramen.roundedimageview.RoundedImageView;
+import com.teamll.expectlauncher.ExpectLauncher;
 import com.teamll.expectlauncher.R;
 
 import com.teamll.expectlauncher.model.App;
@@ -33,12 +34,13 @@ import butterknife.ButterKnife;
 
 import static android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED;
 
-public class IconAppEditorBottomSheet extends BottomSheetDialogFragment implements View.OnClickListener {
+public class MoreSettingBottomSheet extends BottomSheetDialogFragment implements View.OnClickListener {
 
 
     public interface AppEditorCallBack {
         App getAdaptiveApp();
         void onUpdate();
+        void showHideAppTitle(View v);
     }
     AppEditorCallBack listener;
 
@@ -52,13 +54,13 @@ public class IconAppEditorBottomSheet extends BottomSheetDialogFragment implemen
     @BindView(R.id.auto_text) TextView mAutoTextView;
     @BindView(R.id.white) TextView mWhiteTextView;
     @BindView(R.id.black) TextView mBlackTextView;
+    @BindView(R.id.hide_text) TextView mHideTextView;
 
     @BindView(R.id.show_if_normal_type) View mShowIfNormal;
+    public static MoreSettingBottomSheet newInstance(AppEditorCallBack listener) {
 
-    public static IconAppEditorBottomSheet newInstance( AppEditorCallBack listener) {
 
-
-        IconAppEditorBottomSheet fragment = new IconAppEditorBottomSheet();
+        MoreSettingBottomSheet fragment = new MoreSettingBottomSheet();
         if(listener!=null)
         fragment.listener = listener;
         return fragment;
@@ -82,7 +84,7 @@ public class IconAppEditorBottomSheet extends BottomSheetDialogFragment implemen
     public View onCreateView(LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.icon_app_editor,container,false);
+        return inflater.inflate(R.layout.icon_app_editor_bottom_sheet,container,false);
     }
 
 
@@ -100,6 +102,7 @@ public class IconAppEditorBottomSheet extends BottomSheetDialogFragment implemen
                 case R.id.auto_text: setColorType(0); break;
                 case R.id.white: setColorType(1); break;
                 case R.id.black: setColorType(2); break;
+                case R.id.hide_text: setColorType(3); break;
 
             }
         }
@@ -145,7 +148,7 @@ public class IconAppEditorBottomSheet extends BottomSheetDialogFragment implemen
                     @Override
                     public void onStateChanged(@NonNull View bottomSheet, int newState) {
                         if (newState == STATE_COLLAPSED)
-                            IconAppEditorBottomSheet.this.dismiss();
+                            MoreSettingBottomSheet.this.dismiss();
                     }
 
                     @Override
@@ -161,11 +164,20 @@ public class IconAppEditorBottomSheet extends BottomSheetDialogFragment implemen
 
     private void onViewCreated(View view) {
         ButterKnife.bind(this,view);
+        focusColor = Tool.getSurfaceColor();
+        mCornerSeekBar.setProgressColor(focusColor);
+
+
         setClick();
-        mIconConfig = PreferencesUtility.getInstance(getContext()).getIconConfig();
+        mIconConfig =ExpectLauncher.getInstance().getPreferencesUtility().getIconConfig();
+
+        mIsTitleHidden = ExpectLauncher.getInstance().getPreferencesUtility().isShowAppTitle();
         setImageForTypeButton();
         setTypeButton(mIconConfig.getShapedType(),true);
         setCornerSeekBarValue(mIconConfig.getCornerRadius());
+        if(mIsTitleHidden)
+            focusThisColorType(3);
+        else
         focusThisColorType(mIconConfig.getTitleColorType());
     }
     private void setClick() {
@@ -175,6 +187,7 @@ public class IconAppEditorBottomSheet extends BottomSheetDialogFragment implemen
         mAutoTextView.setOnClickListener(this);
         mWhiteTextView.setOnClickListener(this);
         mBlackTextView.setOnClickListener(this);
+        mHideTextView.setOnClickListener(this);
         mCornerSeekBar.setOnRangeChangedListener(new OnRangeChangedListener() {
             @Override
             public void onRangeChanged(RangeSeekBar view, float leftValue, float rightValue, boolean isFromUser) {
@@ -276,21 +289,33 @@ public class IconAppEditorBottomSheet extends BottomSheetDialogFragment implemen
             case 2:
                 dest = mBlackTextView;
                 break;
+            case 3:
+                dest = mHideTextView;
+                break;
         }
         if(dest!=null) {
            // android:textColor="@color/FlatBlue"
            // android:textStyle="bold"
            // android:background="@drawable/count_round"
-            dest.setTextColor(getResources().getColor(R.color.FlatBlue));
+            dest.setTextColor(focusColor);
             dest.setTypeface(Typeface.DEFAULT_BOLD);
             dest.setBackground(getResources().getDrawable(R.drawable.count_round));
 
         }
     }
+    private int focusColor;
+    private boolean mIsTitleHidden = true;
     // use in code
     private void normalAllColorType() {
         // 0 ~ Auto, 1 ~ White, 2 ~ Black
         TextView dest = null;
+        if(mIsTitleHidden) {
+            dest = mHideTextView;
+            dest.setTextColor(getResources().getColor(R.color.BackwardColorHeavy));
+            dest.setTypeface(Typeface.DEFAULT);
+            dest.setBackgroundColor(0);
+        }
+
         switch (mIconConfig.getTitleColorType()) {
             case 0:
                 dest = mAutoTextView;
@@ -313,8 +338,38 @@ public class IconAppEditorBottomSheet extends BottomSheetDialogFragment implemen
     }
     private void setColorType(int colorType) {
        normalAllColorType();
-        mIconConfig.setTitleColorType(colorType).applyAll();
-        focusThisColorType(colorType);
-       update();
+        boolean savedIsTitleHidden = mIsTitleHidden;
+
+       if(colorType==3&&mIsTitleHidden) {
+           // do nothing
+       }
+       if(colorType==3) // && !mIsTittleHidden
+       {
+           mIsTitleHidden = true;
+
+       } else {
+           mIsTitleHidden = false;
+           mIconConfig.setTitleColorType(colorType).applyAll();
+       }
+       focusThisColorType(colorType);
+
+       if(listener==null||savedIsTitleHidden==mIsTitleHidden)
+            update();
+       else
+        listener.showHideAppTitle(mHideTextView);
+
+
+//        boolean savedIsTitleHidden = mIsTitleHidden;
+//       if(colorType==3) {
+//           mIsTitleHidden = !savedIsTitleHidden;
+//         if(!mIsTitleHidden) colorType = mIconConfig.getTitleColorType();
+//       }
+//
+//        mIconConfig.setTitleColorType(colorType).applyAll();
+//        focusThisColorType(colorType);
+//        if(listener==null||savedIsTitleHidden==mIsTitleHidden)
+//        update();
+//       listener.showHideAppTitle(mHideTextView);
+
     }
 }

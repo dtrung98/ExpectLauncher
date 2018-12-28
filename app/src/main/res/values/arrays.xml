@@ -14,6 +14,11 @@
         <item>10</item>
         <item>20</item>
     </string-array>
+    <string-array name="paddingArray">
+        <item>0</item>
+        <item>15</item>
+        <item>20</item>
+    </string-array>
     <string-array name="markArray2">
         <item>-1</item>
         <item>-0.5</item>

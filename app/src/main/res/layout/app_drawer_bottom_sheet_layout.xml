@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_marginBottom="@dimen/dp_8"
+    android:paddingBottom="20dp"
     android:layout_marginTop="@dimen/dp_8">
     <ImageView
         android:id="@+id/toggleButton"
@@ -73,12 +74,34 @@
         android:clickable="true"
         android:focusable="true"
         android:scaleType="center"
-        app:backgroundTint="@color/FloatingButtonColor"
+        app:backgroundTint="@color/FlatWhite"
         app:fabCustomSize="75dp"
-        android:src="@drawable/text_a"
         app:layout_constraintEnd_toStartOf="@id/position"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/position" />
+        app:layout_constraintTop_toTopOf="@id/position"
+        android:visibility="invisible"
+       />
+    <com.teamll.expectlauncher.ui.widgets.numberpicker.NumberPicker
+        android:id="@+id/number_picker"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_centerInParent="true"
+        app:np_width="64dp"
+        app:np_height="180dp"
+        app:np_dividerColor="@color/colorPrimary"
+        app:np_dividerThickness="0dp"
+        app:np_formatter="%2d"
+        app:np_max="30"
+        app:np_min="7"
+        app:np_selectedTextColor="@color/FlatBlue"
+        app:np_selectedTextSize="25sp"
+        app:np_textColor="#88007AFF"
+        app:np_textSize="18sp"
+        app:np_value="3"
+        app:np_wrapSelectorWheel="false"
+        app:layout_constraintEnd_toStartOf="@id/position"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/position"/>
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/position"
         android:layout_width="75dp"
@@ -87,12 +110,13 @@
         android:focusable="true"
         android:scaleType="center"
         android:src="@drawable/move_dark_pink"
-        app:backgroundTint="#FBFFBD"
+        app:backgroundTint="@color/FlatWhite"
         app:fabCustomSize="75dp"
         android:layout_marginTop="12dp"
         app:layout_constraintEnd_toStartOf="@id/app_icon_editor"
         app:layout_constraintStart_toEndOf="@id/show_title"
         app:layout_constraintTop_toBottomOf="@id/seek_bar" />
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/app_icon_editor"
         android:layout_width="75dp"
@@ -103,17 +127,18 @@
         android:src="@drawable/more_red"
         app:fabCustomSize="75dp"
         android:scaleType="center"
-        app:backgroundTint="#FBFFBD"
+        app:backgroundTint="@color/FlatWhite"
         android:clickable="true"
         android:focusable="true"
+
         />
 
     <TextView
         android:id="@+id/show_title_text"
         android:layout_width="wrap_content"
-        android:layout_height="50dp"
+        android:layout_height="42dp"
         android:gravity="center"
-        android:text="@string/visible_app_title"
+        android:text="Font Size"
         android:textColor="#444"
         app:layout_constraintEnd_toStartOf="@id/position"
         app:layout_constraintStart_toStartOf="parent"
@@ -121,7 +146,7 @@
     <TextView
         android:id="@+id/position_text"
         android:layout_width="wrap_content"
-        android:layout_height="50dp"
+        android:layout_height="42dp"
         android:gravity="center"
         android:text="@string/change_position"
         android:textColor="#444"
@@ -132,12 +157,50 @@
     <TextView
         android:id="@+id/more_text"
         android:layout_width="wrap_content"
-        android:layout_height="50dp"
+        android:layout_height="42dp"
         android:gravity="center"
         android:text="@string/app_more"
         android:textColor="#444"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/position"
         app:layout_constraintTop_toBottomOf="@id/app_icon_editor" />
-
+    <TextView
+        android:id="@+id/app_config"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/show_title_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/launcher_setting"
+        android:text="Edit App Config"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:padding="10dp"
+        android:textColor="@color/FlatYellow"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="@drawable/black_rounded_big_light_alpha"
+        />
+    <TextView
+        android:id="@+id/launcher_setting"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/app_config"
+        app:layout_constraintStart_toEndOf="@id/app_config"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="20dp"
+        android:text="@string/launcher_setting"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="10dp"
+        android:padding="10dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:textColor="@color/FlatBlue"
+        android:background="@drawable/black_rounded_big_light_alpha"
+        />
 </android.support.constraint.ConstraintLayout>

@@ -3,13 +3,13 @@
     android:layout_width="@dimen/app_width"
     android:layout_height="@dimen/app_height"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/FlatGreen"
+
     android:layout_margin="1dp">
 <LinearLayout
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/FlatOrange"
+
     android:layout_gravity="center"
   >
 
@@ -32,7 +32,7 @@
         android:singleLine="true"
         android:gravity="center"
         android:textColor="@android:color/black"
-        android:textSize="13sp"
+        android:textSize="@dimen/font_title_app_size"
         android:shadowColor="#40000000"
         android:shadowRadius="2"
         />

@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.v4.content.AsyncTaskLoader;
 
+import com.teamll.expectlauncher.ExpectLauncher;
 import com.teamll.expectlauncher.R;
 import com.teamll.expectlauncher.util.BitmapEditor;
 
@@ -113,9 +114,28 @@ public class AppsLoader extends AsyncTaskLoader<ArrayList<App>> {
                 e.printStackTrace();
             }
         }
+
         AppFolder appFolder = new AppFolder(context);
         appFolder.set(resultItems.subList(0,5));
         resultItems.add(appFolder);
+
+        AppInstance[] appInstances = // new AppInstance[0];
+         ExpectLauncher.getInstance().getPreferencesUtility().getSavedAppInstance();
+
+        int size = resultItems.size();
+        for(int i=0;i<size;i++) {
+            if(appInstances.length==0)
+                resultItems.get(i).createNewSavedInstance(i);
+            else
+            for(int j=0;j<appInstances.length;j++)
+                if(resultItems.get(i).getApplicationPackageName().equals(appInstances[i].getPackageName())) {
+                // attach appInstance to this app
+                    resultItems.get(i).setAppSavedInstance(appInstances[i]);
+                } else if(j == appInstances.length-1) {
+                // create new app instance
+                   resultItems.get(i).createNewSavedInstance(i);
+                }
+        }
 
         return resultItems;
     }

@@ -3,9 +3,9 @@ package com.teamll.expectlauncher.model;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
+
+import com.teamll.expectlauncher.ExpectLauncher;
 
 import java.io.File;
 
@@ -18,10 +18,25 @@ public class App {
     private ApplicationInfo mInfo;
 
     private String mAppLabel;
-    protected Drawable mIcon;
+    Drawable mIcon;
 
     private boolean mMounted;
     private File mApkFile;
+
+    public AppInstance getAppSavedInstance() {
+        return mAppInstance;
+    }
+
+    public void setAppSavedInstance(AppInstance mAppInstance) {
+        this.mAppInstance = mAppInstance;
+    }
+    public void createNewSavedInstance(int index) {
+        if(mAppInstance==null)
+        mAppInstance = ExpectLauncher.getInstance().getPreferencesUtility().createAppInstance(this,index);
+    }
+
+    private AppInstance mAppInstance;
+
 
     public App() {
 

@@ -1,6 +1,5 @@
 package com.teamll.expectlauncher.ui.main.mainscreen;
 
-import android.app.Activity;
 import android.appwidget.AppWidgetHost;
 import android.appwidget.AppWidgetHostView;
 import android.appwidget.AppWidgetManager;
@@ -12,19 +11,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.teamll.expectlauncher.ExpectLauncher;
 import com.teamll.expectlauncher.R;
-import com.teamll.expectlauncher.util.PreferencesUtility;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
@@ -86,7 +80,7 @@ public class AppWidgetHostFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         widgetContainer = view.findViewById(R.id.widget_container);
-        ArrayList<Integer> list = PreferencesUtility.getInstance(getContext()).getWidgetLists();
+        ArrayList<Integer> list = ExpectLauncher.getInstance().getPreferencesUtility().getWidgetLists();
         for (Integer i :
                 list) {
             createWidget(i);
@@ -142,9 +136,9 @@ public class AppWidgetHostFragment extends Fragment {
         super.onStop();
         if(mAppWidgetHost!=null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                PreferencesUtility.getInstance(getContext()).savedWidgetLists(mAppWidgetHost.getAppWidgetIds());
+                ExpectLauncher.getInstance().getPreferencesUtility().savedWidgetLists(mAppWidgetHost.getAppWidgetIds());
             } else {
-                PreferencesUtility.getInstance(getContext()).savedWidgetLists(mID);
+                ExpectLauncher.getInstance().getPreferencesUtility().savedWidgetLists(mID);
             }
         }
         assert mAppWidgetHost != null;

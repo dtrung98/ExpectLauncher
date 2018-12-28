@@ -6,8 +6,8 @@ android {
         applicationId "com.teamll.expectlauncher"
         minSdkVersion 17
         targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+        versionCode 12
+        versionName "3.24"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         renderscriptTargetApi 18
         renderscriptSupportModeEnabled true
@@ -50,7 +50,10 @@ dependencies {
 
     implementation 'com.simplecityapps:recyclerview-fastscroll:1.0.20'
 
-   // implementation 'com.jmedeisis:draglinearlayout:1.1.0'
+   // implementation 'com.shawnlin:number-picker:2.4.7'
+
+    // Gson
+    implementation 'com.google.code.gson:gson:2.8.5'
 
 
 }

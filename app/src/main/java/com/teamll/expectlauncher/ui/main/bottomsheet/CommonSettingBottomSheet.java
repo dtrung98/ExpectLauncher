@@ -10,43 +10,51 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.design.widget.FloatingActionButton;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
+
 import android.widget.ImageView;
 import android.widget.TextView;
 
 
+import com.teamll.expectlauncher.ExpectLauncher;
 import com.teamll.expectlauncher.R;
 import com.teamll.expectlauncher.ui.main.LayoutSwitcher;
 import com.teamll.expectlauncher.ui.main.appdrawer.AppDrawerFragment;
-import com.teamll.expectlauncher.ui.widgets.rangeseekbar.OnRangeChangedListener;
+import com.teamll.expectlauncher.ui.widgets.numberpicker.NumberPicker;
 import com.teamll.expectlauncher.ui.widgets.rangeseekbar.RangeSeekBar;
-import com.teamll.expectlauncher.util.PreferencesUtility;
 import com.teamll.expectlauncher.util.Tool;
 
 import static android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED;
 
-public class RoundedBottomSheetDialogFragment extends BottomSheetDialogFragment implements View.OnClickListener {
-    private static final String TAG ="RoundedBottomSheetDialogFragment";
+public class CommonSettingBottomSheet extends BottomSheetDialogFragment implements View.OnClickListener , NumberPicker.OnValueChangeListener {
+    private static final String TAG ="CommonSettingBottomSheet";
+
+    @Override
+    public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+       if(rangeChangedListener!=null) rangeChangedListener.onValueChange(picker,oldVal,newVal);
+    }
 
 
     public interface BottomSheetListener {
         void onClickButtonInsideBottomSheet(View view);
     }
     BottomSheetListener listener;
-    OnRangeChangedListener rangeChangedListener;
+    AppDrawerFragment rangeChangedListener;
+
     LayoutSwitcher.MODE mode;
     RangeSeekBar rangeSeekBar;
+    NumberPicker mNumberPicker;
     public void setListener(BottomSheetListener listener) {
         this.listener = listener;
     }
     public void setAppDrawer(AppDrawerFragment fragment) {
         this.listener = fragment;
         this.rangeChangedListener = fragment;
+
     }
 
     @Override
@@ -54,8 +62,8 @@ public class RoundedBottomSheetDialogFragment extends BottomSheetDialogFragment 
         return R.style.BottomSheetDialogTheme;
     }
 
-    public static RoundedBottomSheetDialogFragment newInstance(LayoutSwitcher.MODE mode) {
-        RoundedBottomSheetDialogFragment fragment = new RoundedBottomSheetDialogFragment();
+    public static CommonSettingBottomSheet newInstance(LayoutSwitcher.MODE mode) {
+        CommonSettingBottomSheet fragment = new CommonSettingBottomSheet();
         fragment.mode = mode;
         return fragment;
     }
@@ -83,12 +91,17 @@ public class RoundedBottomSheetDialogFragment extends BottomSheetDialogFragment 
         } else {
             view = inflater.inflate(R.layout.app_drawer_bottom_sheet_layout, container, false);
             ids = new int[] {
-                    R.id.toggleButton, R.id.show_title, R.id.position, R.id.app_icon_editor
+                    R.id.toggleButton, R.id.show_title, R.id.position, R.id.app_icon_editor,R.id.launcher_setting,R.id.app_config
             };
 
             rangeSeekBar = view.findViewById(R.id.seek_bar);
-            rangeSeekBar.setValue(PreferencesUtility.getInstance(getActivity().getApplicationContext()).getAppIconSize() * 100);
-            if (!PreferencesUtility.getInstance(getActivity().getApplicationContext()).isShowAppTitle()) {
+            rangeSeekBar.setValue(ExpectLauncher.getInstance().getPreferencesUtility().getAppIconSize() * 100);
+
+            mNumberPicker = view.findViewById(R.id.number_picker);
+            mNumberPicker.setValue(ExpectLauncher.getInstance().getPreferencesUtility().getFontTitleSize(getContext()));
+            mNumberPicker.setOnValueChangedListener(this);
+
+            if (!ExpectLauncher.getInstance().getPreferencesUtility().isShowAppTitle()) {
                 // detect hidden app title
                 ((FloatingActionButton) view.findViewById(R.id.show_title)).setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
                 ((TextView) view.findViewById(R.id.show_title_text)).setText(R.string.hidden_app_title);
@@ -96,6 +109,11 @@ public class RoundedBottomSheetDialogFragment extends BottomSheetDialogFragment 
 
             if (rangeChangedListener != null)
                 rangeSeekBar.setOnRangeChangedListener(rangeChangedListener);
+            int color = Tool.getSurfaceColor();
+            mNumberPicker.setSelectedTextColor(color);
+            rangeSeekBar.setProgressColor(color);
+
+            mNumberPicker.setTextColor(Color.argb(0x88,Color.red(color),Color.green(color),Color.blue(color)));
         }
 
         // set on click for all buttons
@@ -103,8 +121,10 @@ public class RoundedBottomSheetDialogFragment extends BottomSheetDialogFragment 
                 ids) {
             View img = view.findViewById(i);
             img.setOnClickListener(this);
-            if(img instanceof FloatingActionButton) {
-                ((FloatingActionButton)img).setColorFilter(Tool.getSurfaceColor());
+            if(img instanceof ImageView) {
+                ((ImageView)img).setColorFilter(Tool.getSurfaceColor());
+            } else if(img instanceof TextView) {
+                ((TextView)img).setTextColor(Tool.getSurfaceColor());
             }
         }
 
@@ -173,7 +193,7 @@ public class RoundedBottomSheetDialogFragment extends BottomSheetDialogFragment 
                     @Override
                     public void onStateChanged(@NonNull View bottomSheet, int newState) {
                         if (newState == STATE_COLLAPSED)
-                            RoundedBottomSheetDialogFragment.this.dismiss();
+                            CommonSettingBottomSheet.this.dismiss();
                     }
 
                     @Override

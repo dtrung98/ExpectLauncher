@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.NestedScrollView;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -23,10 +22,9 @@ import com.teamll.expectlauncher.model.Rectangle;
 import com.teamll.expectlauncher.ui.main.AppLoaderActivity;
 import com.teamll.expectlauncher.ui.main.LayoutSwitcher;
 import com.teamll.expectlauncher.ui.main.MainActivity;
-import com.teamll.expectlauncher.ui.main.bottomsheet.RoundedBottomSheetDialogFragment;
+import com.teamll.expectlauncher.ui.main.bottomsheet.CommonSettingBottomSheet;
 import com.teamll.expectlauncher.ui.widgets.MotionRoundedBitmapFrameLayout;
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.CustomItemTouchHelper;
-import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.OnStartDragListener;
 import com.teamll.expectlauncher.util.Tool;
 
 import java.util.ArrayList;
@@ -34,7 +32,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainScreenFragment extends AppWidgetHostFragment implements View.OnTouchListener, LayoutSwitcher.EventSender,AppLoaderActivity.AppDetailReceiver, RoundedBottomSheetDialogFragment.BottomSheetListener{
+public class MainScreenFragment extends AppWidgetHostFragment implements View.OnTouchListener, LayoutSwitcher.EventSender,AppLoaderActivity.AppDetailReceiver, CommonSettingBottomSheet.BottomSheetListener{
     private static final String TAG="MainScreenFragment";
 
     private long savedTime;
@@ -101,7 +99,7 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
     widgetContainer.setOnLongClickListener(new View.OnLongClickListener() {
         @Override
         public boolean onLongClick(View v) {
-            RoundedBottomSheetDialogFragment fragment =  RoundedBottomSheetDialogFragment.newInstance(LayoutSwitcher.MODE.IN_MAIN_SCREEN);
+            CommonSettingBottomSheet fragment =  CommonSettingBottomSheet.newInstance(LayoutSwitcher.MODE.IN_MAIN_SCREEN);
             fragment.setListener(MainScreenFragment.this);
             fragment.show(getActivity().getSupportFragmentManager(),
                     "song_popup_menu");

@@ -31,7 +31,9 @@
     <dimen name="dp_4">4dp</dimen>
     <dimen name="dp_0">0dp</dimen>
     <dimen name="recycler_view_margin_top">64dp</dimen>
-
+    <dimen name="font_title_app_size">13sp</dimen>
+    <integer name="font_title_size_integer">13</integer>
+    <dimen name="one_sp">1sp</dimen>
     <integer name="duration_bar">800</integer>
     <integer name="duration_search">800</integer>
 </resources>
