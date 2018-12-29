@@ -1,13 +1,13 @@
 # Expect Launcher
-##### The launcher you always expect
+####  “ The launcher you always expect ” 
 
 ## Features
-##### Home and App Drawer supports
-##### Widget
-##### Custom app icon, app name,font size and more
-##### Move App in App Drawer,hide app
-##### Theme supports
-##### etc
+- ##### Home and App Drawer supports
+- ##### Widget
+- ##### Custom app icon, app name,font size and more
+- ##### Move App in App Drawer,hide app
+- ##### Theme supports
+- ##### etc
 ## Screenshots
 </br>
 <div align="center">
@@ -40,7 +40,7 @@ src="https://user-images.githubusercontent.com/33343210/50539489-ad890380-0bb3-1
 </br>
 
 ## Download
-Download Apk from [here](https://github.com/dtrung98/Source/raw/master/expect_launcher_29_12.apk) or go to this link, support from android Android 4.2 (API 17), up to android P.
+##### Download Apk from [here](https://github.com/dtrung98/Source/raw/master/expect_launcher_29_12.apk) or go to this link, support from android Android 4.2 (API 17), up to android P.
 ```
 https://github.com/dtrung98/Source/raw/master/expect_launcher_29_12.apk
 ```
