@@ -39,9 +39,32 @@ src="https://user-images.githubusercontent.com/33343210/50539489-ad890380-0bb3-1
   </div>
 </br>
 
-## Download
+## Installing
 ##### Download Apk from [here](https://github.com/dtrung98/Source/raw/master/expect_launcher_29_12.apk) or go to this link, support from android Android 4.2 (API 17), up to android P.
 ```
 https://github.com/dtrung98/Source/raw/master/expect_launcher_29_12.apk
 ```
-</br>
+## Build
+
+To build:
+
+```
+$ git clone https://github.com/dtrung98/ExpectLauncher.git
+$ cd ExpectLauncher
+$ ./gradlew build
+```
+## LICENSE
+
+    Copyright (c) 2016-present, RxJava Contributors.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
