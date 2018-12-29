@@ -6,6 +6,7 @@ the launcher you always expect
 ##### Widget
 ##### Custom app icon, app name,font size and more
 ##### Move App in App Drawer,hide app
+##### Theme supports
 ##### etc
 ## Screenshots
 </br>
