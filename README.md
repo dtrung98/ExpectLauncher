@@ -1,5 +1,5 @@
 # Expect Launcher
-the launcher you always expect
+##### The launcher you always expect
 
 ## Features
 ##### Home and App Drawer supports
@@ -40,7 +40,7 @@ src="https://user-images.githubusercontent.com/33343210/50539489-ad890380-0bb3-1
 </br>
 
 ## Download
-Download Apk from [here](https://github.com/dtrung98/Source/raw/master/expect_launcher_29_12.apk) or go to this link
+Download Apk from [here](https://github.com/dtrung98/Source/raw/master/expect_launcher_29_12.apk) or go to this link, support from android Android 4.2 (API 17), up to android P.
 ```
 https://github.com/dtrung98/Source/raw/master/expect_launcher_29_12.apk
 ```
