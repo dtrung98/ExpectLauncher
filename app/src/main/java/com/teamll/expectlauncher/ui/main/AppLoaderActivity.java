@@ -24,18 +24,16 @@ public abstract class AppLoaderActivity extends AppCompatActivity implements Loa
 
 
     private ArrayList<AppDetailReceiver> listeners = new ArrayList<>();
-    private ArrayList<App> appData = new ArrayList<>();
+    private ArrayList<App> mData = new ArrayList<>();
     public void addAppDetailReceiver(AppDetailReceiver receiver) {
         if(!listeners.contains(receiver)) {
             listeners.add(receiver);
-           if(appData.size()!=0) receiver.onLoadComplete(appData);
+           if(mData.size()!=0) receiver.onLoadComplete(mData);
         }
     }
     public void removeAppDetailReceiver(AppDetailReceiver receiver) {
         if(listeners.contains(receiver)) {
-
             listeners.remove(receiver);
-
         }
     }
 
@@ -52,7 +50,7 @@ public abstract class AppLoaderActivity extends AppCompatActivity implements Loa
 
     }
 
-
+    AppsLoader mLoader;
     @NonNull
     @Override
     public Loader<ArrayList<App>> onCreateLoader(int i, @Nullable Bundle bundle) {
@@ -61,17 +59,17 @@ public abstract class AppLoaderActivity extends AppCompatActivity implements Loa
 
     @Override
     public void onLoadFinished(@NonNull Loader<ArrayList<App>> loader, ArrayList<App> appDetails) {
-        appData.clear();
-        appData.addAll(appDetails);
+        mData.clear();
+        mData.addAll(appDetails);
 
         for (AppDetailReceiver receiver: listeners) {
-            receiver.onLoadComplete(appData);
+            receiver.onLoadComplete(mData);
         }
     }
 
     @Override
     public void onLoaderReset(@NonNull Loader<ArrayList<App>> loader) {
-        appData.clear();
+        mData.clear();
         for (AppDetailReceiver receiver: listeners) {
             receiver.onLoadReset();
         }

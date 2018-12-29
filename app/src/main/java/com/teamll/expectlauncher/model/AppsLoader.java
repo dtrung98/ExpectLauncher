@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.v4.content.AsyncTaskLoader;
+import android.util.Log;
 
 import com.teamll.expectlauncher.ExpectLauncher;
 import com.teamll.expectlauncher.R;
@@ -19,16 +20,19 @@ import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 /**
  * @credit http://developer.android.com/reference/android/content/AsyncTaskLoader.html
  */
 public class AppsLoader extends AsyncTaskLoader<ArrayList<App>> {
-    ArrayList<App> mInstalledApps;
+    private static final String TAG ="AppsLoader";
 
-    final PackageManager mPm;
-    PackageIntentReceiver mPackageObserver;
+    private ArrayList<App> mInstalledApps;
+
+    private final PackageManager mPm;
+    private PackageIntentReceiver mPackageObserver;
 
     public AppsLoader(Context context) {
         super(context);
@@ -51,106 +55,86 @@ public class AppsLoader extends AsyncTaskLoader<ArrayList<App>> {
     }
     @Override
     public ArrayList<App> loadInBackground() {
-        SharedPreferences pref = getContext().getSharedPreferences("app-data", Context.MODE_PRIVATE);
-        String appString = pref.getString("app-list", "");
-        // retrieve the list of installed applications
-        List<ApplicationInfo> apps = mPm.getInstalledApplications(0);
+        long t1 = System.currentTimeMillis(),t2,t3,t4,t5;
 
-        if (apps == null) {
-            apps = new ArrayList<ApplicationInfo>();
+        // retrieve the list of installed applications
+        List<ApplicationInfo> applicationInfos = mPm.getInstalledApplications(0);
+
+        if (applicationInfos == null) {
+            applicationInfos = new ArrayList<>();
         }
+
+        t2 = System.currentTimeMillis();
 
         final Context context = getContext();
 
-        // create corresponding apps and load their labels
-        ArrayList<App> items = new ArrayList<App>(apps.size());
-        ArrayList<App> resultItems = new ArrayList<App>();
-        for (int i = 0; i < apps.size(); i++) {
-            String pkg = apps.get(i).packageName;
-            // only apps which are launchable
-            if (context.getPackageManager().getLaunchIntentForPackage(pkg) != null) {
-                App app = new App(context, apps.get(i));
+        // get the saved app instances if any
+        AppInstance[] appInstances = ExpectLauncher.getInstance().getPreferencesUtility().getSavedAppInstance();
+
+        t3 = System.currentTimeMillis();
+
+        ArrayList<App> appList = new ArrayList<>(applicationInfos.size());
+        HashMap<String,App> appMap = new HashMap<>(applicationInfos.size());
+
+        App myApp = null;
+        for (ApplicationInfo appInfo :
+                applicationInfos) {
+            String pkg = appInfo.packageName;
+            if(context.getPackageManager().getLaunchIntentForPackage(pkg)!=null) {
+                App app = new App(context,appInfo);
                 app.loadLabel(context);
-              createAverageColor(app);
-
-              // Rename itself label
-              if(app.getApplicationPackageName().equals(context.getPackageName()))
-                  app.setLabel(context.getResources().getString(R.string.preference));
-
-             items.add(app);
-            }
-        }
-
-        // sort the list
-        if (appString.equals("")) {
-            Collections.sort(items, ALPHA_COMPARATOR);
-
-            // Preference is the first item by default
-            for(int i=0;i<items.size();i++) {
-                if(items.get(i).getApplicationPackageName().equals(context.getPackageName())) {
-                    items.add(1, items.remove(i));
-                    break;
+                if(pkg.equals(context.getPackageName())) app.setLabel(context.getResources().getString(R.string.preference));
+                if(myApp==null&&appInstances.length==0&&pkg.equals(context.getPackageName())) myApp = app;
+                else {
+                    appList.add(app);
+                    appMap.put(app.getApplicationPackageName(),app);
                 }
             }
-
-            resultItems = items;
         }
-        else {
-            try {
-                JSONArray appsJson = new JSONArray(appString);
-                int count = appsJson.length();
-                for (int index = 0; index < count; index++) {
-                    int id = findItem(items, appsJson.get(index).toString());
-                    if (id > -1) {
-                        resultItems.add(items.get(id));
-                        items.remove(id);
-                    }
-                }
-                count = items.size();
-                for (int index = 0; index < count; index++) {
-                    resultItems.add(items.get(index));
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
+
+        t4 = System.currentTimeMillis();
+
+        ArrayList<App> returnList;
+
+        // combine appInstance to appList
+        // add my launcher to be the first item
+        if(appInstances.length==0) {
+            // Sort the list
+            Collections.sort(appList, ALPHA_COMPARATOR);
+           if(myApp!=null)  appList.add(0,myApp);
+            for (int i = 0; i < appList.size(); i++) {
+                App app = appList.get(i);
+                app.createNewSavedInstance(i);
             }
-        }
-
-        AppFolder appFolder = new AppFolder(context);
-        appFolder.set(resultItems.subList(0,5));
-        resultItems.add(appFolder);
-
-        AppInstance[] appInstances = // new AppInstance[0];
-         ExpectLauncher.getInstance().getPreferencesUtility().getSavedAppInstance();
-
-        int size = resultItems.size();
-        for(int i=0;i<size;i++) {
-            if(appInstances.length==0)
-                resultItems.get(i).createNewSavedInstance(i);
-            else
-            for(int j=0;j<appInstances.length;j++)
-                if(resultItems.get(i).getApplicationPackageName().equals(appInstances[i].getPackageName())) {
-                // attach appInstance to this app
-                    resultItems.get(i).setAppSavedInstance(appInstances[i]);
-                } else if(j == appInstances.length-1) {
-                // create new app instance
-                   resultItems.get(i).createNewSavedInstance(i);
-                }
-        }
-
-        return resultItems;
-    }
-    private void createAverageColor(App app) {
-        if(app.getIcon() instanceof BitmapDrawable) {
-             BitmapDrawable bd = (BitmapDrawable) app.getIcon();
-            int[] c =  BitmapEditor.getAverageColorRGB(bd.getBitmap());
-            // int c2 = Tool.getContrastVersionForColor(Color.rgb(c[0],c[1],c[2]));
-            int c2 = Color.rgb(c[0],c[1],c[2]);
-            c2 = BitmapEditor.darkenColor(c2);
-            app.setDarkenAverageColor(c2);
-            // mIcon.setBackgroundColor(c2);
+            returnList = appList;
         } else {
-            app.setDarkenAverageColor(Color.WHITE);
+            returnList = new ArrayList<>(appList.size());
+            // the app instances is exist in map
+            for (AppInstance instance: appInstances) {
+                App app = appMap.get(instance.getPackageName());
+                if (app != null) {
+                    app.setAppSavedInstance(instance);
+                    returnList.add(app);
+                    appList.remove(app);
+                    // else the app in instance might be deleted
+                }
+            }
+
+            // we need to create the new instances for the new added apps
+            for (App app :
+                    appList) {
+                app.createNewSavedInstance(returnList.size());
+                returnList.add(app);
+            }
         }
+        t5 = System.currentTimeMillis();
+        Log.d(TAG, "loadInBackgroundV2: t1 "+0);
+        Log.d(TAG, "loadInBackgroundV2: t2 "+(t2-t1));
+        Log.d(TAG, "loadInBackgroundV2: t3 "+(t3 - t2));
+        Log.d(TAG, "loadInBackgroundV2: t4 "+(t4 - t3));
+        Log.d(TAG, "loadInBackgroundV2: t5 "+(t5 - t4));
+        Log.d(TAG, "loadInBackgroundV2: finish");
+        return returnList;
     }
 
     @Override

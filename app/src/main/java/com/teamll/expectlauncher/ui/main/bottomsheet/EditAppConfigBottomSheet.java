@@ -4,8 +4,12 @@ import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,13 +18,15 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v7.graphics.Palette;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -36,6 +42,9 @@ import com.teamll.expectlauncher.ui.widgets.rangeseekbar.RangeSeekBar;
 import com.teamll.expectlauncher.util.PreferencesUtility;
 import com.teamll.expectlauncher.util.Tool;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
@@ -44,7 +53,7 @@ import butterknife.OnTextChanged;
 
 import static android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED;
 
-public class EditAppConfigBottomSheet extends BottomSheetDialogFragment implements OnRangeChangedListener {
+public class EditAppConfigBottomSheet extends BottomSheetDialogFragment implements OnRangeChangedListener, ColorPickerAdapter.OnColorChangedListener, Palette.PaletteAsyncListener {
     private static final String TAG ="EditAppConfig";
 
     @Override
@@ -104,13 +113,35 @@ public class EditAppConfigBottomSheet extends BottomSheetDialogFragment implemen
                 mIcon.setPadding(pd,pd,pd,pd);
                 break;
             case 2:
-                mIcon.setBackgroundColor(app.getDarkenAverageColor());
+                mIcon.setBackgroundColor(app.getAppSavedInstance().getCustomBackground());
                 mIcon.setCornerRadius(iec.getCornerRadius()*appSize);
                 int pd2 = (int) (app.getAppSavedInstance().getPadding()*appSize);
                 mIcon.setPadding(pd2,pd2,pd2,pd2);
                 break;
         }
 
+    }
+
+    @Override
+    public void onColorChanged(int position, int newColor) {
+        Log.d(TAG, "onColorChanged: "+position);
+        mApp.getAppSavedInstance().setCustomBackground(newColor);
+        if(mListener!=null) mListener.onUpdateItem(mIndex);
+        mIcon.setBackgroundColor(newColor);
+     //   mRecyclerView.smoothScrollToPosition(position);
+        mRecyclerView.getLayoutManager().smoothScrollToPosition(mRecyclerView,null,position);
+        applyTheme();
+    }
+
+    @Override
+    public void onGenerated(@Nullable Palette palette) {
+        if(palette==null) return;
+       List<Palette.Swatch> swatches = palette.getSwatches();
+        for (Palette.Swatch s:
+                swatches) {
+            if(mColorPickerAdapter!=null&&s!=null) mColorPickerAdapter.addData(s.getRgb());
+        }
+        if(mColorPickerAdapter!=null) mColorPickerAdapter.addData(Color.WHITE);
     }
 
     public interface UpdateItemListener {
@@ -137,6 +168,11 @@ public class EditAppConfigBottomSheet extends BottomSheetDialogFragment implemen
     @BindView(R.id.toggleButton) ImageView mToggle;
     @BindView(R.id.corner_seek_bar) RangeSeekBar mRangeSeekBar;
     @BindView(R.id.hide_switch) SwitchCompat mSwitch;
+
+    @BindView(R.id.recycler_view) RecyclerView mRecyclerView;
+    @BindView(R.id.recycler_view_label) TextView mRecyclerViewLabel;
+    @BindView(R.id.recyclerview_panel) View mRecyclerViewPanel;
+    ColorPickerAdapter mColorPickerAdapter;
 
     @OnTextChanged(R.id.title)
     void  onTitleChange(CharSequence s, int start, int before, int count) {
@@ -256,6 +292,7 @@ public class EditAppConfigBottomSheet extends BottomSheetDialogFragment implemen
     }
     private void onViewCreated(View view) {
         ButterKnife.bind(this, view);
+
         applyTheme();
 
         if(mApp!=null) {
@@ -265,19 +302,47 @@ public class EditAppConfigBottomSheet extends BottomSheetDialogFragment implemen
             if (customTitle.isEmpty())
                 mEditText.setText(mApp.getLabel());
             else mEditText.setText(customTitle);
-
-
         }
         mEditText.setSelection(mEditText.getText().length());
         bindAppIconType(mApp);
         setSeekBarValue((float) mApp.getAppSavedInstance().getPadding());
         mRangeSeekBar.setOnRangeChangedListener(this);
+
+        mColorPickerAdapter = new ColorPickerAdapter(this);
+        mRecyclerView.setAdapter(mColorPickerAdapter);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false));
+        mColorPickerAdapter.setData(mApp.getAppSavedInstance().getBackground1(),mApp.getAppSavedInstance().getBackground2());
+        mColorPickerAdapter.setSelectedColor(mApp.getAppSavedInstance().getCustomBackground());
+        if(mApp.getIcon() instanceof BitmapDrawable)
+        Palette.from(((BitmapDrawable) mApp.getIcon()).getBitmap()).generate(this);
+        else {
+            Palette.from(drawableToBitmap(mApp.getIcon())).generate(this);
+        }
+    }
+
+    public static Bitmap drawableToBitmap (Drawable drawable) {
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable)drawable).getBitmap();
+        }
+
+        int width = drawable.getIntrinsicWidth();
+        width = width > 0 ? width : 1;
+        int height = drawable.getIntrinsicHeight();
+        height = height > 0 ? height : 1;
+
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
     }
 
     int color;
     private void applyTheme() {
-         color = Tool.getSurfaceColor();
-
+        if(mApp==null)
+        this.color = Tool.getSurfaceColor();
+        else this.color = mApp.getAppSavedInstance().getBackground1();
         mToggle.setColorFilter(color);
         mInfoIcon.setColorFilter(color);
         int alpha_color = Color.argb(0x22,Color.red(color),Color.green(color),Color.blue(color));

@@ -3,7 +3,9 @@ package com.teamll.expectlauncher.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
+import android.os.Build;
 import android.preference.PreferenceManager;
+import android.system.Os;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -18,9 +20,13 @@ import com.teamll.expectlauncher.model.AppInstance;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 
 public final class PreferencesUtility {
     private static final String TAG ="PreferencesUtility";
@@ -66,28 +72,64 @@ public final class PreferencesUtility {
     }
     public AppInstance[] getSavedAppInstance() {
         String data = mPreferences.getString(SAVED_APP_INSTANCES,"");
-        if(data.isEmpty()) return new AppInstance[0];
+        if(data==null||data.isEmpty()) return new AppInstance[0];
         AppInstance[] array = new GsonBuilder().create().fromJson(data,AppInstance[].class);
+        Arrays.sort(array, (o1, o2) -> o1.getIndex()-o2.getIndex());
         return array;
     }
-    public AppInstance createAppInstance(App app,int index) {
+    public static int findAppInstancesIfAny(AppInstance[] data,String pkg) {
+        for (int i = 0; i < data.length; i++) {
+            if(pkg.equals(data[i].getPackageName())) return i;
+        }
+        return -1;
+    }
+    public static App findAppByInstance(ArrayList<App> data, AppInstance instance){
+        int size = data.size();
+        int index = instance.getIndex();
+        if(index<size&&data.get(index).getApplicationPackageName().equals(instance.getPackageName())) return data.get(index);
+        return findByCodeIsIn(data,instance.getPackageName());
+    }
+    public static App findByCodeIsIn(Collection<App> listCarnet, String codeIsIn) {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return listCarnet.stream().filter(carnet -> codeIsIn.equals(carnet.getApplicationPackageName())).findFirst().orElse(null);
+        } else {
+            for (App app : listCarnet) {
+                if (app.getApplicationPackageName().equals(codeIsIn)) return app;
+            }
+            return null;
+        }
+    }
+
+        public AppInstance createAppInstance(App app,int index) {
         AppInstance appInstance = new AppInstance();
         appInstance.setIndex(index);
         appInstance.setPackageName(app.getApplicationPackageName());
-        appInstance.setBackground1(app.getDarkenAverageColor());
-        appInstance.setPadding(4.0f/62);
+
+        int[] color = Util.getAverageColor(app);
+        appInstance.setBackground1(color[0]);
+        appInstance.setCustomBackground(color[0]);
+        appInstance.setBackground2(color[1]);
+
+        appInstance.setPadding(2/31f);
+
         appInstance.setApps(new ArrayList<>());
+
         if(app instanceof AppFolder) appInstance.setIsFolder(true);
+
         return appInstance;
     }
     public void saveAppInstance(ArrayList<App> data) {
         ArrayList<AppInstance> app = new ArrayList<>();
-        for (App a : data) {
+        for (int i = 0; i < data.size(); i++) {
+            App a = data.get(i);
+            AppInstance instance = a.getAppSavedInstance();
+            instance.setIndex(i);
             app.add(a.getAppSavedInstance());
         }
         Type listType = new TypeToken<ArrayList<AppInstance>>() {}.getType();
         String json = new GsonBuilder().create().toJson(app,listType);
-        Log.d(TAG, "saveAppInstance: "+json);
+      //  Log.d(TAG, "saveAppInstance: "+json);
         final SharedPreferences.Editor editor = mPreferences.edit();
         editor.putString(SAVED_APP_INSTANCES,json);
         editor.apply();
@@ -148,7 +190,7 @@ public final class PreferencesUtility {
     public IconEditorConfig getIconConfig() {
         if(iec !=null) return this.iec;
         iec = new IconEditorConfig();
-        iec.mShapedType = mPreferences.getInt(IconEditorConfig.SHAPE_TYPE,0); // 0 mean normal, 1 mean white square, 2 mean color square
+        iec.mShapedType = mPreferences.getInt(IconEditorConfig.SHAPE_TYPE,2); // 0 mean normal, 1 mean white square, 2 mean color square
         iec.mWhiteBackground = mPreferences.getBoolean(IconEditorConfig.WHITE_BACKGROUND,true);
         iec.mPadding = mPreferences.getFloat(IconEditorConfig.PADDING,4.0f/62);
         iec.mAutoTextColor = mPreferences.getBoolean(IconEditorConfig.AUTO_TEXT_COLOR,true);

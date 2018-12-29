@@ -101,11 +101,4 @@ public class App {
     public void setLabel(String s) {
         mAppLabel = s;
     }
-    private int mDarkenAverageColor = Color.WHITE;
-    public int getDarkenAverageColor() {
-        return mDarkenAverageColor;
-    }
-    public void setDarkenAverageColor(int color) {
-        mDarkenAverageColor = color;
-    }
 }

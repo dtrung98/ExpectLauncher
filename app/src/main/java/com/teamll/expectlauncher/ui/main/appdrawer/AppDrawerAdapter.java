@@ -35,9 +35,12 @@ import com.teamll.expectlauncher.R;
 import com.teamll.expectlauncher.model.App;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import com.teamll.expectlauncher.model.AppInstance;
+import com.teamll.expectlauncher.ui.main.AppLoaderActivity;
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.ItemTouchHelperAdapter;
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.ItemTouchHelperViewHolder;
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.OnStartDragListener;
@@ -142,6 +145,7 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
+        Log.d(TAG, "onBindViewHolder: inSearchMode ="+mInSearchMode);
         if(!mInSearchMode) {
             holder.bind(mData.get(position));
         } else {
@@ -167,6 +171,8 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
       //  Collections.swap(mData, fromPosition, toPosition);
         notifyItemMoved(fromPosition, toPosition);
         mData.add(toPosition, mData.remove(fromPosition));
+        mData.get(toPosition).getAppSavedInstance().setIndex(toPosition);
+        mData.get(fromPosition).getAppSavedInstance().setIndex(fromPosition);
         return true;
     }
 
@@ -386,7 +392,7 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
                     mIcon.setPadding(pd,pd,pd,pd);
                     break;
                 case 2:
-                   mIcon.setBackgroundColor(app.getDarkenAverageColor());
+                   mIcon.setBackgroundColor(app.getAppSavedInstance().getCustomBackground());
                     mIcon.setCornerRadius(iec.getCornerRadius()*appSize);
                     int pd2 = (int) (app.getAppSavedInstance().getPadding()*appSize);
                     mIcon.setPadding(pd2,pd2,pd2,pd2);
@@ -544,49 +550,48 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
     }
 
     public void backupApps() {
-        SharedPreferences pref = mContext.getSharedPreferences("app-data", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-
-        JSONArray appsJson = new JSONArray();
-        int count = mData.size();
-        for (int index = 0; index < count; index++) {
-            appsJson.put(mData.get(index).getApplicationPackageName());
-        }
-
-        editor.putString("app-list", appsJson.toString());
-        editor.apply();
-        Log.v("appsList: ", appsJson.toString());
+//        SharedPreferences pref = mContext.getSharedPreferences("app-data", Context.MODE_PRIVATE);
+//        SharedPreferences.Editor editor = pref.edit();
+//
+//        JSONArray appsJson = new JSONArray();
+//        int count = mData.size();
+//        for (int index = 0; index < count; index++) {
+//            appsJson.put(mData.get(index).getApplicationPackageName());
+//        }
+//
+//        editor.putString("app-list", appsJson.toString());
+//        editor.apply();
+//        Log.v("appsList: ", appsJson.toString());
 
         ExpectLauncher.getInstance().getPreferencesUtility().saveAppInstance(mData);
     }
 
-
-
     public void restoreApps() {
-        SharedPreferences pref = mContext.getSharedPreferences("app-data", Context.MODE_PRIVATE);
-        String appString = pref.getString("app-list", "");
-        if (appString!=null&&!appString.isEmpty()){
-            try {
-                ArrayList<App> items = new ArrayList<App>();
-                JSONArray appsJson = new JSONArray(appString);
-                int count = appsJson.length();
-                for (int index = 0; index < count; index++) {
-                    int id = Util.findPackageName(mData, appsJson.get(index).toString());
-                    if (id > -1) {
-                        items.add(mData.get(id));
-                        mData.remove(id);
-                    }
-
-                }
-                count = mData.size();
-                for (int index = 0; index < count; index++) {
-                    items.add(mData.get(index));
-                }
-                mData = items;
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
+//        SharedPreferences pref = mContext.getSharedPreferences("app-data", Context.MODE_PRIVATE);
+//        String appString = pref.getString("app-list", "");
+//        if (appString!=null&&!appString.isEmpty()){
+//            try {
+//                ArrayList<App> items = new ArrayList<App>();
+//                JSONArray appsJson = new JSONArray(appString);
+//                int count = appsJson.length();
+//                for (int index = 0; index < count; index++) {
+//                    int id = Util.findPackageName(mData, appsJson.get(index).toString());
+//                    if (id > -1) {
+//                        items.add(mData.get(id));
+//                        mData.remove(id);
+//                    }
+//
+//                }
+//                count = mData.size();
+//                for (int index = 0; index < count; index++) {
+//                    items.add(mData.get(index));
+//                }
+//                mData = items;
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+//        }
+        Collections.sort(mData,(o1, o2) -> o1.getAppSavedInstance().getIndex()-o2.getAppSavedInstance().getIndex());
         notifyDataSetChanged();
     }
 }

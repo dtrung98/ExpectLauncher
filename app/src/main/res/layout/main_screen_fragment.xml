@@ -27,31 +27,37 @@
             android:layout_height="match_parent"
             android:orientation="horizontal"
             android:weightSum="4"
-            android:visibility="visible">
-            <ImageView
+            android:visibility="visible"
+           >
+            <com.makeramen.roundedimageview.RoundedImageView
                 android:id="@+id/dockApp1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:padding="15dp" />
-            <ImageView
+                android:layout_margin="@dimen/app_in_dock_padding"
+                app:riv_mutate_background="true"/>
+            <com.makeramen.roundedimageview.RoundedImageView
                 android:id="@+id/dockApp2"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:padding="15dp"/>
-            <ImageView
+                android:layout_margin="15dp"
+                app:riv_mutate_background="true"/>
+            <com.makeramen.roundedimageview.RoundedImageView
                 android:id="@+id/dockApp3"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:padding="15dp"/>
-            <ImageView
+                android:layout_margin="15dp"
+                app:riv_mutate_background="true"/>
+            <com.makeramen.roundedimageview.RoundedImageView
                 android:id="@+id/dockApp4"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:padding="15dp"/>
+                android:cropToPadding="true"
+                android:layout_margin="15dp"
+                app:riv_mutate_background="true"/>
         </LinearLayout>
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view"

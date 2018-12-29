@@ -24,6 +24,8 @@ import com.teamll.expectlauncher.ExpectLauncher;
 import com.teamll.expectlauncher.R;
 
 import com.teamll.expectlauncher.model.App;
+import com.teamll.expectlauncher.ui.main.MainActivity;
+import com.teamll.expectlauncher.ui.main.mainscreen.MainScreenFragment;
 import com.teamll.expectlauncher.ui.widgets.rangeseekbar.OnRangeChangedListener;
 import com.teamll.expectlauncher.ui.widgets.rangeseekbar.RangeSeekBar;
 import com.teamll.expectlauncher.util.PreferencesUtility;
@@ -213,7 +215,7 @@ public class MoreSettingBottomSheet extends BottomSheetDialogFragment implements
            App iv = listener.getAdaptiveApp();
            if(iv!=null) {
                bitmap = iv.getIcon();
-               mTypeColorSquareButton.setBackgroundColor(iv.getDarkenAverageColor());
+               mTypeColorSquareButton.setBackgroundColor(iv.getAppSavedInstance().getCustomBackground());
            }
         }
         if(bitmap!=null) {
@@ -249,6 +251,11 @@ public class MoreSettingBottomSheet extends BottomSheetDialogFragment implements
     }
     private void update() {
         if(listener!=null) listener.onUpdate();
+        MainActivity m= ((MainActivity)getActivity());
+        if(m!=null) {
+        MainScreenFragment ma =  m.getMainScreenFragment();
+        if(ma!=null) ma.bindDock();
+    }
     }
 
     // use for controller

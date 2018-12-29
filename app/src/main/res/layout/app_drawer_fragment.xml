@@ -17,7 +17,7 @@
         app:round_number="1.75"
         app:round_back_color="#FFEEEEEE">
             <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
-            android:id="@+id/recyclerview"
+            android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="@dimen/recycler_view_margin_top"

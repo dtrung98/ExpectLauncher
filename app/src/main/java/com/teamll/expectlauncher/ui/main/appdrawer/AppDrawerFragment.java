@@ -75,7 +75,7 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
      */
     public AppDrawerAdapter mAdapter;
 
-   @BindView(R.id.recyclerview) public RecyclerView mRecyclerView;
+   @BindView(R.id.recycler_view) public RecyclerView mRecyclerView;
    @BindView(R.id.recycler_view_parent) public FrameLayout mRecyclerViewParent;
 
    /**

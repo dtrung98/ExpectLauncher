@@ -168,7 +168,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
     void translateAppDrawerByMarginTop(int id, int pos) {
 
         int saved = appDrawerParams.topMargin;
-        appDrawerParams.topMargin = (id==R.id.recyclerview) ? pos : rect.Height + pos;
+        appDrawerParams.topMargin = (id==R.id.recycler_view) ? pos : rect.Height + pos;
 
         // topMargin ở vị trí này thì dock bắt đầu thu nhỏ dần
         float startKeyDock = 3 / 4.0f * rect.Height - mainScreen.dockParams.height;
@@ -283,7 +283,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
                if (onMoveUp() && appDrawerParams.topMargin <= 3 / 4.0f * rect.Height)
                    motionUp();
                else motionDown();
-           } else if(id ==R.id.recyclerview&&mode==MODE.IN_APP_DRAWER){
+           } else if(id ==R.id.recycler_view &&mode==MODE.IN_APP_DRAWER){
                if((onMoveDown())&&appDrawerParams.topMargin>=1/5.0f*rect.Height) {
                    motionDown();
                }
@@ -309,7 +309,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
 
                if(tempY0==assignPosY0) {
 
-                      if(direction == MOVE_DIRECTION.MOVE_DOWN&&id==R.id.recyclerview)
+                      if(direction == MOVE_DIRECTION.MOVE_DOWN&&id==R.id.recycler_view)
                    translateAppDrawerByMarginTop(id,(int) (e.getRawY()-assignPosY0));
                       else if(direction==MOVE_DIRECTION.MOVE_UP&&id==R.id.container)
                          translateAppDrawerByMarginTop(id,(int) (e.getRawY()-assignPosY0));
@@ -318,7 +318,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
                       }
                } else {
                    float delta = e.getRawY() - assignPosY0;
-                   if(id==R.id.recyclerview&&delta<0) {
+                   if(id==R.id.recycler_view &&delta<0) {
                        down = false;
                        translateAppDrawerByMarginTop(id,0);
                        return false;
@@ -459,7 +459,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
             public void onAnimationUpdate(ValueAnimator animation) {
                 int value = (int)animation.getAnimatedValue();
                 if(value<0) value=0;
-                  translateAppDrawerByMarginTop(R.id.recyclerview,value);
+                  translateAppDrawerByMarginTop(R.id.recycler_view,value);
             }
         });
         va.addListener(new AnimatorListenerAdapter() {

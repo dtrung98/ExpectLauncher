@@ -40,4 +40,5 @@
     <!-- Dock Setting -->
     <dimen name="dock_app_margin_left">10dp</dimen>
     <dimen name="dock_app_margin_right">10dp</dimen>
+    <dimen name="app_in_dock_padding">15dp</dimen>
 </resources>

@@ -1,5 +1,7 @@
 package com.teamll.expectlauncher.model;
 
+import android.graphics.Color;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
@@ -32,11 +34,11 @@ public class AppInstance {
     @SerializedName("custom_title")
     private String customTitle ="";
     @SerializedName("custom_background")
-    private int customBackground =0;
+    private int customBackground = Color.WHITE;
     @SerializedName("background1")
-    private int background1 = 0;
+    private int background1 = Color.WHITE;
     @SerializedName("background2")
-    private int background2 = 0;
+    private int background2 = Color.WHITE;
     @SerializedName("hidden")
     private boolean hidden = false;
     @SerializedName("lock")

@@ -14,10 +14,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.makeramen.roundedimageview.RoundedImageView;
+import com.teamll.expectlauncher.ExpectLauncher;
 import com.teamll.expectlauncher.R;
 import com.teamll.expectlauncher.model.App;
 import com.teamll.expectlauncher.model.Rectangle;
@@ -27,6 +30,7 @@ import com.teamll.expectlauncher.ui.main.MainActivity;
 import com.teamll.expectlauncher.ui.main.bottomsheet.CommonSettingBottomSheet;
 import com.teamll.expectlauncher.ui.widgets.MotionRoundedBitmapFrameLayout;
 import com.teamll.expectlauncher.ui.widgets.itemtouchhelper.CustomItemTouchHelper;
+import com.teamll.expectlauncher.util.PreferencesUtility;
 import com.teamll.expectlauncher.util.Tool;
 import com.teamll.expectlauncher.util.Util;
 
@@ -73,7 +77,7 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
     float oneDp = 0;
     Rectangle rect;
     public FrameLayout.LayoutParams dockParams;
-    ImageView dockApp[] = new ImageView[4];
+    RoundedImageView dockApp[] = new RoundedImageView[4];
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,10 +118,7 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
     dockApp[1] =dock.findViewById(R.id.dockApp2);
     dockApp[2] =dock.findViewById(R.id.dockApp3);
     dockApp[3] =dock.findViewById(R.id.dockApp4);
-        for (View v :
-                dockApp) {
-            v.setOnTouchListener(this);
-        }
+
     dock.setBackGroundColor(Color.WHITE);
     dock.setAlphaBackground(0.35f);
     dock.setRoundNumber(1.75f,true);
@@ -125,6 +126,23 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
     dockParams.topMargin = (int) (rect.Height - navigationHeight - dockParams.bottomMargin - dockParams.height);
     dockParams.bottomMargin = 0;
     dock.requestLayout();
+
+        for (int i = 0; i < dockApp.length; i++) {
+            View v = dockApp[i];
+            if (v.getLayoutParams() instanceof LinearLayout.LayoutParams) {
+                LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) v.getLayoutParams();
+                float dockWidth = Tool.getScreenSize(getContext())[0] - getResources().getDimension(R.dimen.dock_margin) * 2;
+                float dockHeight = getResources().getDimension(R.dimen.dock_height);
+                float appSize = dockHeight - p.topMargin - p.bottomMargin;
+                float margin = (dockWidth - 4 * appSize) / 5f;
+                Log.d(TAG, "onViewCreated: " + margin);
+                p.setMarginStart((int) margin);
+                if(i==dockApp.length-1)
+                p.setMarginEnd((int) margin);
+                v.requestLayout();
+            }
+            v.setOnTouchListener(this);
+        }
 
     toggle = view.findViewById(R.id.toggleButton);
     toggleParams = (FrameLayout.LayoutParams) toggle.getLayoutParams();
@@ -248,6 +266,7 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
         for(int i=0;i<appInDock.size();i++) {
             dockApp[i].setImageDrawable(appInDock.get(i).getIcon());
         }
+        bindDock();
     }
     void openApp(View v, App app) {
         ((AppLoaderActivity)getActivity()).openApp(v, app);
@@ -256,6 +275,36 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
     @Override
     public void onLoadReset() {
 
+    }
+    public void bindDock() {
+        if(dockApp!=null&&dockApp.length==4&&appInDock!=null&&appInDock.size()>=4) {
+            PreferencesUtility.IconEditorConfig iec = ExpectLauncher.getInstance().getPreferencesUtility().getIconConfig();
+            float appSize = dockApp[0].getWidth();
+            for (int i = 0; i < dockApp.length; i++) {
+                switch (iec.getShapedType()) {
+                    case 0:
+                        dockApp[i].setBackgroundColor(0);
+                        dockApp[i].setCornerRadius(0);
+                        dockApp[i].setPadding(0, 0, 0, 0);
+                        break;
+                    case 1:
+                        dockApp[i].setBackgroundColor(Color.WHITE);
+                        //    Log.d(TAG, "bindAppIconType: "+iec.getCornerRadius());
+                        dockApp[i].setCornerRadius(iec.getCornerRadius() * appSize);
+                        int pd = (int) (appInDock.get(i).getAppSavedInstance().getPadding() * appSize);
+                        dockApp[i].setPadding(pd, pd, pd, pd);
+                        break;
+                    case 2:
+                        dockApp[i].setBackgroundColor(appInDock.get(i).getAppSavedInstance().getCustomBackground());
+                        dockApp[i].setCornerRadius(iec.getCornerRadius() * appSize);
+                        int pd2 = (int) (appInDock.get(i).getAppSavedInstance().getPadding() * appSize);
+                        dockApp[i].setPadding(pd2, pd2, pd2, pd2);
+                        break;
+                }
+
+
+            }
+        }
     }
 
     @Override
