@@ -1,11 +1,13 @@
 # Expect Launcher
-####  “ The launcher you always expect ” 
+#### <img width="100" height="100" src="https://user-images.githubusercontent.com/33343210/50539724-88968f80-0bb7-11e9-96da-abb0db95dd63.png"/>
+#### “ The launcher you always expect ” 
 
 ## Features
 - ##### Home and App Drawer supports
 - ##### Widget
 - ##### Custom app icon, app name,font size and more
 - ##### Move App in App Drawer,hide app
+- ##### Custom app open animation
 - ##### Theme supports
 - ##### etc
 ## Screenshots
