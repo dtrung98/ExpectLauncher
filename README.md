@@ -6,7 +6,7 @@
 - ##### Home and App Drawer supports
 - ##### Widget
 - ##### Custom app icon, app name,font size and more
-- ##### Move App in App Drawer,hide app
+- ##### Change app position in App Drawer,hide app
 - ##### Custom app open animation
 - ##### Theme supports
 - ##### etc
