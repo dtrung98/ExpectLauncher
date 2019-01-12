@@ -57,7 +57,4 @@ dependencies {
 
     // Pallete
     implementation 'com.android.support:palette-v7:28.0.0'
-
-    //carousel dùng cho about_setting
-    compile 'com.synnapps:carouselview:0.1.5'
 }

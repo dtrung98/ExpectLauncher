@@ -3,14 +3,16 @@ package com.teamll.expectlauncher.ui.main.setting;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.synnapps.carouselview.CarouselView;
-import com.synnapps.carouselview.ViewListener;
 import com.teamll.expectlauncher.R;
 import com.teamll.expectlauncher.ui.widgets.fragmentnavigationcontroller.SupportFragment;
 import com.teamll.expectlauncher.util.Tool;
@@ -24,17 +26,17 @@ import butterknife.OnClick;
 public class AboutSetting extends SupportFragment {
     @BindView(R.id.back_button)
     ImageView mBackButton;
-    CarouselView carouselView;
-    int NUMBER_OF_PAGES = 5;
+    RecyclerView mRecyclerView;
+    RecyclerView.LayoutManager mLayoutManager;
+    RecyclerView.Adapter mAdapter;
     private int[] mIConID = {};
 
     ArrayList<String[]> infor = new ArrayList<String[]>();
-    int[] drawable;
 
     public AboutSetting() {
-        infor.add(new String[]{"Lê Văn Tư", "1612770", "Đại học KHTN, Tp. Hồ Chí Minh"});
-        infor.add(new String[]{"Nguyễn Hữu Tứ", "1612772", "Đại học KHTN, Tp. Hồ Chí Minh"});
         infor.add(new String[]{"Lê Đình Trung", "1612751", "Đại học KHTN, Tp. Hồ Chí Minh"});
+        infor.add(new String[]{"Nguyễn Hữu Tứ", "1612772", "Đại học KHTN, Tp. Hồ Chí Minh"});
+        infor.add(new String[]{"Lê Văn Tư", "1612770", "Đại học KHTN, Tp. Hồ Chí Minh"});
         infor.add(new String[]{"Nguyễn Anh Tuấn", "1612788", "Đại học KHTN, Tp. Hồ Chí Minh"});
         infor.add(new String[]{"Phạm Hữu Hoàng Việt", "1612810", "Đại học KHTN, Tp. Hồ Chí Minh"});
     }
@@ -51,28 +53,14 @@ public class AboutSetting extends SupportFragment {
     protected View onCreateView(LayoutInflater inflater, ViewGroup container) {
         View v = inflater.inflate(R.layout.about_setting,container,false);
 
-        ViewListener viewListener = new ViewListener() {
+        mRecyclerView = (RecyclerView) v.findViewById(R.id.recyclerView);
 
-            @Override
-            public View setViewForPosition(int position) {
-                View customView = getLayoutInflater().inflate(R.layout.item_carousel, null);
+        mLayoutManager = new LinearLayoutManager(getContext());
+        mRecyclerView.setLayoutManager(mLayoutManager);
 
-                TextView text_name = (TextView)customView.findViewById(R.id.text_name);
-                text_name.setText(infor.get(position)[0]);
+        mAdapter = new TeamAdapter(infor);
+        mRecyclerView.setAdapter(mAdapter);
 
-                TextView text_student_id = (TextView)customView.findViewById(R.id.text_student_id);
-                text_student_id.setText(infor.get(position)[1]);
-
-                TextView text_school = (TextView)customView.findViewById(R.id.text_school);
-                text_school.setText(infor.get(position)[2]);
-
-                return customView;
-            }
-        };
-
-        carouselView = (CarouselView) v.findViewById(R.id.carouselView);
-        carouselView.setPageCount(NUMBER_OF_PAGES);
-        carouselView.setViewListener(viewListener);
         return v;
     }
 
@@ -101,4 +89,50 @@ public class AboutSetting extends SupportFragment {
             mBackButton.requestLayout();
         }
     }
+
+    public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.MyViewHolder> {
+        private ArrayList<String[]> mDataset;
+
+        public class MyViewHolder extends RecyclerView.ViewHolder {
+            public TextView mName;
+            public TextView mStudentId;
+            public TextView mSchool;
+            public MyViewHolder(ConstraintLayout v) {
+                super(v);
+                mName = (TextView)v.findViewById(R.id.text_name);
+                mStudentId = (TextView)v.findViewById(R.id.text_student_id);
+                mSchool = (TextView)v.findViewById(R.id.text_school);
+            }
+        }
+
+        public TeamAdapter(ArrayList<String[]> myDataset) {
+            mDataset = myDataset;
+        }
+
+        @Override
+        public TeamAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent,
+                                                           int viewType) {
+            // create a new view
+            ConstraintLayout v = (ConstraintLayout) LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_team, parent, false);
+
+            MyViewHolder vh = new MyViewHolder(v);
+            return vh;
+        }
+
+        @Override
+        public void onBindViewHolder(MyViewHolder holder, int position) {
+            holder.mName.setText(mDataset.get(position)[0]);
+            holder.mStudentId.setText(mDataset.get(position)[1]);
+            holder.mSchool.setText(mDataset.get(position)[2]);
+        }
+
+        // Return the size of your dataset (invoked by the layout manager)
+        @Override
+        public int getItemCount() {
+            return mDataset.size();
+        }
+    }
 }
+
+
