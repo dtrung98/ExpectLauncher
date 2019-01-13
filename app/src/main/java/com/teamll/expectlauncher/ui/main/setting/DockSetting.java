@@ -4,19 +4,14 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.teamll.expectlauncher.R;
 import com.teamll.expectlauncher.model.App;
 import com.teamll.expectlauncher.ui.main.AppLoaderActivity;
-import com.teamll.expectlauncher.ui.main.MainActivity;
-import com.teamll.expectlauncher.ui.widgets.fragmentnavigationcontroller.PresentStyle;
 import com.teamll.expectlauncher.ui.widgets.fragmentnavigationcontroller.SupportFragment;
 import com.teamll.expectlauncher.util.Tool;
 import com.teamll.expectlauncher.util.Util;
@@ -27,7 +22,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class DockSetting extends SupportFragment implements AppLoaderActivity.AppDetailReceiver {
+public class DockSetting extends SupportFragment implements AppLoaderActivity.AppsReceiver {
     @BindView(R.id.back_button)
     ImageView mBackButton;
     ImageView dockApps[] = new ImageView[4];
@@ -78,7 +73,7 @@ public class DockSetting extends SupportFragment implements AppLoaderActivity.Ap
             ((ImageView)view.findViewById(id)).setColorFilter(color);
         }
         // dang ky nhan danh sach app
-        ((AppLoaderActivity)getActivity()).addAppDetailReceiver(this);
+        ((AppLoaderActivity)getActivity()).addAppsReceiver(this);
 
 
     }
@@ -86,7 +81,7 @@ public class DockSetting extends SupportFragment implements AppLoaderActivity.Ap
     @Override
     public void onDestroy() {
         // huy di khi huy fragment
-        ((AppLoaderActivity)getActivity()).removeAppDetailReceiver(this);
+        ((AppLoaderActivity)getActivity()).removeAppsReceiver(this);
         super.onDestroy();
     }
 

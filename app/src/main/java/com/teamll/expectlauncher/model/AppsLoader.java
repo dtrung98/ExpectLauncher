@@ -1,20 +1,14 @@
 package com.teamll.expectlauncher.model;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
 import com.teamll.expectlauncher.ExpectLauncher;
 import com.teamll.expectlauncher.R;
-import com.teamll.expectlauncher.util.BitmapEditor;
-
-import org.json.JSONArray;
-import org.json.JSONException;
+import com.teamll.expectlauncher.ui.main.AppLoaderActivity;
 
 import java.text.Collator;
 import java.util.ArrayList;
@@ -26,7 +20,7 @@ import java.util.List;
 /**
  * @credit http://developer.android.com/reference/android/content/AsyncTaskLoader.html
  */
-public class AppsLoader extends AsyncTaskLoader<ArrayList<App>> {
+public class AppsLoader extends AsyncTaskLoader<ArrayList<App>> implements AppLoaderActivity.AppsReceiver {
     private static final String TAG ="AppsLoader";
 
     private ArrayList<App> mInstalledApps;
@@ -134,6 +128,7 @@ public class AppsLoader extends AsyncTaskLoader<ArrayList<App>> {
         Log.d(TAG, "loadInBackgroundV2: t4 "+(t4 - t3));
         Log.d(TAG, "loadInBackgroundV2: t5 "+(t5 - t4));
         Log.d(TAG, "loadInBackgroundV2: finish");
+        ExpectLauncher.getInstance().getPreferencesUtility().saveAppInstance(returnList);
         return returnList;
     }
 
@@ -239,4 +234,14 @@ public class AppsLoader extends AsyncTaskLoader<ArrayList<App>> {
             return sCollator.compare(object1.getLabel(), object2.getLabel());
         }
     };
+
+    @Override
+    public void onLoadComplete(ArrayList<App> data) {
+
+    }
+
+    @Override
+    public void onLoadReset() {
+
+    }
 }

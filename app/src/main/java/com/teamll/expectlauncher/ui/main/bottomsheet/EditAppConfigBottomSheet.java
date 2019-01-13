@@ -135,13 +135,29 @@ public class EditAppConfigBottomSheet extends BottomSheetDialogFragment implemen
 
     @Override
     public void onGenerated(@Nullable Palette palette) {
+
         if(palette==null) return;
+
        List<Palette.Swatch> swatches = palette.getSwatches();
+       int most = 0;
+       int color = -1;
         for (Palette.Swatch s:
                 swatches) {
-            if(mColorPickerAdapter!=null&&s!=null) mColorPickerAdapter.addData(s.getRgb());
+            if(mColorPickerAdapter!=null&&s!=null) {
+                Log.d(TAG, "onGenerated: color "+s.getRgb()+", population = "+s.getPopulation());
+                int cur = s.getPopulation();
+                if(cur>most) {
+                    color = s.getRgb();
+                    most = cur;
+                }
+                mColorPickerAdapter.addData(s.getRgb());
+            }
         }
-        if(mColorPickerAdapter!=null) mColorPickerAdapter.addData(Color.WHITE);
+//
+      if(mColorPickerAdapter!=null) mColorPickerAdapter.addData(Color.WHITE);
+//        if(mColorPickerAdapter!=null) {
+//            mColorPickerAdapter.setSelectedColor(color);
+//        }
     }
 
     public interface UpdateItemListener {
@@ -311,7 +327,7 @@ public class EditAppConfigBottomSheet extends BottomSheetDialogFragment implemen
         mColorPickerAdapter = new ColorPickerAdapter(this);
         mRecyclerView.setAdapter(mColorPickerAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false));
-        mColorPickerAdapter.setData(mApp.getAppSavedInstance().getBackground1(),mApp.getAppSavedInstance().getBackground2());
+        mColorPickerAdapter.addData(mApp.getAppSavedInstance().getBackground1(),mApp.getAppSavedInstance().getBackground2());
         mColorPickerAdapter.setSelectedColor(mApp.getAppSavedInstance().getCustomBackground());
         if(mApp.getIcon() instanceof BitmapDrawable)
         Palette.from(((BitmapDrawable) mApp.getIcon()).getBitmap()).generate(this);

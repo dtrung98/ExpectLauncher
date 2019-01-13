@@ -52,7 +52,7 @@ public class ColorPickerAdapter extends RecyclerView.Adapter<ColorPickerAdapter.
     private int mColor = -1;
     public void setSelectedColor(Integer color) {
         mColor = color;
-       mSelected = mData.indexOf(color);
+       findSelected();
     }
     public void findSelected() {
         int newOne = mData.indexOf(mColor);
@@ -84,8 +84,6 @@ public class ColorPickerAdapter extends RecyclerView.Adapter<ColorPickerAdapter.
         }
 
     }
-
-
 
 
     @NonNull

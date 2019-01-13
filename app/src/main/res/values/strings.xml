@@ -26,4 +26,5 @@
     <string name="add_wallpaper">Add wallpaper</string>
     <string name="remove_last_widget">Remove last widget</string>
     <string name="add_widget">Add Widget</string>
+    <string name="reload_app">Reload app list</string>
 </resources>

@@ -41,7 +41,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
     }
 
     private MainScreenFragment mainScreen;
-    private AppDrawerFragment appDrawer;
+    private AppDrawerFragment mAppDrawer;
     private FrameLayout container;
     private Rectangle rect;
     private FrameLayout.LayoutParams appDrawerParams;
@@ -64,7 +64,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
     //    if(true) return;
 
         mainScreen = null;
-        appDrawer = null;
+        mAppDrawer = null;
         container = null;
         rect = null;
         appDrawerParams = null;
@@ -90,7 +90,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
         if(isBind) return;
         isBind = true;
         this.mainScreen = mainScreen;
-        this.appDrawer = appDrawer;
+        this.mAppDrawer = appDrawer;
         container = activity.findViewById(R.id.container);
 
         rect = new Rectangle();
@@ -146,7 +146,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
         if(v.getId()==recyclerView.getId()) {
         }
         if(!isViewAttached()) return false;
-       if(v.getId() ==recyclerView.getId()&&appDrawer.mAdapter.getMode()==AppDrawerAdapter.APP_DRAWER_CONFIG_MODE.NORMAL) {
+       if(v.getId() ==recyclerView.getId()&& mAppDrawer.mAdapter.getMode()==AppDrawerAdapter.APP_DRAWER_CONFIG_MODE.NORMAL) {
            {
                Log.d(TAG, "onTouch: recycler on touch "+logAction(event));
 
@@ -193,11 +193,11 @@ public class LayoutSwitcher implements View.OnTouchListener {
             mainScreen.dock.setScaleY(1 - 0.25f * keyNormalize);
             mainScreen.setAlpha(1 - keyNormalize);
 
-        if(appDrawer.mSearchBackGround instanceof MotionRoundedBitmapFrameLayout)
-        appDrawer.mSearchBackGround.invalidate();
+        if(mAppDrawer.mSearchBackGround instanceof MotionRoundedBitmapFrameLayout)
+        mAppDrawer.mSearchBackGround.invalidate();
 
-          if(appDrawer.mSearchBackGround instanceof MotionRoundedBitmapFrameLayout)
-            appDrawer.mRecyclerViewParent.invalidate();
+          if(mAppDrawer.mSearchBackGround instanceof MotionRoundedBitmapFrameLayout)
+            mAppDrawer.mRecyclerViewParent.invalidate();
 
           toggle.requestLayout();
         if(keyValue<=1) {
@@ -217,13 +217,13 @@ public class LayoutSwitcher implements View.OnTouchListener {
         float alpha_blur = value/max_value;
         if(alpha_blur>1) alpha_blur = 1;
 
-        if(appDrawer.mRecyclerViewParent instanceof DarkenRoundedBackgroundFrameLayout) {
+        if(mAppDrawer.mRecyclerViewParent instanceof DarkenRoundedBackgroundFrameLayout) {
 
-            ((DarkenRoundedBackgroundFrameLayout) appDrawer.mRecyclerViewParent).setRoundNumber(0.5f + value * (1.75f - 0.5f), true);
-            ((DarkenRoundedBackgroundFrameLayout)appDrawer.mRecyclerViewParent).setAlphaBackground(value * max_value);
+            ((DarkenRoundedBackgroundFrameLayout) mAppDrawer.mRecyclerViewParent).setRoundNumber(0.5f + value * (1.75f - 0.5f), true);
+            ((DarkenRoundedBackgroundFrameLayout) mAppDrawer.mRecyclerViewParent).setAlphaBackground(value * max_value);
 
-            if(appDrawer.mRecyclerViewParent instanceof MotionRoundedBitmapFrameLayout) {
-                ((MotionRoundedBitmapFrameLayout)appDrawer.mRecyclerViewParent).setAlphaBlurPaint(alpha_blur, false);
+            if(mAppDrawer.mRecyclerViewParent instanceof MotionRoundedBitmapFrameLayout) {
+                ((MotionRoundedBitmapFrameLayout) mAppDrawer.mRecyclerViewParent).setAlphaBlurPaint(alpha_blur, false);
                 }
         }
         toggle.setAlpha(value);
@@ -249,8 +249,8 @@ public class LayoutSwitcher implements View.OnTouchListener {
     public void onBackPressed() {
 
         if(mode==MODE.IN_APP_DRAWER) {
-            if(appDrawer.mAdapter.getMode()!=AppDrawerAdapter.APP_DRAWER_CONFIG_MODE.NORMAL)
-                appDrawer.mAdapter.switchMode(AppDrawerAdapter.APP_DRAWER_CONFIG_MODE.NORMAL);
+            if(mAppDrawer.mAdapter.getMode()!=AppDrawerAdapter.APP_DRAWER_CONFIG_MODE.NORMAL)
+                mAppDrawer.mAdapter.switchMode(AppDrawerAdapter.APP_DRAWER_CONFIG_MODE.NORMAL);
             else
             motionDown();
         }
@@ -339,8 +339,8 @@ public class LayoutSwitcher implements View.OnTouchListener {
            if(mode ==MODE.IN_MAIN_SCREEN)
            fragment.setListener(mainScreen);
            else
-               fragment.setAppDrawer(appDrawer);
-           fragment.show(appDrawer.getActivity().getSupportFragmentManager(),
+               fragment.setAppDrawer(mAppDrawer);
+           fragment.show(mAppDrawer.getActivity().getSupportFragmentManager(),
                     "song_popup_menu");
         }
 
@@ -416,7 +416,8 @@ public class LayoutSwitcher implements View.OnTouchListener {
         Log.d(TAG, "onTouchBoth: event = "+logAction(event));
         v.performClick();
         gestureListener.setAdaptiveView(v);
-
+        if(event.getAction()!=MotionEvent.ACTION_UP&& mAppDrawer != null) mAppDrawer.setRecyclerMoving(true);
+        else if(mAppDrawer!=null) mAppDrawer.setRecyclerMoving(false);
         boolean b = mGestureDetector.onTouchEvent(event) ;
         boolean c = false;
             switch (event.getAction()) {
@@ -426,7 +427,7 @@ public class LayoutSwitcher implements View.OnTouchListener {
         return b||c;
     }
     private boolean onTouchRecyclerView(View v, MotionEvent event) {
-        if(appDrawer!=null&&appDrawer.handleIfMenuIsShown())
+        if(mAppDrawer !=null&& mAppDrawer.handleIfMenuIsShown())
         return true;
         return (checkOnTop()) && onTouchBoth(v,event);
     }

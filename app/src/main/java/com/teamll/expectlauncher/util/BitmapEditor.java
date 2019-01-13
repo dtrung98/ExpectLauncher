@@ -27,6 +27,8 @@ import android.view.View;
 import android.widget.ImageView;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by trung on 7/11/2017.
@@ -368,6 +370,139 @@ public final class BitmapEditor {
         return new int[] {
                 r, g, b
         };
+    }
+    public static int getMostPopularColor(Bitmap bitmap) {
+        return 0;
+    }
+    public static int getDominantColor2(Bitmap bitmap) {
+        if (bitmap == null)
+            throw new NullPointerException();
+
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        int size = width * height;
+        int pixels[] = new int[size];
+
+        Bitmap bitmap2 = bitmap.copy(Bitmap.Config.ARGB_4444, false);
+
+        bitmap2.getPixels(pixels, 0, width, 0, 0, width, height);
+
+        HashMap<Integer, Integer> colorMap = new HashMap<Integer, Integer>();
+
+        int color = 0;
+        Integer count = 0;
+        for (int i = 0; i < pixels.length; i++) {
+            color = pixels[i];
+            if(Color.alpha(color)<=25) continue;
+            count = colorMap.get(color);
+            if (count == null)
+                count = 0;
+            colorMap.put(color, ++count);
+        }
+
+        int dominantColor = 0;
+        int max = 0;
+        for (Map.Entry<Integer, Integer> entry : colorMap.entrySet()) {
+            if (entry.getValue() > max) {
+                max = entry.getValue();
+                dominantColor = entry.getKey();
+            }
+        }
+        return dominantColor;
+    }
+    public static int[] getDominantAndMostColor(Bitmap bitmap) {
+        if(bitmap == null) return new int[] {Color.WHITE,Color.WHITE};
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        int size = width * height;
+        int pixels[] = new int[size];
+        HashMap<Integer, Integer> colorMap = new HashMap<Integer, Integer>();
+        bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
+        int color;
+        int r = 0;
+        int g = 0;
+        int b = 0;
+        int a;
+        int count = 0;
+        Integer mostCount  = 0;
+        for (int i = 0; i < pixels.length; i++) {
+            color = pixels[i];
+            a = Color.alpha(color);
+            if (a > 0) {
+                r += Color.red(color);
+                g += Color.green(color);
+                b += Color.blue(color);
+                count++;
+            }
+
+            if(a>25) {
+                mostCount = colorMap.get(color);
+                if(mostCount==null) mostCount = 0;
+                colorMap.put(color,++mostCount);
+            }
+        }
+
+        r /= count;
+        g /= count;
+        b /= count;
+        r = (r << 16) & 0x00FF0000;
+        g = (g << 8) & 0x0000FF00;
+        b = b & 0x000000FF;
+        color = 0xFF000000 | r | g | b;
+        if(color==0) color = Color.WHITE;
+
+        int mostColor = Color.WHITE;
+        int max = 0;
+        for (Map.Entry<Integer, Integer> entry : colorMap.entrySet()) {
+            if (entry.getValue() > max) {
+                max = entry.getValue();
+                mostColor = entry.getKey();
+            }
+        }
+
+        return new int[]{color,mostColor};
+    }
+    public static int getLuminance(int argb) {
+        int lum= (   77  * ((argb>>16)&255)
+                + 150 * ((argb>>8)&255)
+                + 29  * ((argb)&255))>>8;
+        return lum;
+    }
+
+    public static int getDominantColor(Bitmap bitmap) {
+        if (bitmap == null) {
+            return Color.WHITE;
+        }
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        int size = width * height;
+        int pixels[] = new int[size];
+        //Bitmap bitmap2 = bitmap.copy(Bitmap.Config.ARGB_4444, false);
+        bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
+        int color;
+        int r = 0;
+        int g = 0;
+        int b = 0;
+        int a;
+        int count = 0;
+        for (int i = 0; i < pixels.length; i++) {
+            color = pixels[i];
+            a = Color.alpha(color);
+            if (a > 0) {
+                r += Color.red(color);
+                g += Color.green(color);
+                b += Color.blue(color);
+                count++;
+            }
+        }
+        r /= count;
+        g /= count;
+        b /= count;
+        r = (r << 16) & 0x00FF0000;
+        g = (g << 8) & 0x0000FF00;
+        b = b & 0x000000FF;
+        color = 0xFF000000 | r | g | b;
+        return color;
     }
     public static Bitmap updateSat(Bitmap src, float settingSat) {
 

@@ -45,6 +45,9 @@ public class MainActivity extends AppLoaderActivity implements Tool.WallpaperCha
        Tool.getInstance().resumeWallpaperTracking();
         mHomeWatcher.startWatch();
     }
+    public FragmentNavigationController getNavigationController() {
+        return mNavigationController;
+    }
 
     @Override
     protected void onPause() {
@@ -79,10 +82,11 @@ public class MainActivity extends AppLoaderActivity implements Tool.WallpaperCha
                     .sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
             getFragmentReference();
 
+
         } else {
             initScreen();
-            initBackStack(savedInstanceState);
         }
+        initBackStack(savedInstanceState);
         initHomeWatcher();
         GetPermission();
 
@@ -248,6 +252,7 @@ public class MainActivity extends AppLoaderActivity implements Tool.WallpaperCha
 
     @Override
     public void onOpenPreference(View v, App app) {
+        Log.d(TAG, "onOpenPreference");
        presentFragment(new DashBoardSetting());
 
     }
@@ -269,7 +274,9 @@ public class MainActivity extends AppLoaderActivity implements Tool.WallpaperCha
         return null!= mNavigationController;
     }
     public void presentFragment(SupportFragment fragment) {
+        Log.d(TAG, "presentFragment");
         if(isNavigationControllerInit()) {
+            Log.d(TAG, "presentFragment: INIT");
 //            Random r = new Random();
 //            mNavigationController.setPresentStyle(r.nextInt(39)+1); //exclude NONE present style
             mNavigationController.setPresentStyle(fragment.getPresentTransition());

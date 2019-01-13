@@ -3,6 +3,7 @@ package com.teamll.expectlauncher.util;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.view.View;
@@ -22,9 +23,12 @@ public class Util {
         int[] ret = new int[2];
         if(app.getIcon() instanceof BitmapDrawable) {
             BitmapDrawable bd = (BitmapDrawable) app.getIcon();
-            int[] c =  BitmapEditor.getAverageColorRGB(bd.getBitmap());
-            // int c2 = Tool.getContrastVersionForColor(Color.rgb(c[0],c[1],c[2]));
-            ret[1] = Color.rgb(c[0],c[1],c[2]);
+
+            int[] dominantNMostColor = BitmapEditor.getDominantAndMostColor(bd.getBitmap());
+            int lightValue = BitmapEditor.getLuminance(dominantNMostColor[1]);
+            if(lightValue>243||lightValue<17) ret[1] = dominantNMostColor[1];
+            else ret[1] = dominantNMostColor[0];
+
             ret[0] = BitmapEditor.darkenColor(ret[1]);
         } else {
            ret[0] = Color.WHITE;

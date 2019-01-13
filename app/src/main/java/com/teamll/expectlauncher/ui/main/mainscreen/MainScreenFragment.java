@@ -15,10 +15,11 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.RequestOptions;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.teamll.expectlauncher.ExpectLauncher;
 import com.teamll.expectlauncher.R;
@@ -39,7 +40,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainScreenFragment extends AppWidgetHostFragment implements View.OnTouchListener, LayoutSwitcher.EventSender,AppLoaderActivity.AppDetailReceiver, CommonSettingBottomSheet.BottomSheetListener{
+public class MainScreenFragment extends AppWidgetHostFragment implements View.OnTouchListener, LayoutSwitcher.EventSender,AppLoaderActivity.AppsReceiver, CommonSettingBottomSheet.BottomSheetListener{
     private static final String TAG="MainScreenFragment";
 
     private long savedTime;
@@ -102,6 +103,7 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view,savedInstanceState);
     ButterKnife.bind(this,view);
+        Tool.getInstance().AddWallpaperChangedNotifier(dock);
         mRootView = view;
     widgetContainer.setOnLongClickListener(new View.OnLongClickListener() {
         @Override
@@ -155,12 +157,12 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
         params.bottomMargin = 0;
         widgetContainer.setMinimumHeight(params.height);
         scrollView.requestLayout();
-    Tool.getInstance().AddWallpaperChangedNotifier(dock);
+
         AppLoaderActivity ac = (AppLoaderActivity)getActivity();
         if(ac!=null)
-            ac.addAppDetailReceiver(this);
+            ac.addAppsReceiver(this);
         else throw new NullPointerException("Fragment was created from an activity class that doesn't inherit from AppLoaderActivity class");
-
+        bindDock();
     }
     private void dockClick(View v) {
         for (int i=0;i<appInDock.size();i++) {
@@ -181,6 +183,13 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
            }
         }
     }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+    }
+
 
     @Override
     public View getRoot() {
@@ -264,7 +273,13 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
         }
 
         for(int i=0;i<appInDock.size();i++) {
-            dockApp[i].setImageDrawable(appInDock.get(i).getIcon());
+            RequestOptions requestOptions = new RequestOptions();
+            Glide.with(getContext())
+                    .load(appInDock.get(i).getIcon())
+                    .apply(requestOptions)
+                    .transition(DrawableTransitionOptions.withCrossFade(650))
+                    .into(dockApp[i]);
+           // dockApp[i].setImageDrawable(appInDock.get(i).getIcon());
         }
         bindDock();
     }
@@ -301,7 +316,7 @@ public class MainScreenFragment extends AppWidgetHostFragment implements View.On
                         dockApp[i].setPadding(pd2, pd2, pd2, pd2);
                         break;
                 }
-
+                dockApp[i].requestLayout();
 
             }
         }

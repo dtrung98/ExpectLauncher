@@ -57,6 +57,62 @@
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+            <View
+                android:id="@+id/reload_app_panel"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintTop_toTopOf="@id/reload_app"
+                app:layout_constraintBottom_toBottomOf="@id/reload_app"
+                app:layout_constraintStart_toStartOf="@id/icon_reload_app"
+                app:layout_constraintEnd_toEndOf="@id/next_reload_app"
+                android:background="@drawable/black_rounded_big"/>
+            <ImageView
+                android:id="@+id/icon_reload_app"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                app:srcCompat="@drawable/ic_autorenew_black_24dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:tint="@color/FlatRed"
+                app:layout_constraintTop_toTopOf="@id/reload_app"
+                app:layout_constraintBottom_toBottomOf="@id/reload_app"
+                app:layout_constraintStart_toStartOf="parent"/>
+            <TextView
+                android:id="@+id/reload_app"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:text="@string/reload_app"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textStyle="bold"
+                android:textColor="@color/setting_label_color"
+
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@id/icon_reload_app"
+                app:layout_constraintEnd_toStartOf="@id/next_reload_app"/>
+            <com.tuyenmonkey.mkloader.MKLoader
+                android:id="@+id/next_reload_app"
+                android:layout_width="50dp"
+                android:layout_height="26dp"
+                android:tint="@color/FlatRed"
+                app:mk_type="Whirlpool"
+                app:mk_color="#444"
+                android:visibility="gone"
+                app:layout_constraintTop_toTopOf="@id/reload_app"
+                app:layout_constraintBottom_toBottomOf="@id/reload_app"
+                app:layout_constraintEnd_toEndOf="parent"/>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/reload_app_panel"
+                app:layout_constraintStart_toStartOf="@id/reload_app_panel"
+                app:layout_constraintEnd_toEndOf="@id/reload_app_panel"
+                android:layout_margin="15dp"
+                android:textColor="#777"
+                android:textStyle="bold"
+                android:textSize="11sp"
+                android:text="Reload app list might help you to apply new system theme to this launcher."/>
         </android.support.constraint.ConstraintLayout>
     </android.support.v4.widget.NestedScrollView>
 </android.support.constraint.ConstraintLayout>

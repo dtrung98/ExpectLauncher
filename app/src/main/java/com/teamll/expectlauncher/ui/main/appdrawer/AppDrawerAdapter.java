@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.view.MotionEventCompat;
@@ -29,6 +31,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.teamll.expectlauncher.ExpectLauncher;
 import com.teamll.expectlauncher.R;
@@ -121,7 +128,7 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
         initFontValue();
     }
     public void setData(List<App> data) {
-        Log.d(TAG, "setData");
+      //  Log.d(TAG, "setData");
         mData.clear();
         if (data!=null) {
             mData.addAll(data);
@@ -142,10 +149,14 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
         View view =LayoutInflater.from(parent.getContext()).inflate(R.layout.item_app_drawer_v2, parent, false);
         return new ViewHolder(view);
     }
+    long savedCount = 0;
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
-        Log.d(TAG, "onBindViewHolder: inSearchMode ="+mInSearchMode);
+        long now = System.currentTimeMillis();
+        Log.d(TAG, "onBindViewHolder: "+mData.get(position).getLabel()+", "+position+", deltaPrev = "+ (now - savedCount));
+        savedCount = System.currentTimeMillis();
+      //  Log.d(TAG, "onBindViewHolder: inSearchMode ="+mInSearchMode);
         if(!mInSearchMode) {
             holder.bind(mData.get(position));
         } else {
@@ -166,7 +177,7 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
 
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
-        Log.d(TAG, "onItemMove: from "+fromPosition +" to "+ toPosition);
+    //    Log.d(TAG, "onItemMove: from "+fromPosition +" to "+ toPosition);
 
       //  Collections.swap(mData, fromPosition, toPosition);
         notifyItemMoved(fromPosition, toPosition);
@@ -229,7 +240,6 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
         }
 
         void bind(App app) {
-            Log.d(TAG, "bind item "+getAdapterPosition());
 
             String custom = app.getAppSavedInstance().getCustomTitle();
             if(custom.isEmpty())
@@ -237,9 +247,20 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
            else mTitle.setText(custom);
 
            mIcon.setImageDrawable(app.getIcon());
+
+
             bindMovableIcon();
             bindAppSizeAndType(app);
             bindAppTitleTextView();
+
+//            RequestOptions requestOptions = new RequestOptions().override(68,68);
+//
+//            Glide.with(mContext)
+//                    .load(app.getIcon())
+//                    .apply(requestOptions)
+//                    // .transition(DrawableTransitionOptions.withCrossFade(650))
+//                    .into(mIcon);
+
         }
         @SuppressLint("ClickableViewAccessibility")
         void setResponseOnTouch() {
@@ -261,12 +282,12 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
 
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
-
                     gd.onTouchEvent(event);
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN: {
                             ImageView view = (ImageView) v;
                             //overlay is black with transparency of 0x77 (119)
+                            if(view.getDrawable() !=null)
                             view.getDrawable().setColorFilter(0x22000000,PorterDuff.Mode.SRC_ATOP);
                             view.getBackground().setColorFilter(0x22000000,PorterDuff.Mode.SRC_ATOP);
                             view.setAlpha(0.85f);
@@ -277,6 +298,7 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
                         case MotionEvent.ACTION_CANCEL: {
                             ImageView view = (ImageView) v;
                             //clear the overlay
+                            if(view.getDrawable() !=null)
                             view.getDrawable().clearColorFilter();
                             view.getBackground().clearColorFilter();
                             view.setAlpha(1f);
@@ -294,7 +316,7 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
 
             if(mConfigMode!=APP_DRAWER_CONFIG_MODE.MOVABLE_APP_ICON) {
                 if(mXButton.getVisibility()==View.VISIBLE&&mOldConfigModeIsMovable&&!mData.get(getAdapterPosition()).getApplicationPackageName().equals(mContext.getPackageName())) {
-                    Log.d(TAG, "bindDeleteIcon: "+getAdapterPosition());
+                //    Log.d(TAG, "bindDeleteIcon: "+getAdapterPosition());
                     ScaleAnimation sa = new ScaleAnimation(1f,0f,1f,0f,ScaleAnimation.RELATIVE_TO_SELF,0.5f, ScaleAnimation.RELATIVE_TO_SELF,0.5f);
                     sa.setDuration(250);
                     // sa.setInterpolator(new OvershootInterpolator());
@@ -423,9 +445,10 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
             rootParams.height = nh + textParams.height;
             bindAppIconType(nw, app);
             bindDeleteIcon(nw);
-            itemView.requestLayout();
-            mIcon.requestLayout();
-            mTitle.requestLayout();
+
+          //  itemView.requestLayout();
+          //  mIcon.requestLayout();
+          //  mTitle.requestLayout();
         }
         private void bindAppTitleTextView() {
             if(ExpectLauncher.getInstance().getPreferencesUtility().isShowAppTitle()) {
@@ -538,8 +561,6 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
         };
     }
 
-
-
     public interface ItemClickListener {
         void onItemClick(View view, App app);
         void onItemLongPressed(View view, App app, int index);
@@ -550,47 +571,14 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
     }
 
     public void backupApps() {
-//        SharedPreferences pref = mContext.getSharedPreferences("app-data", Context.MODE_PRIVATE);
-//        SharedPreferences.Editor editor = pref.edit();
-//
-//        JSONArray appsJson = new JSONArray();
-//        int count = mData.size();
-//        for (int index = 0; index < count; index++) {
-//            appsJson.put(mData.get(index).getApplicationPackageName());
-//        }
-//
-//        editor.putString("app-list", appsJson.toString());
-//        editor.apply();
-//        Log.v("appsList: ", appsJson.toString());
 
+        Log.d(TAG, "backupApps");
         ExpectLauncher.getInstance().getPreferencesUtility().saveAppInstance(mData);
     }
 
     public void restoreApps() {
-//        SharedPreferences pref = mContext.getSharedPreferences("app-data", Context.MODE_PRIVATE);
-//        String appString = pref.getString("app-list", "");
-//        if (appString!=null&&!appString.isEmpty()){
-//            try {
-//                ArrayList<App> items = new ArrayList<App>();
-//                JSONArray appsJson = new JSONArray(appString);
-//                int count = appsJson.length();
-//                for (int index = 0; index < count; index++) {
-//                    int id = Util.findPackageName(mData, appsJson.get(index).toString());
-//                    if (id > -1) {
-//                        items.add(mData.get(id));
-//                        mData.remove(id);
-//                    }
-//
-//                }
-//                count = mData.size();
-//                for (int index = 0; index < count; index++) {
-//                    items.add(mData.get(index));
-//                }
-//                mData = items;
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//        }
+
+        Log.d(TAG, "restoreApps");
         Collections.sort(mData,(o1, o2) -> o1.getAppSavedInstance().getIndex()-o2.getAppSavedInstance().getIndex());
         notifyDataSetChanged();
     }

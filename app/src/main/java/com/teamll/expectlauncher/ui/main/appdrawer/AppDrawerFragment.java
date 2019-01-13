@@ -54,7 +54,7 @@ import butterknife.ButterKnife;
 public class AppDrawerFragment extends Fragment implements View.OnClickListener,EditAppConfigBottomSheet.UpdateItemListener,
                                                             AppDrawerAdapter.ItemClickListener,
                                                             OnStartDragListener,
-                                                           AppLoaderActivity.AppDetailReceiver,
+        AppLoaderActivity.AppsReceiver,
                                                            LayoutSwitcher.EventSender,
                                                            CommonSettingBottomSheet.BottomSheetListener,
                                                            OnRangeChangedListener,
@@ -127,6 +127,7 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
     FrameLayout.LayoutParams params;
 
     @BindView(R.id.search_view) public SearchView mSearchView;
+    private boolean recyclerMoving;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -189,7 +190,7 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
         /**
          * Đăng ký bộ lắng nghe việc load app cho đối tượng này.
          */
-        ((AppLoaderActivity)getActivity()).addAppDetailReceiver(this);
+        ((AppLoaderActivity)getActivity()).addAppsReceiver(this);
 
         mSearchView.setOnQueryTextListener(this);
         mSearchView.setOnClickListener(this);
@@ -305,14 +306,10 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public void onItemLongPressed(View view, App app, int index) {
+        if(isRecyclerMoving) return;
         mAdaptiveApp = app;
         mAdaptiveIndex = index;
-//        dismissMenu();
-//        mPopupMenu = new PopupMenu(getContext(),view);
-//        mPopupMenu.inflate(R.menu.my_menu);
-//        mPopupMenu.setGravity(Gravity.TOP);
-//        mPopupMenu.show();
-//        if(true) return;
+
         CommonSettingBottomSheet fragment =  CommonSettingBottomSheet.newInstance(LayoutSwitcher.MODE.IN_APP_DRAWER);
 
         fragment.setAppDrawer(this);
@@ -529,5 +526,9 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
        if(mAdapter!=null) mAdapter.setFontValue(oldVal,newVal);
+    }
+    boolean isRecyclerMoving = false;
+    public void setRecyclerMoving(boolean recyclerMoving) {
+        this.recyclerMoving = recyclerMoving;
     }
 }

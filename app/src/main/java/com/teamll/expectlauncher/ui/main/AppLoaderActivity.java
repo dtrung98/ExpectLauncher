@@ -23,15 +23,15 @@ public abstract class AppLoaderActivity extends AppCompatActivity implements Loa
     private static final String TAG ="AppLoaderActivity";
 
 
-    private ArrayList<AppDetailReceiver> listeners = new ArrayList<>();
+    private ArrayList<AppsReceiver> listeners = new ArrayList<>();
     private ArrayList<App> mData = new ArrayList<>();
-    public void addAppDetailReceiver(AppDetailReceiver receiver) {
+    public void addAppsReceiver(AppsReceiver receiver) {
         if(!listeners.contains(receiver)) {
             listeners.add(receiver);
            if(mData.size()!=0) receiver.onLoadComplete(mData);
         }
     }
-    public void removeAppDetailReceiver(AppDetailReceiver receiver) {
+    public void removeAppsReceiver(AppsReceiver receiver) {
         if(listeners.contains(receiver)) {
             listeners.remove(receiver);
         }
@@ -42,6 +42,9 @@ public abstract class AppLoaderActivity extends AppCompatActivity implements Loa
         super.onCreate(savedInstanceState);
         getSupportLoaderManager().initLoader(0, null,  this);
     }
+    public void restartLoader() {
+        getSupportLoaderManager().restartLoader(0,null,this);
+    }
 
     @Override
     protected void onResume() {
@@ -50,7 +53,6 @@ public abstract class AppLoaderActivity extends AppCompatActivity implements Loa
 
     }
 
-    AppsLoader mLoader;
     @NonNull
     @Override
     public Loader<ArrayList<App>> onCreateLoader(int i, @Nullable Bundle bundle) {
@@ -62,7 +64,7 @@ public abstract class AppLoaderActivity extends AppCompatActivity implements Loa
         mData.clear();
         mData.addAll(appDetails);
 
-        for (AppDetailReceiver receiver: listeners) {
+        for (AppsReceiver receiver: listeners) {
             receiver.onLoadComplete(mData);
         }
     }
@@ -70,13 +72,13 @@ public abstract class AppLoaderActivity extends AppCompatActivity implements Loa
     @Override
     public void onLoaderReset(@NonNull Loader<ArrayList<App>> loader) {
         mData.clear();
-        for (AppDetailReceiver receiver: listeners) {
+        for (AppsReceiver receiver: listeners) {
             receiver.onLoadReset();
         }
         Toast.makeText(this, "reset", Toast.LENGTH_SHORT).show();
     }
 
-    public interface AppDetailReceiver {
+    public interface AppsReceiver {
         void onLoadComplete(ArrayList<App> data);
         void onLoadReset();
     }
@@ -94,15 +96,16 @@ public abstract class AppLoaderActivity extends AppCompatActivity implements Loa
                     Math.cos(mFrequency * time) + 1);
         }
     }
-    public void onOpenPreference(View v, App app) {
-        Toast.makeText(this,"Preference will be available soon...",Toast.LENGTH_SHORT).show();
-    }
+    public abstract void onOpenPreference(View v, App app);
     public void openApp(View v, App app) {
+        Log.d(TAG, "openApp");
         if (app != null) {
             if(app.getApplicationPackageName().equals(getResources().getString(R.string.package_name))) {
+                Log.d(TAG, "openApp SELF");
                 onOpenPreference(v,app);
                 return;
             }
+            Log.d(TAG, "openApp OPEN");
 
             Intent intent =getPackageManager().getLaunchIntentForPackage(app.getApplicationPackageName());
             if (intent != null) {

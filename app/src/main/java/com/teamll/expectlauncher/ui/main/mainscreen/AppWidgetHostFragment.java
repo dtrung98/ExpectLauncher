@@ -136,8 +136,8 @@ public class AppWidgetHostFragment extends Fragment {
         super.onStop();
         if(mAppWidgetHost!=null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                ExpectLauncher.getInstance().getPreferencesUtility().savedWidgetLists(mAppWidgetHost.getAppWidgetIds());
-            } else {
+//                ExpectLauncher.getInstance().getPreferencesUtility().savedWidgetLists(mAppWidgetHost.getAppWidgetIds());
+//            } else {
                 ExpectLauncher.getInstance().getPreferencesUtility().savedWidgetLists(mID);
             }
         }

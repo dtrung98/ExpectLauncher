@@ -9,19 +9,26 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.teamll.expectlauncher.R;
-import com.teamll.expectlauncher.ui.widgets.fragmentnavigationcontroller.PresentStyle;
+import com.teamll.expectlauncher.model.App;
+import com.teamll.expectlauncher.ui.main.AppLoaderActivity;
 import com.teamll.expectlauncher.ui.widgets.fragmentnavigationcontroller.SupportFragment;
 import com.teamll.expectlauncher.util.Tool;
+import com.tuyenmonkey.mkloader.MKLoader;
+
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class ApplicationSetting extends SupportFragment {
+public class ApplicationSetting extends SupportFragment implements AppLoaderActivity.AppsReceiver {
     @BindView(R.id.back_button)
     ImageView mBackButton;
 
-    private int[] mIConID = {};
+    @BindView(R.id.next_reload_app)
+    MKLoader mLoading;
+
+    private int[] mIConID = {R.id.icon_reload_app};
 
     @BindView(R.id.background_toolbar)
     View mBackgroundToobar;
@@ -34,6 +41,13 @@ public class ApplicationSetting extends SupportFragment {
     @Override
     protected View onCreateView(LayoutInflater inflater, ViewGroup container) {
         return inflater.inflate(R.layout.application_setting,container,false);
+    }
+
+    @OnClick(R.id.reload_app_panel)
+    void reloadAppList() {
+        if(mLoading!=null)
+            mLoading.setVisibility(View.VISIBLE);
+        getMainActivity().restartLoader();
     }
 
     @Override
@@ -49,6 +63,17 @@ public class ApplicationSetting extends SupportFragment {
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        getMainActivity().addAppsReceiver(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getMainActivity().removeAppsReceiver(this);
+    }
 
     @Override
     public boolean isWhiteTheme() {
@@ -61,5 +86,18 @@ public class ApplicationSetting extends SupportFragment {
             ((ViewGroup.MarginLayoutParams) mBackButton.getLayoutParams()).topMargin = value;
             mBackButton.requestLayout();
         }
+    }
+
+    @Override
+    public void onLoadComplete(ArrayList<App> data) {
+        if(mLoading!=null&&mLoading.getVisibility()==View.VISIBLE) {
+            mLoading.setVisibility(View.GONE);
+            mLoading.postDelayed(() -> getMainActivity().getNavigationController().popToRootFragment(),300);
+        }
+    }
+
+    @Override
+    public void onLoadReset() {
+
     }
 }

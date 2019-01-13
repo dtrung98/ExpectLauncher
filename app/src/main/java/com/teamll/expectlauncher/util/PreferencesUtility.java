@@ -108,7 +108,7 @@ public final class PreferencesUtility {
 
         int[] color = Util.getAverageColor(app);
         appInstance.setBackground1(color[0]);
-        appInstance.setCustomBackground(color[0]);
+        appInstance.setCustomBackground(color[1]);
         appInstance.setBackground2(color[1]);
 
         appInstance.setPadding(2/31f);
@@ -187,6 +187,7 @@ public final class PreferencesUtility {
     }
 
     private IconEditorConfig iec;
+
     public IconEditorConfig getIconConfig() {
         if(iec !=null) return this.iec;
         iec = new IconEditorConfig();
@@ -195,9 +196,10 @@ public final class PreferencesUtility {
         iec.mPadding = mPreferences.getFloat(IconEditorConfig.PADDING,4.0f/62);
         iec.mAutoTextColor = mPreferences.getBoolean(IconEditorConfig.AUTO_TEXT_COLOR,true);
         iec.mTextColor = mPreferences.getInt(IconEditorConfig.TEXT_COLOR, 0); // 0 means auto, 1 means white, 2 means black
-        iec.mCornerRadius = mPreferences.getFloat(IconEditorConfig.CORNER_RADIUS,6/31.0f);
+        iec.mCornerRadius = mPreferences.getFloat(IconEditorConfig.CORNER_RADIUS,8/31.0f);
         return iec;
     }
+
     public static class IconEditorConfig {
 
         static String SHAPE_TYPE ="ic_shape_type";
