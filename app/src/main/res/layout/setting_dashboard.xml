@@ -156,6 +156,7 @@
                 app:layout_constraintEnd_toEndOf="@id/next_app_drawer"
                 android:background="@drawable/black_rounded_big"/>
             <TextView
+                android:visibility="gone"
                 android:id="@+id/app_drawer"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
@@ -171,6 +172,7 @@
                 app:layout_constraintStart_toEndOf="@id/icon_app_drawer"
                 app:layout_constraintEnd_toStartOf="@id/next_app"/>
             <ImageView
+                android:visibility="gone"
                 android:id="@+id/next_app_drawer"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
@@ -181,6 +183,7 @@
                 app:layout_constraintBottom_toBottomOf="@id/app_drawer"
                 app:layout_constraintEnd_toEndOf="parent"/>
             <ImageView
+                android:visibility="gone"
                 android:id="@+id/icon_app_drawer"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
@@ -192,6 +195,7 @@
                 app:layout_constraintBottom_toBottomOf="@id/app_drawer"
                 app:layout_constraintStart_toStartOf="parent"/>
             <View
+                android:visibility="gone"
                 android:layout_width="0dp"
                 android:layout_height="2dp"
                 app:layout_constraintTop_toBottomOf="@id/app_drawer"
@@ -201,6 +205,7 @@
                 android:background="#06060606"
                 />
             <TextView
+                android:visibility="gone"
                 android:id="@+id/folders"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
@@ -217,6 +222,7 @@
                 app:layout_constraintStart_toEndOf="@id/icon_folders"
                 app:layout_constraintEnd_toStartOf="@id/next_dock"/>
             <ImageView
+                android:visibility="gone"
                 android:id="@+id/next_folders"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
@@ -227,6 +233,7 @@
                 app:layout_constraintBottom_toBottomOf="@id/folders"
                 app:layout_constraintEnd_toEndOf="parent"/>
             <ImageView
+                android:visibility="gone"
                 android:id="@+id/icon_folders"
                 android:layout_width="50dp"
                 android:layout_height="50dp"

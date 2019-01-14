@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/background_color"
+    android:background="@color/FlatWhite"
     android:focusable="true"
     android:clickable="true">
     <View
@@ -15,7 +15,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:background="@color/FlatRed"
+        android:background="#10000000"
+        android:elevation="10dp"
         app:layout_constraintBottom_toBottomOf="@id/back_button"/>
     <ImageView
         android:id="@+id/back_button"
@@ -26,7 +27,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_back_button"
-        android:tint="@color/a_white"
+        android:tint="@color/FlatRed"
+        android:elevation="10dp"
         />
     <TextView
         android:id="@+id/title"
@@ -44,7 +46,8 @@
         android:gravity="center"
         android:textSize="20dp"
         android:textStyle="bold"
-        android:textColor="@color/a_white"/>
+        android:elevation="10dp"
+        android:textColor="@color/FlatRed"/>
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/scroll_view"
         android:layout_width="0dp"
@@ -52,141 +55,116 @@
         android:layout_marginTop="0dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        app:layout_constraintTop_toBottomOf="@id/back_button"
+
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:id="@+id/linear1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dp_16"
-                android:gravity="center_vertical"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <ImageView
-                    android:id="@+id/imageView1"
-                    android:layout_width="@dimen/dp_16"
-                    android:layout_height="@dimen/dp_16"
-                    android:background="@drawable/home" />
+            android:layout_height="wrap_content"
+            android:paddingBottom="50dp">
+            <ImageView
+                android:id="@+id/app_icon"
+                android:layout_width="105dp"
+                android:layout_height="105dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="91dp"
+                android:src="@drawable/home_gradient"/>
 
                 <TextView
-                    android:id="@+id/textView1"
-                    android:layout_width="@dimen/dp_80"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/dp_4"
-                    android:text="App Name" />
-
-                <TextView
+                    android:id="@+id/name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="ExpectLauncher"
-                    android:textStyle="bold" />
-            </LinearLayout>
+                    android:text="Expect Launcher ™"
+                    android:textStyle="bold"
+                    android:textSize="17sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
 
-            <LinearLayout
-                android:id="@+id/linear2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dp_16"
-                android:gravity="center_vertical"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/linear1">
-
-                <ImageView
-                    android:id="@+id/imageView2"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:background="@drawable/editor" />
-
+                    android:textColor="@color/HeavyRed"
+                    app:layout_constraintTop_toBottomOf="@id/app_icon"/>
                 <TextView
-                    android:id="@+id/textView2"
-                    android:layout_width="@dimen/dp_80"
-                    android:layout_height="wrap_content"
-                    android:text="Version"
-                    android:layout_marginLeft="@dimen/dp_4"/>
-
-                <TextView
+                    android:id="@+id/version"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="1.0.0"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/linear3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:gravity="center_vertical"
+                    android:text="Version 1.12 | Final"
+                    android:textColor="#333"
+                    android:textSize="12sp"
+                    android:layout_marginTop="4dp"
+                    app:layout_constraintTop_toBottomOf="@id/name"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+            <ImageView
+                android:id="@+id/dot_1"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="10dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/linear2">
+                app:layout_constraintEnd_toEndOf="parent"
+                app:srcCompat="@drawable/circle_color_drawable"
+                android:padding="6dp"
+                android:tint="#CCC"
+                app:layout_constraintTop_toBottomOf="@id/version"/>
+            <TextView
+                android:id="@+id/develop_by"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Developed by"
+                android:textColor="#555"
+                android:textStyle="bold"
+                android:layout_marginTop="10dp"
+                android:textSize="12sp"
+                app:layout_constraintTop_toBottomOf="@id/dot_1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+            <TextView
+                android:id="@+id/team"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Team LL"
+                android:textStyle="bold"
+                android:textSize="17sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
 
-                <ImageView
-                    android:id="@+id/imageView3"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:background="@drawable/circle_color_drawable" />
-
-                <TextView
-                    android:id="@+id/textView3"
-                    android:layout_width="@dimen/dp_80"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/dp_4"
-                    android:text="Our Team" />
-
-            </LinearLayout>
-
+                android:textColor="@color/FlatRed"
+                android:padding="5dp"
+                app:layout_constraintTop_toBottomOf="@id/develop_by"/>
+            <TextView
+                android:id="@+id/member"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Member"
+                android:textColor="#555"
+                android:textStyle="bold"
+                android:layout_marginTop="20dp"
+                android:textSize="12sp"
+                app:layout_constraintTop_toBottomOf="@id/team"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:scrollbars="vertical"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/linear3" />
+                app:layout_constraintTop_toBottomOf="@id/member"
 
-            <LinearLayout
-                android:id="@+id/linear4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:gravity="center_vertical"
+                tools:listitem ="@layout/item_team"/>
+            <ImageView
+                android:id="@+id/dot_2"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="10dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/recyclerView">
-
-                <ImageView
-                    android:id="@+id/imageView4"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:background="@drawable/editor" />
-
-                <TextView
-                    android:id="@+id/textView4"
-                    android:layout_width="@dimen/dp_80"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/dp_4"
-                    android:text="Description" />
-
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="@dimen/dp_0"
-                android:layout_marginEnd="@dimen/dp_16"
-                android:layout_marginBottom="@dimen/dp_16"
-                android:text="This application is used for customizing your smart phone's UI..."
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/linear4" />
-
+                app:srcCompat="@drawable/circle_color_drawable"
+                android:padding="6dp"
+                android:tint="#CCC"
+                app:layout_constraintTop_toBottomOf="@id/recyclerView"/>
         </android.support.constraint.ConstraintLayout>
     </android.support.v4.widget.NestedScrollView>
 </android.support.constraint.ConstraintLayout>

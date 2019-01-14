@@ -246,6 +246,12 @@ public class AppDrawerFragment extends Fragment implements View.OnClickListener,
         if(mAdapter!=null) mAdapter.notifyItemChanged(item);
     }
 
+    @Override
+    public void onShowOrHideItem(int item) {
+        mAdapter.backupApps();
+        ((AppLoaderActivity)getActivity()).receiveAppsNow(this);
+    }
+
     /**
      * Hàm này cài đặt GridLayoutManager cho mRecyclerView
      * Tính toán số lượng cột phù hợp để hiển thị vừa vặn độ rộng màn hình

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/background_color"
     android:focusable="true"
     android:clickable="true">
@@ -103,6 +104,7 @@
                 app:layout_constraintBottom_toBottomOf="@id/reload_app"
                 app:layout_constraintEnd_toEndOf="parent"/>
             <TextView
+                android:id="@+id/note"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/reload_app_panel"
@@ -113,6 +115,51 @@
                 android:textStyle="bold"
                 android:textSize="11sp"
                 android:text="Reload app list might help you to apply new system theme to this launcher."/>
+            <View
+                android:id="@+id/restore_app_panel"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintTop_toTopOf="@id/restore_app"
+                app:layout_constraintBottom_toBottomOf="@id/recycler_view"
+                app:layout_constraintStart_toStartOf="@id/icon_restore_app"
+                app:layout_constraintEnd_toEndOf="@id/restore_app"
+                android:background="@drawable/black_rounded_big"/>
+            <ImageView
+                android:id="@+id/icon_restore_app"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                app:srcCompat="@drawable/ic_restore_page_black_24dp"
+                android:paddingTop="13dp"
+                android:paddingBottom="12dp"
+                android:tint="@color/FlatRed"
+                app:layout_constraintTop_toTopOf="@id/restore_app"
+                app:layout_constraintBottom_toBottomOf="@id/restore_app"
+                app:layout_constraintStart_toStartOf="parent"/>
+            <TextView
+                android:id="@+id/restore_app"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:text="@string/restore_app"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textStyle="bold"
+                android:textColor="@color/setting_label_color"
+                android:layout_marginTop="20dp"
+                app:layout_constraintTop_toBottomOf="@id/note"
+                app:layout_constraintStart_toEndOf="@id/icon_restore_app"
+                app:layout_constraintEnd_toEndOf="parent"/>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/restore_app"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:listitem="@layout/choose_app_dialog_app_item"/>
         </android.support.constraint.ConstraintLayout>
     </android.support.v4.widget.NestedScrollView>
 </android.support.constraint.ConstraintLayout>

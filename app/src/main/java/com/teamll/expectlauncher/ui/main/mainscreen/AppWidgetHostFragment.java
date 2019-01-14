@@ -149,6 +149,7 @@ public class AppWidgetHostFragment extends Fragment {
      * Removes the widget displayed by this AppWidgetHostView.
      */
     public void removeWidget(AppWidgetHostView hostView) {
+        mID.remove((Integer) hostView.getAppWidgetId());
         mAppWidgetHost.deleteAppWidgetId(hostView.getAppWidgetId());
         widgetContainer.removeView(hostView);
     }

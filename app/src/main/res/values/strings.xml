@@ -27,4 +27,5 @@
     <string name="remove_last_widget">Remove last widget</string>
     <string name="add_widget">Add Widget</string>
     <string name="reload_app">Reload app list</string>
+    <string name="restore_app">Restore hidden apps</string>
 </resources>

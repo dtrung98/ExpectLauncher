@@ -14,7 +14,7 @@
             android:id="@+id/text_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/BackwardColor"
+            android:textColor="@color/HeavyRed"
             android:layout_marginTop="@dimen/dp_16"
             android:textStyle="bold"/>
 
@@ -22,14 +22,14 @@
             android:id="@+id/text_student_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/Gray"
+            android:textColor="#444"
             android:layout_marginTop="@dimen/dp_8"/>
 
         <TextView
             android:id="@+id/text_school"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/Gray"
+            android:textColor="#444"
             android:layout_marginTop="@dimen/dp_0"
             android:layout_marginBottom="@dimen/dp_16"/>
     </LinearLayout>

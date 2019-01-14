@@ -37,6 +37,9 @@ public abstract class AppLoaderActivity extends AppCompatActivity implements Loa
         }
     }
 
+    public void receiveAppsNow(AppsReceiver receiver) {
+        if(mData.size()!=0) receiver.onLoadComplete(mData);
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,6 +85,7 @@ public abstract class AppLoaderActivity extends AppCompatActivity implements Loa
         void onLoadComplete(ArrayList<App> data);
         void onLoadReset();
     }
+
     public static class MyBounceInterpolator implements android.view.animation.Interpolator {
         private double mAmplitude = 1;
         private double mFrequency = 10;

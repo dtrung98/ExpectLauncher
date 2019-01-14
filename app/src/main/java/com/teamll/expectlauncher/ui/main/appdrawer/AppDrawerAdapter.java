@@ -65,7 +65,7 @@ import butterknife.OnClick;
 
 public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.ViewHolder> implements ItemTouchHelperAdapter, Filterable {
     private static final String TAG="AppDrawerAdapter";
-
+    private ArrayList<App> mBackup = new ArrayList<>();
     private ArrayList<App> mData = new ArrayList<>();
     private ArrayList<App> mFilterData = new ArrayList<>();
 
@@ -130,8 +130,14 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
     public void setData(List<App> data) {
       //  Log.d(TAG, "setData");
         mData.clear();
+        mBackup.clear();
         if (data!=null) {
-            mData.addAll(data);
+            mBackup.addAll(data);
+            for (App app:
+                 data) {
+                if (!app.getAppSavedInstance().isHidden())   mData.add(app);
+            }
+
         }
         notifyDataSetChanged();
     }
@@ -573,7 +579,7 @@ public class AppDrawerAdapter extends RecyclerView.Adapter<AppDrawerAdapter.View
     public void backupApps() {
 
         Log.d(TAG, "backupApps");
-        ExpectLauncher.getInstance().getPreferencesUtility().saveAppInstance(mData);
+        ExpectLauncher.getInstance().getPreferencesUtility().saveAppInstance(mBackup);
     }
 
     public void restoreApps() {

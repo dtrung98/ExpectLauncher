@@ -1,5 +1,6 @@
 package com.teamll.expectlauncher.ui.main.setting;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -27,22 +28,27 @@ public class AboutSetting extends SupportFragment {
     @BindView(R.id.back_button)
     ImageView mBackButton;
     RecyclerView mRecyclerView;
+
+    @BindView(R.id.title) TextView mTitle;
+    @BindView(R.id.name) TextView mName;
+    @BindView(R.id.team) TextView mTeam;
+
     RecyclerView.LayoutManager mLayoutManager;
     RecyclerView.Adapter mAdapter;
-    private int[] mIConID = {};
 
     ArrayList<String[]> infor = new ArrayList<String[]>();
 
     public AboutSetting() {
         infor.add(new String[]{"Lê Đình Trung", "1612751", "Đại học KHTN, Tp. Hồ Chí Minh"});
-        infor.add(new String[]{"Nguyễn Hữu Tứ", "1612772", "Đại học KHTN, Tp. Hồ Chí Minh"});
         infor.add(new String[]{"Lê Văn Tư", "1612770", "Đại học KHTN, Tp. Hồ Chí Minh"});
+        infor.add(new String[]{"Nguyễn Hữu Tứ", "1612772", "Đại học KHTN, Tp. Hồ Chí Minh"});
         infor.add(new String[]{"Nguyễn Anh Tuấn", "1612788", "Đại học KHTN, Tp. Hồ Chí Minh"});
         infor.add(new String[]{"Phạm Hữu Hoàng Việt", "1612810", "Đại học KHTN, Tp. Hồ Chí Minh"});
     }
 
     @BindView(R.id.background_toolbar)
     View mBackgroundToobar;
+
     @OnClick(R.id.back_button)
     void back() {
         getMainActivity().dismiss();
@@ -51,35 +57,36 @@ public class AboutSetting extends SupportFragment {
     @Nullable
     @Override
     protected View onCreateView(LayoutInflater inflater, ViewGroup container) {
-        View v = inflater.inflate(R.layout.about_setting,container,false);
-
-        mRecyclerView = (RecyclerView) v.findViewById(R.id.recyclerView);
-
-        mLayoutManager = new LinearLayoutManager(getContext());
-        mRecyclerView.setLayoutManager(mLayoutManager);
-
-        mAdapter = new TeamAdapter(infor);
-        mRecyclerView.setAdapter(mAdapter);
-
-        return v;
+        return  inflater.inflate(R.layout.about_setting,container,false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this,view);
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
+
+        mLayoutManager = new LinearLayoutManager(getContext());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        mAdapter = new TeamAdapter(infor);
+        mRecyclerView.setAdapter(mAdapter);
+        applyTheme();
+    }
+    private void applyTheme() {
         int color = Tool.getSurfaceColor();
-        mBackgroundToobar.setBackgroundColor(color);
-        for (int id :
-                mIConID) {
-            ((ImageView)view.findViewById(id)).setColorFilter(color);
-        }
+        int heavy = Tool.getHeavyColor();
+        mBackButton.setColorFilter(color);
+        mTitle.setTextColor(color);
+
+        mName.setTextColor(heavy);
+        mTeam.setTextColor(color);
 
     }
 
     @Override
     public boolean isWhiteTheme() {
-        return false;
+        return true;
     }
 
     @Override
@@ -123,6 +130,7 @@ public class AboutSetting extends SupportFragment {
         @Override
         public void onBindViewHolder(MyViewHolder holder, int position) {
             holder.mName.setText(mDataset.get(position)[0]);
+            holder.mName.setTextColor(Tool.getHeavyColor());
             holder.mStudentId.setText(mDataset.get(position)[1]);
             holder.mSchool.setText(mDataset.get(position)[2]);
         }

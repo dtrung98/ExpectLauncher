@@ -161,7 +161,8 @@ public class EditAppConfigBottomSheet extends BottomSheetDialogFragment implemen
     }
 
     public interface UpdateItemListener {
-        public void onUpdateItem(int item);
+        void onUpdateItem(int item);
+        void onShowOrHideItem(int item);
     }
 
     public static EditAppConfigBottomSheet newInstance(UpdateItemListener listener,App app,int index) {
@@ -230,10 +231,16 @@ public class EditAppConfigBottomSheet extends BottomSheetDialogFragment implemen
             mHideAlertIcon.setVisibility(View.VISIBLE);
             mHideAlertText.setVisibility(View.VISIBLE);
             mSwitch.setTextColor(color);
+            mApp.getAppSavedInstance().setHidden(true);
+            if(mListener!=null) mListener.onShowOrHideItem(mIndex);
+
         } else {
             mHideAlertText.setVisibility(View.GONE);
             mHideAlertIcon.setVisibility(View.GONE);
             mSwitch.setTextColor(0xFF888888);
+            mApp.getAppSavedInstance().setHidden(false);
+
+            if(mListener!=null) mListener.onShowOrHideItem(mIndex);
         }
     }
 

@@ -3,6 +3,8 @@ package com.teamll.expectlauncher.ui.main.setting;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,14 +23,23 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class ApplicationSetting extends SupportFragment implements AppLoaderActivity.AppsReceiver {
+public class ApplicationSetting extends SupportFragment implements AppLoaderActivity.AppsReceiver,ShowHiddenAppAdapter.onItemClick {
     @BindView(R.id.back_button)
     ImageView mBackButton;
 
     @BindView(R.id.next_reload_app)
     MKLoader mLoading;
 
-    private int[] mIConID = {R.id.icon_reload_app};
+    @BindView(R.id.icon_restore_app) View mIconRestore;
+    @BindView(R.id.restore_app) View mRestoreApp;
+    @BindView(R.id.restore_app_panel) View mRestoreAppPanel;
+
+    private int[] mIConID = {R.id.icon_reload_app,R.id.icon_restore_app};
+
+    @BindView(R.id.recycler_view)
+    RecyclerView mRecyclerview;
+
+    ShowHiddenAppAdapter mAdapter;
 
     @BindView(R.id.background_toolbar)
     View mBackgroundToobar;
@@ -61,6 +72,15 @@ public class ApplicationSetting extends SupportFragment implements AppLoaderActi
             ((ImageView)view.findViewById(id)).setColorFilter(color);
         }
 
+        mAdapter = new ShowHiddenAppAdapter();
+        mAdapter.setOnItemClick(this);
+        mRecyclerview.setAdapter(mAdapter);
+        mRecyclerview.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
+      //  refreshData();
+    }
+    public void refreshData() {
+        getMainActivity().receiveAppsNow(this);
+
     }
 
     @Override
@@ -90,14 +110,30 @@ public class ApplicationSetting extends SupportFragment implements AppLoaderActi
 
     @Override
     public void onLoadComplete(ArrayList<App> data) {
+        mAdapter.setData(data);
         if(mLoading!=null&&mLoading.getVisibility()==View.VISIBLE) {
             mLoading.setVisibility(View.GONE);
             mLoading.postDelayed(() -> getMainActivity().getNavigationController().popToRootFragment(),300);
         }
+
+
     }
 
     @Override
     public void onLoadReset() {
 
+    }
+
+    @Override
+    public void onItemClick(App app, int pos) {
+        app.getAppSavedInstance().setHidden(false);
+        refreshData();
+    }
+
+    @Override
+    public void onNoHiddenApp() {
+        mRestoreApp.setVisibility(View.GONE);
+        mRestoreAppPanel.setVisibility(View.GONE);
+        mIconRestore.setVisibility(View.GONE);
     }
 }
