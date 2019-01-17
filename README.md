@@ -42,9 +42,9 @@ src="https://user-images.githubusercontent.com/33343210/50539489-ad890380-0bb3-1
 </br>
 
 ## Installing
-##### Download Apk from [here](https://github.com/dtrung98/Source/raw/master/expect_launcher_29_12.apk) or go to the link below, support from Android 4.2 (API 17), up to android P.
+##### Download Apk from [here](https://github.com/dtrung98/Source/raw/master/expect_launcher_14_01.apk) or go to the link below, support from Android 4.2 (API 17), up to android P.
 ```
-https://github.com/dtrung98/Source/raw/master/expect_launcher_29_12.apk
+https://github.com/dtrung98/Source/raw/master/expect_launcher_14_01.apk
 ```
 ## Build
 
